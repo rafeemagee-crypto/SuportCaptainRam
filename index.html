@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Captain Ram – Support the Channel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #e0e0e8; font-family: 'Rajdhani', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px); pointer-events: none; z-index: 0; }
+  .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  .container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  .header { text-align: center; margin-bottom: 56px; }
+  .logo-ring { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #00c8ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 24px rgba(0,200,255,0.25), inset 0 0 24px rgba(0,200,255,0.08); animation: pulse 3s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 24px rgba(0,200,255,0.25), inset 0 0 24px rgba(0,200,255,0.08); } 50% { box-shadow: 0 0 40px rgba(0,200,255,0.45), inset 0 0 32px rgba(0,200,255,0.15); } }
+  .logo-text { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900; color: #00c8ff; letter-spacing: 2px; }
+  .site-title { font-family: 'Orbitron', monospace; font-size: clamp(26px, 5vw, 46px); font-weight: 900; color: #ffffff; letter-spacing: 4px; text-transform: uppercase; line-height: 1.1; margin-bottom: 8px; }
+  .site-title span { color: #00c8ff; }
+  .tagline { font-size: 15px; font-weight: 500; color: #7a8a9a; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+  .divider { width: 120px; height: 1px; background: linear-gradient(90deg, transparent, #00c8ff, transparent); margin: 0 auto; }
+  .channels { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px; }
+  .channel-badge { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; background: rgba(255,255,255,0.03); text-decoration: none; transition: all 0.2s; cursor: pointer; }
+  .channel-badge:hover { border-color: rgba(0,200,255,0.5); background: rgba(0,200,255,0.06); transform: translateY(-2px); }
+  .ch-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .ch-label { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: #aab8c8; }
+  .ch-name { font-size: 15px; font-weight: 600; color: #e0e8f0; }
+  .goal-section { max-width: 620px; margin: 0 auto 52px; border: 1px solid rgba(0,200,255,0.2); border-radius: 6px; background: rgba(0,200,255,0.04); padding: 24px 28px; }
+  .goal-section.hidden { display: none; }
+  .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .goal-ship { display: flex; align-items: center; gap: 10px; }
+  .goal-ship-icon { font-size: 22px; }
+  .goal-title { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; }
+  .goal-subtitle { font-size: 12px; color: #4a7a9a; letter-spacing: 1px; margin-top: 2px; }
+  .goal-amounts { text-align: right; }
+  .goal-current { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #00e5ff; text-shadow: 0 0 10px rgba(0,229,255,0.5); }
+  .goal-target { font-size: 12px; color: #4a7a9a; letter-spacing: 1px; }
+  .goal-bar-track { width: 100%; height: 14px; background: rgba(0,200,255,0.08); border-radius: 7px; border: 1px solid rgba(0,200,255,0.15); margin: 14px 0 10px; overflow: hidden; }
+  .goal-bar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, #0077aa, #00c8ff, #00f0ff); box-shadow: 0 0 12px rgba(0,200,255,0.5); transition: width 1s ease; position: relative; }
+  .goal-bar-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25)); border-radius: 0 7px 7px 0; animation: shimmer-bar 2s ease-in-out infinite; }
+  @keyframes shimmer-bar { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+  .goal-footer { display: flex; justify-content: space-between; align-items: center; }
+  .goal-percent { font-family: 'Orbitron', monospace; font-size: 11px; color: #00c8ff; letter-spacing: 2px; }
+  .goal-label { font-size: 11px; color: #3a5a6a; letter-spacing: 1px; text-transform: uppercase; }
+  .goal-complete { display: none; text-align: center; margin-top: 10px; }
+  .goal-complete.show { display: block; }
+  .goal-complete-text { font-family: 'Orbitron', monospace; font-size: 12px; color: #00ff88; letter-spacing: 3px; animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .admin-panel { display: none; max-width: 620px; margin: -36px auto 48px; background: rgba(255,100,0,0.05); border: 1px solid rgba(255,100,0,0.2); border-radius: 6px; padding: 20px 24px; }
+  .admin-panel.visible { display: block; }
+  .admin-label { font-size: 11px; color: #ff6400; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .admin-section { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,100,0,0.15); }
+  .admin-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .admin-section-label { font-size: 10px; color: #ff9060; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .admin-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .admin-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,100,0,0.3); border-radius: 3px; color: #e0e8f0; font-family: 'Orbitron', monospace; font-size: 12px; padding: 8px 12px; outline: none; }
+  .admin-input-name { width: 200px; }
+  .admin-input-sub { width: 200px; }
+  .admin-input-price { width: 100px; }
+  .admin-input-amount { width: 120px; }
+  .admin-btn { padding: 8px 16px; background: rgba(255,100,0,0.15); border: 1px solid rgba(255,100,0,0.4); border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; color: #ff8040; cursor: pointer; letter-spacing: 1px; transition: all 0.15s; white-space: nowrap; }
+  .admin-btn:hover { background: rgba(255,100,0,0.28); }
+  .admin-btn.toggle-off { background: rgba(255,50,50,0.15); border-color: rgba(255,50,50,0.4); color: #ff5050; }
+  .admin-btn.toggle-off:hover { background: rgba(255,50,50,0.28); }
+  .admin-btn.toggle-on { background: rgba(0,200,100,0.15); border-color: rgba(0,200,100,0.4); color: #00cc66; }
+  .admin-btn.toggle-on:hover { background: rgba(0,200,100,0.28); }
+  .admin-btn.save-btn { background: rgba(0,200,255,0.15); border-color: rgba(0,200,255,0.4); color: #00c8ff; }
+  .admin-btn.save-btn:hover { background: rgba(0,200,255,0.28); }
+  .section-head { text-align: center; margin-bottom: 32px; }
+  .section-head h2 { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; margin-bottom: 6px; }
+  .section-head p { font-size: 15px; color: #6a7a8a; letter-spacing: 1px; }
+  .amounts { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .amount-btn { padding: 12px 24px; border: 2px solid #00e5ff; border-radius: 3px; background: rgba(0,220,255,0.18); color: #ffffff; font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 900; cursor: pointer; transition: all 0.15s; letter-spacing: 2px; box-shadow: 0 0 16px rgba(0,220,255,0.35), inset 0 0 12px rgba(0,220,255,0.15); text-shadow: 0 0 10px rgba(0,240,255,1), 0 0 20px rgba(0,200,255,0.7); }
+  .amount-btn:hover, .amount-btn.active { background: rgba(0,220,255,0.32); border-color: #00f0ff; box-shadow: 0 0 28px rgba(0,220,255,0.65), inset 0 0 18px rgba(0,220,255,0.25); color: #ffffff; text-shadow: 0 0 14px rgba(0,255,255,1), 0 0 28px rgba(0,220,255,1); transform: translateY(-2px); }
+  .custom-row { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
+  .custom-prefix { display: flex; align-items: center; justify-content: center; height: 42px; padding: 0 12px; background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.35); border-right: none; border-radius: 3px 0 0 3px; color: #00e5ff; font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 700; text-shadow: 0 0 8px rgba(0,220,255,0.8); flex-shrink: 0; }
+  .custom-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,200,255,0.2); border-radius: 0 3px 3px 0; color: #e0e8f0; font-family: 'Orbitron', monospace; font-size: 14px; padding: 11px 14px; width: 140px; height: 42px; outline: none; transition: border-color 0.2s; }
+  .custom-input:focus { border-color: #00c8ff; }
+  .custom-input::placeholder { color: #3a4a5a; }
+  .donate-main { display: block; width: 100%; max-width: 400px; margin: 0 auto 56px; padding: 18px; background: rgba(0,220,255,0.18); border: 2px solid #00e5ff; border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; box-shadow: 0 0 18px rgba(0,220,255,0.38), inset 0 0 14px rgba(0,220,255,0.15); text-shadow: 0 0 10px rgba(0,240,255,1), 0 0 22px rgba(0,200,255,0.8); }
+  .donate-main::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,220,255,0.3), transparent); transition: left 0.4s; }
+  .donate-main:hover::before { left: 100%; }
+  .donate-main:hover { background: #00c8ff; color: #0a0a0f; text-shadow: none; box-shadow: 0 0 36px rgba(0,200,255,0.65); border-color: #00f0ff; transform: translateY(-1px); }
+  .donate-main:active { transform: translateY(0); }
+  .msg-section { text-align: center; margin-bottom: 40px; }
+  .msg-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #4a5a6a; margin-bottom: 8px; display: block; }
+  .msg-input { width: 100%; max-width: 480px; display: block; margin: 0 auto; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 3px; color: #c0c8d0; font-family: 'Rajdhani', sans-serif; font-size: 15px; padding: 12px 14px; resize: none; outline: none; transition: border-color 0.2s; }
+  .msg-input:focus { border-color: rgba(0,200,255,0.3); }
+  .msg-input::placeholder { color: #2a3a4a; }
+  .venmo-card { max-width: 480px; margin: 0 auto 56px; border: 1px solid rgba(0,200,255,0.15); border-radius: 4px; background: rgba(0,200,255,0.04); padding: 28px; text-align: center; }
+  .venmo-logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .venmo-icon { width: 32px; height: 32px; }
+  .venmo-wordmark { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: #008cff; letter-spacing: 2px; }
+  .venmo-handle { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #ffffff; margin-bottom: 6px; }
+  .venmo-sub { font-size: 13px; color: #4a6a8a; letter-spacing: 1px; margin-bottom: 20px; }
+  .venmo-btn { display: inline-block; padding: 12px 32px; background: #008cff; border-radius: 3px; color: #ffffff; font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-decoration: none; cursor: pointer; border: none; transition: all 0.15s; }
+  .venmo-btn:hover { background: #0070cc; box-shadow: 0 0 20px rgba(0,140,255,0.3); transform: translateY(-1px); }
+  .support-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 56px; }
+  .support-card { border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; background: rgba(255,255,255,0.02); padding: 20px; transition: border-color 0.2s; }
+  .support-card:hover { border-color: rgba(0,200,255,0.25); }
+  .support-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .support-card h3 { font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #00c8ff; margin-bottom: 6px; }
+  .support-card p { font-size: 14px; color: #6a7a8a; line-height: 1.5; font-weight: 400; }
+  .footer { text-align: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px; }
+  .footer p { font-size: 13px; color: #3a4a5a; letter-spacing: 1px; }
+  .footer span { color: #00c8ff; }
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { border: 1px solid #00c8ff; border-radius: 4px; background: #0d0d18; padding: 40px 32px; text-align: center; max-width: 360px; box-shadow: 0 0 60px rgba(0,200,255,0.15); }
+  .confirm-box h2 { font-family: 'Orbitron', monospace; font-size: 20px; color: #00c8ff; margin-bottom: 12px; letter-spacing: 2px; }
+  .confirm-box p { font-size: 15px; color: #8898a8; margin-bottom: 20px; line-height: 1.6; }
+  .confirm-countdown { font-family: 'Orbitron', monospace; font-size: 13px; color: #00c8ff; letter-spacing: 2px; margin-bottom: 20px; }
+  .confirm-close { padding: 10px 28px; background: #00c8ff; border: none; border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; color: #0a0a0f; cursor: pointer; letter-spacing: 2px; }
+  .confirm-close:hover { background: #22d8ff; }
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="grid-bg"></div>
+<div class="container">
+  <header class="header">
+    <div class="logo-ring"><span class="logo-text">CR</span></div>
+    <h1 class="site-title">Captain <span>Ram</span></h1>
+    <p class="tagline">Support the Creator</p>
+    <div class="divider"></div>
+  </header>
+  <div class="channels">
+    <a class="channel-badge" href="https://www.youtube.com/channel/UCJC6Zz794_UNz4SaDop-Hpg" target="_blank">
+      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#ff4444"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+      <div><div class="ch-label">YouTube Gaming</div><div class="ch-name">RamPlayz</div></div>
+    </a>
+    <a class="channel-badge" href="https://www.twitch.tv/cptram2_0" target="_blank">
+      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#9146ff"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+      <div><div class="ch-label">Twitch Live</div><div class="ch-name">Cptram2_0</div></div>
+    </a>
+    <a class="channel-badge" href="https://www.youtube.com/channel/UCaHL7qk2e8TX_2iRwkwFuAQ" target="_blank">
+      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#00c8ff"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+      <div><div class="ch-label">Projects & DIY</div><div class="ch-name">RamCreates</div></div>
+    </a>
+  </div>
+  <div class="goal-section" id="goalSection">
+    <div class="goal-header">
+      <div class="goal-ship">
+        <span class="goal-ship-icon">🚀</span>
+        <div>
+          <div class="goal-title" id="goalName">Aurora Mk II</div>
+          <div class="goal-subtitle" id="goalSub">Current Mission · Star Citizen</div>
+        </div>
+      </div>
+      <div class="goal-amounts">
+        <div class="goal-current" id="goalCurrent">$0</div>
+        <div class="goal-target" id="goalTargetLabel">of $56 goal</div>
+      </div>
+    </div>
+    <div class="goal-bar-track">
+      <div class="goal-bar-fill" id="goalBar" style="width:0%"></div>
+    </div>
+    <div class="goal-footer">
+      <div class="goal-percent" id="goalPercent">0% FUNDED</div>
+      <div class="goal-label">Help Ram fly ✦</div>
+    </div>
+    <div class="goal-complete" id="goalComplete">
+      <span class="goal-complete-text" id="goalCompleteText">🚀 MISSION FUNDED — AURORA MK II COMPLETE! 🚀</span>
+    </div>
+  </div>
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-label">⚙ Goal Admin Controls</div>
+    <div class="admin-section">
+      <div class="admin-section-label">✦ Change Goal Name & Target</div>
+      <div class="admin-row">
+        <input class="admin-input admin-input-name" type="text" id="adminName" placeholder="Goal name (e.g. New GPU)"/>
+        <input class="admin-input admin-input-sub" type="text" id="adminSub" placeholder="Subtitle (e.g. Hardware Upgrade)"/>
+        <input class="admin-input admin-input-price" type="number" id="adminPrice" placeholder="$ goal" min="1"/>
+        <button class="admin-btn save-btn" onclick="saveGoalInfo()">Save Goal</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-label">✦ Update Current Amount Raised</div>
+      <div class="admin-row">
+        <span style="color:#ff8040;font-family:'Orbitron',monospace;font-size:14px;">$</span>
+        <input class="admin-input admin-input-amount" type="number" id="adminAmount" placeholder="0.00" min="0" step="0.01"/>
+        <button class="admin-btn" onclick="updateGoal()">Update</button>
+        <button class="admin-btn" onclick="resetGoal()">Reset to $0</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-label">✦ Goal Visibility</div>
+      <div class="admin-row">
+        <button class="admin-btn toggle-off" id="toggleBtn" onclick="toggleGoal()">Hide Goal</button>
+      </div>
+    </div>
+  </div>
+  <section>
+    <div class="section-head">
+      <h2>Choose an Amount</h2>
+      <p>Every contribution powers the next build</p>
+    </div>
+    <div class="amounts">
+      <button class="amount-btn" onclick="selectAmount(this, 3)">$3</button>
+      <button class="amount-btn" onclick="selectAmount(this, 5)">$5</button>
+      <button class="amount-btn" onclick="selectAmount(this, 10)">$10</button>
+      <button class="amount-btn" onclick="selectAmount(this, 25)">$25</button>
+      <button class="amount-btn" onclick="selectAmount(this, 50)">$50</button>
+    </div>
+    <div class="custom-row">
+      <div class="custom-prefix">$</div>
+      <input class="custom-input" type="number" id="customAmt" placeholder="Custom" min="1" oninput="clearPresets()" />
+    </div>
+    <div class="msg-section">
+      <label class="msg-label">Leave a message (optional)</label>
+      <textarea class="msg-input" id="msgBox" rows="3" placeholder="Say hi, share a suggestion, or just send good vibes..."></textarea>
+    </div>
+    <button class="donate-main" onclick="handleDonate()">Send Support via Venmo</button>
+  </section>
+  <div class="venmo-card">
+    <div class="venmo-logo">
+      <svg class="venmo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#008cff" d="M19.05 1.75c.525 1.05.75 2.1.75 3.45 0 4.275-3.675 9.825-6.675 13.8H6.525L3.75 2.5l5.7-.525 1.425 11.4c1.35-2.175 3-5.625 3-7.5 0-1.2-.225-2.025-.6-2.7L19.05 1.75z"/>
+      </svg>
+      <span class="venmo-wordmark">Venmo</span>
+    </div>
+    <div class="venmo-handle">@CptRam</div>
+    <div class="venmo-sub">Tap to open Venmo directly on your device</div>
+    <button class="venmo-btn" onclick="handleDonate()">Open in Venmo</button>
+  </div>
+  <div class="support-grid">
+    <div class="support-card"><span class="support-icon">🎮</span><h3>Gaming Content</h3><p>Helps fund new games, gear, and stream upgrades for RamPlayz &amp; Cptram2_0.</p></div>
+    <div class="support-card"><span class="support-icon">🔧</span><h3>DIY Builds</h3><p>Covers materials and tools for the next wild project on the build channel.</p></div>
+    <div class="support-card"><span class="support-icon">⚡</span><h3>Keep the Lights On</h3><p>Equipment, software, and hosting keep the content flowing every week.</p></div>
+  </div>
+  <footer class="footer">
+    <p>Made with love for the <span>Captain Ram</span> community &bull; YouTube: <span>RamPlayz</span> &amp; <span>RamCreates</span> &bull; Twitch: <span>Cptram2_0</span></p>
+  </footer>
+</div>
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h2>Thanks!</h2>
+    <p>Opening Venmo now. Every bit of support means the world — see you in the stream!</p>
+    <div class="confirm-countdown" id="countdown">Redirecting in 3...</div>
+    <button class="confirm-close" onclick="goNow()">Open Venmo Now</button>
+  </div>
+</div>
+<script>
+  const DEFAULT_NAME  = 'Aurora Mk II';
+  const DEFAULT_SUB   = 'Current Mission · Star Citizen';
+  const DEFAULT_PRICE = 56;
+
+  let goalName    = localStorage.getItem('goalName')  || DEFAULT_NAME;
+  let goalSub     = localStorage.getItem('goalSub')   || DEFAULT_SUB;
+  let goalPrice   = parseFloat(localStorage.getItem('goalPrice') || DEFAULT_PRICE);
+  let currentAmount = parseFloat(localStorage.getItem('goalAmount') || '0');
+  let goalVisible = localStorage.getItem('goalVisible') !== 'false';
+  let selectedAmount = null;
+  let countdownTimer = null;
+  let venmoUrl = '';
+
+  function applyGoalInfo() {
+    document.getElementById('goalName').textContent = goalName;
+    document.getElementById('goalSub').textContent = goalSub;
+    document.getElementById('goalTargetLabel').textContent = 'of $' + goalPrice + ' goal';
+    document.getElementById('goalCompleteText').textContent =
+      '🚀 MISSION FUNDED — ' + goalName.toUpperCase() + ' COMPLETE! 🚀';
+    document.getElementById('adminName').value = goalName;
+    document.getElementById('adminSub').value = goalSub;
+    document.getElementById('adminPrice').value = goalPrice;
+  }
+
+  function saveGoalInfo() {
+    const name  = document.getElementById('adminName').value.trim();
+    const sub   = document.getElementById('adminSub').value.trim();
+    const price = parseFloat(document.getElementById('adminPrice').value);
+    if (name)  { goalName  = name;  localStorage.setItem('goalName', name); }
+    if (sub)   { goalSub   = sub;   localStorage.setItem('goalSub', sub); }
+    if (!isNaN(price) && price > 0) {
+      goalPrice = price;
+      localStorage.setItem('goalPrice', price);
+      currentAmount = 0;
+      localStorage.setItem('goalAmount', '0');
+      document.getElementById('adminAmount').value = '';
+    }
+    applyGoalInfo();
+    renderGoal();
+  }
+
+  function renderGoal() {
+    const pct = Math.min(100, (currentAmount / goalPrice) * 100);
+    document.getElementById('goalBar').style.width = pct + '%';
+    document.getElementById('goalCurrent').textContent = '$' + currentAmount.toFixed(0);
+    document.getElementById('goalPercent').textContent = Math.round(pct) + '% FUNDED';
+    if (currentAmount >= goalPrice) {
+      document.getElementById('goalComplete').classList.add('show');
+      document.getElementById('goalBar').style.background = 'linear-gradient(90deg, #00aa55, #00ff88)';
+      document.getElementById('goalBar').style.boxShadow = '0 0 14px rgba(0,255,136,0.6)';
+    } else {
+      document.getElementById('goalComplete').classList.remove('show');
+      document.getElementById('goalBar').style.background = 'linear-gradient(90deg, #0077aa, #00c8ff, #00f0ff)';
+      document.getElementById('goalBar').style.boxShadow = '0 0 12px rgba(0,200,255,0.5)';
+    }
+  }
+
+  function applyVisibility() {
+    const section = document.getElementById('goalSection');
+    const btn = document.getElementById('toggleBtn');
+    if (goalVisible) {
+      section.classList.remove('hidden');
+      btn.textContent = 'Hide Goal';
+      btn.classList.remove('toggle-on');
+      btn.classList.add('toggle-off');
+    } else {
+      section.classList.add('hidden');
+      btn.textContent = 'Show Goal';
+      btn.classList.remove('toggle-off');
+      btn.classList.add('toggle-on');
+    }
+  }
+
+  function toggleGoal() {
+    goalVisible = !goalVisible;
+    localStorage.setItem('goalVisible', goalVisible);
+    applyVisibility();
+  }
+
+  function updateGoal() {
+    const val = parseFloat(document.getElementById('adminAmount').value);
+    if (!isNaN(val) && val >= 0) {
+      currentAmount = val;
+      localStorage.setItem('goalAmount', val);
+      renderGoal();
+    }
+  }
+
+  function resetGoal() {
+    currentAmount = 0;
+    localStorage.setItem('goalAmount', '0');
+    document.getElementById('adminAmount').value = '';
+    renderGoal();
+  }
+
+  function selectAmount(btn, amt) {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedAmount = amt;
+    document.getElementById('customAmt').value = '';
+  }
+
+  function clearPresets() {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    selectedAmount = null;
+  }
+
+  function buildVenmoUrl() {
+    const amt = selectedAmount || parseFloat(document.getElementById('customAmt').value) || null;
+    const note = encodeURIComponent(document.getElementById('msgBox').value || 'Supporting Captain Ram!');
+    let url = 'https://www.venmo.com/u/CptRam';
+    if (amt) url += '?txn=pay&amount=' + amt + '&note=' + note;
+    return url;
+  }
+
+  function handleDonate() {
+    venmoUrl = buildVenmoUrl();
+    document.getElementById('confirmOverlay').classList.add('show');
+    startCountdown();
+  }
+
+  function startCountdown() {
+    let secs = 3;
+    const el = document.getElementById('countdown');
+    el.textContent = 'Redirecting in ' + secs + '...';
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(function() {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(countdownTimer);
+        el.textContent = 'Opening Venmo...';
+        window.open(venmoUrl, '_blank');
+        setTimeout(closeConfirm, 1000);
+      } else {
+        el.textContent = 'Redirecting in ' + secs + '...';
+      }
+    }, 1000);
+  }
+
+  function goNow() {
+    clearInterval(countdownTimer);
+    window.open(venmoUrl, '_blank');
+    closeConfirm();
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    document.getElementById('countdown').textContent = 'Redirecting in 3...';
+  }
+
+  if (window.location.search.includes('admin=1')) {
+    document.getElementById('adminPanel').classList.add('visible');
+  }
+
+  applyGoalInfo();
+  applyVisibility();
+  setTimeout(renderGoal, 300);
+</script>
+</body>
+</html>
