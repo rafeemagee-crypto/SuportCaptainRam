@@ -821,7 +821,8 @@ section {
   height: 10px;
   border-radius: 50%;
 }
-.pip.gold    { background: #00c8ff; box-shadow: 0 0 6px rgba(0,200,255,0.6); }
+.pip.gold    { background: #C8960A; box-shadow: 0 0 6px rgba(200,150,10,0.5); }
+.pip.slate   { background: #5a8aaa; }
 .pip.silver  { background: #8A8A8A; }
 .pip.teal    { background: #1D9E75; }
 .pip.dim     { background: var(--border); }
@@ -1319,85 +1320,104 @@ footer {
 <section class="ranks" id="ranks">
   <div class="section-tag">Command Structure</div>
   <div class="section-title">Rank Table</div>
-  <p class="section-sub">Nine ranks across three tiers. Promotion is earned through participation, contribution, and Standing Points — never just time served.</p>
+  <p class="section-sub">Ten ranks across four tiers. Promotion is earned through participation, contribution, and Standing Points — never just time served.</p>
 
   <table class="rank-table">
     <thead>
       <tr>
         <th>Rank</th>
+        <th>Abbr</th>
         <th>Tier</th>
         <th>Pips</th>
         <th>Summary</th>
-        <th>SP Threshold</th>
+        <th>Promotion</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="rank-name-cell">Admiral</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">ADM</td>
         <td><span class="tier-badge tier-command">Command</span></td>
         <td><div class="pips"><div class="pip diamond"></div><div class="pip diamond"></div><div class="pip diamond"></div></div></td>
-        <td>Org founder. Final authority. Sets strategy.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--text3);">Founder</span></td>
+        <td>Org founder. Absolute final authority. Sets org vision.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#C8960A;">Founder only</td>
       </tr>
       <tr>
         <td class="rank-name-cell">Fleet Commander</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">FC</td>
         <td><span class="tier-badge tier-command">Command</span></td>
         <td><div class="pips"><div class="pip gold"></div><div class="pip gold"></div><div class="pip gold"></div></div></td>
-        <td>Leads multi-ship operations. Manages division heads.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">Appointed</span></td>
+        <td>Commands full fleet. Acts as Admiral when absent. ★ Sector Commander eligible.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#C8960A;">Admiral only</td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Strike Leader</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">SL</td>
+        <td><span class="tier-badge tier-command">Command</span></td>
+        <td><div class="pips"><div class="pip gold"></div><div class="pip gold"></div><div class="pip dim"></div></div></td>
+        <td>Commands a squadron of ships. Tactical lead in the field. ★ Sector Commander eligible.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#C8960A;">Admiral approval</td>
       </tr>
       <tr>
         <td class="rank-name-cell">Captain</td>
-        <td><span class="tier-badge tier-command">Command</span></td>
-        <td><div class="pips"><div class="pip gold"></div><div class="pip gold"></div><div class="pip dim"></div></div></td>
-        <td>Commands a vessel or squadron. Runs org events.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">Appointed</span></td>
-      </tr>
-      <tr>
-        <td class="rank-name-cell">Division Head</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">CPT</td>
         <td><span class="tier-badge tier-officer">Officer</span></td>
         <td><div class="pips"><div class="pip silver"></div><div class="pip silver"></div><div class="pip silver"></div></div></td>
-        <td>Leads a division. Recruits, trains, assigns.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">60 SP</span></td>
+        <td>Full command of a vessel and crew. Files after-action reports.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#185FA5;">FC + Admiral</td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Commander</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">CMD</td>
+        <td><span class="tier-badge tier-officer">Officer</span></td>
+        <td><div class="pips"><div class="pip silver"></div><div class="pip silver"></div><div class="pip dim"></div></div></td>
+        <td>Senior officer. Runs division ops. Can command a ship if no Captain present.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#185FA5;">Captain + Admiral</td>
       </tr>
       <tr>
         <td class="rank-name-cell">Lieutenant</td>
-        <td><span class="tier-badge tier-officer">Officer</span></td>
-        <td><div class="pips"><div class="pip silver"></div><div class="pip silver"></div><div class="pip dim"></div></div></td>
-        <td>Deputy to Division Head. Coordination & mentoring.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">60 SP</span></td>
-      </tr>
-      <tr>
-        <td class="rank-name-cell">Specialist</td>
-        <td><span class="tier-badge tier-officer">Officer</span></td>
-        <td><div class="pips"><div class="pip silver"></div><div class="pip dim"></div><div class="pip dim"></div></div></td>
-        <td>Expert in their role. Mentors crew members.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">40 SP</span></td>
-      </tr>
-      <tr>
-        <td class="rank-name-cell">Senior Crew</td>
-        <td><span class="tier-badge tier-crew">Crew</span></td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">LT</td>
+        <td><span class="tier-badge tier-nco">NCO</span></td>
         <td><div class="pips"><div class="pip teal"></div><div class="pip teal"></div><div class="pip teal"></div></div></td>
-        <td>Veteran. 10+ events. Trusted crew lead on ships.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">20 SP</span></td>
+        <td>Junior officer. Mentors enlisted. Runs smaller ops independently.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#1D9E75;">Commander + Admiral</td>
       </tr>
       <tr>
-        <td class="rank-name-cell">Crew Member</td>
-        <td><span class="tier-badge tier-crew">Crew</span></td>
+        <td class="rank-name-cell">Sergeant</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">SGT</td>
+        <td><span class="tier-badge tier-nco">NCO</span></td>
         <td><div class="pips"><div class="pip teal"></div><div class="pip teal"></div><div class="pip dim"></div></div></td>
-        <td>Active member. Division-assigned. Academy graduate.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">5 SP</span></td>
+        <td>Leads a crew section during ops. First point of contact for enlisted.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#1D9E75;">Lieutenant rec.</td>
       </tr>
       <tr>
-        <td class="rank-name-cell">Recruit</td>
-        <td><span class="tier-badge tier-crew">Crew</span></td>
-        <td><div class="pips"><div class="pip teal"></div><div class="pip dim"></div><div class="pip dim"></div></div></td>
-        <td>New joiner. In Academy orientation.</td>
-        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">0 SP</span></td>
+        <td class="rank-name-cell">Corporal</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">CPL</td>
+        <td><span class="tier-badge tier-enlisted">Enlisted</span></td>
+        <td><div class="pips"><div class="pip slate"></div><div class="pip slate"></div><div class="pip slate"></div></div></td>
+        <td>Department leader. Proven crew. Leads their role group on a ship.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#5a8aaa;">Lieutenant auth.</td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Private</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">PVT</td>
+        <td><span class="tier-badge tier-enlisted">Enlisted</span></td>
+        <td><div class="pips"><div class="pip slate"></div><div class="pip slate"></div><div class="pip dim"></div></div></td>
+        <td>General crew. Academy graduate. Learning the ropes in their division.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#5a8aaa;">Graduate Academy</td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Cadet</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">CDT</td>
+        <td><span class="tier-badge tier-enlisted">Enlisted</span></td>
+        <td><div class="pips"><div class="pip slate"></div><div class="pip dim"></div><div class="pip dim"></div></div></td>
+        <td>New joiner. In Second Fleet Academy orientation.</td>
+        <td style="font-family:var(--mono);font-size:11px;color:#5a8aaa;">Enroll in Academy</td>
       </tr>
     </tbody>
   </table>
 </section>
+
 
 <!-- ─── CTA ─── -->
 <section class="cta" id="enroll">
