@@ -2447,20 +2447,30 @@ async function loginReturningMember() {
   const discord  = document.getElementById('login-discord').value.trim();
   const err = document.getElementById('login-error');
   if (!callsign) { err.textContent = '// ERROR: CALLSIGN REQUIRED'; return; }
-  if (!discord)  { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
 
-  const email    = callsign.toLowerCase() + '@ramsorg.app';
-  const password = callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
+  const email = callsign.toLowerCase() + '@ramsorg.app';
+  // Admin account uses fixed password — everyone else uses callsign+discord
+  const password = callsign === ADMIN_CALLSIGN
+    ? 'CaptainRam_admin2024'
+    : callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
+
+  // Non-admin must provide discord
+  if (callsign !== ADMIN_CALLSIGN && !discord) {
+    err.textContent = '// ERROR: DISCORD USERNAME REQUIRED';
+    return;
+  }
 
   try {
     const cred = await signInFn(email, password);
     currentUser = cred.user;
     localStorage.setItem('ram_callsign', callsign);
-    localStorage.setItem('ram_discord',  discord);
+    localStorage.setItem('ram_discord',  discord || 'Admiral');
     localStorage.setItem('ram_password', password);
+    localStorage.setItem('ram_approved', 'true');
     await loadMemberAndEnter(callsign);
   } catch(e) {
     err.textContent = '// ERROR: INVALID CALLSIGN OR DISCORD USERNAME';
+    console.error(e);
   }
 }
 
@@ -2520,8 +2530,17 @@ window.setupAdminAccount = async function() {
     alert('✓ Admin account created! Reload the page — you will be signed in as CaptainRam.');
   } catch(e) {
     if (e.code === 'auth/email-already-in-use') {
-      console.log('Account already exists — just log in.');
-      alert('Account already exists. Open the RSI dropdown and use Academy / Sign In with callsign CaptainRam and discord "Admiral".');
+      // Account exists — just sign in directly
+      try {
+        const cred = await signInFn(email, password);
+        currentUser = cred.user;
+        localStorage.setItem('ram_callsign', ADMIN_CALLSIGN);
+        localStorage.setItem('ram_password', password);
+        localStorage.setItem('ram_approved', 'true');
+        alert('✓ Signed in as CaptainRam. Reload the page.');
+      } catch(e2) {
+        alert('Could not sign in: ' + e2.message);
+      }
     } else {
       console.error(e);
       alert('Error: ' + e.message);
