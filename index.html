@@ -1010,11 +1010,11 @@ footer {
 
   <div class="hero-stats">
     <div class="stat-item">
-      <div class="stat-num">4</div>
+      <div class="stat-num">6</div>
       <div class="stat-label">Divisions</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">9</div>
+      <div class="stat-num">10</div>
       <div class="stat-label">Ranks</div>
     </div>
     <div class="stat-item">
@@ -1156,7 +1156,7 @@ footer {
 <!-- ─── DIVISIONS ─── -->
 <section class="divisions" id="divisions">
   <div class="section-tag">Pick Your Lane</div>
-  <div class="section-title">The Seven Divisions</div>
+  <div class="section-title">The Six Divisions</div>
   <p class="section-sub">Every member of RAMSORG belongs to a division. Your division is your crew, your specialty, and your career track. Choose the lane that fits how you play.</p>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:2px;">
@@ -1420,11 +1420,27 @@ function goToAcademy() {
   document.getElementById('page-academy').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
   if (!academyInited) { initAcademy(); academyInited = true; }
-  // Show enrollment gate if first time
+
   const callsign = localStorage.getItem('ram_callsign');
+  const pending  = localStorage.getItem('ram_pending') === 'true';
+  const approved = localStorage.getItem('ram_approved') === 'true';
+
   if (!callsign) {
+    // Never enrolled — show step 1
     document.getElementById('enroll-gate').style.display = 'flex';
+    document.getElementById('enroll-step-1').style.display = 'block';
+    document.getElementById('enroll-step-2').style.display = 'none';
+    document.getElementById('enroll-step-3').style.display = 'none';
+  } else if (pending && !approved) {
+    // Enrolled but not yet approved — show pending screen
+    document.getElementById('enroll-gate').style.display = 'flex';
+    document.getElementById('enroll-step-1').style.display = 'none';
+    document.getElementById('enroll-step-2').style.display = 'none';
+    document.getElementById('enroll-step-3').style.display = 'block';
+    const pd = document.getElementById('pending-callsign');
+    if (pd) pd.textContent = '// CALLSIGN: ' + callsign + ' — AWAITING ADMIRAL APPROVAL';
   } else {
+    // Approved — go straight in
     document.getElementById('enroll-gate').style.display = 'none';
     updateCallsignDisplay(callsign);
   }
@@ -1466,6 +1482,7 @@ function openAdminPanel() {
   document.getElementById('page-admin').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
   renderAdminMembers();
+  renderAdminApplications();
   renderAdminEvents();
   renderAdminInstructors();
   renderAdminAnnouncements();
@@ -1493,6 +1510,56 @@ function getAdminData(key, def) {
   try { return JSON.parse(localStorage.getItem('ram_admin_' + key) || 'null') || def; } catch(e) { return def; }
 }
 function setAdminData(key, val) { localStorage.setItem('ram_admin_' + key, JSON.stringify(val)); }
+
+// ── APPLICATIONS ──
+function renderAdminApplications() {
+  const el = document.getElementById('admin-application-list');
+  if (!el) return;
+  const apps = getAdminData('applications', []);
+  if (!apps.length) { el.innerHTML = '<div class="admin-empty">No applications yet.</div>'; return; }
+  el.innerHTML = apps.map((a, i) => `
+    <div class="admin-row" style="border-color:${a.status==='Approved'?'rgba(31,200,160,0.3)':a.status==='Rejected'?'rgba(232,64,64,0.2)':'#1e3a5f'}">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${a.callsign} <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${a.status==='Approved'?'#1fc8a0':a.status==='Rejected'?'#e84040':'#00c8ff'};border:1px solid;padding:2px 8px;margin-left:8px;">${a.status}</span>${a.examPassed?'<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;margin-left:6px;">✓ EXAM PASSED</span>':''}</div>
+        <div class="admin-row-meta" style="margin-top:6px;">
+          Discord: <span style="color:#8ab8d8">${a.discord}</span>
+          &nbsp;·&nbsp; RSI: <span style="color:#8ab8d8">${a.rsi}</span>
+          &nbsp;·&nbsp; Applied: ${a.date}
+        </div>
+      </div>
+      <div class="admin-row-actions">
+        ${a.status==='Pending'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button><button class="admin-btn-sm admin-btn-danger" onclick="rejectApplication(${i})">Reject</button>`:''}
+        ${a.status==='Approved'?'<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;">Approved ✓</span>':''}
+        ${a.status==='Rejected'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function approveApplication(i) {
+  const apps = getAdminData('applications', []);
+  apps[i].status = 'Approved';
+  setAdminData('applications', apps);
+  // Set approved flag — when the cadet checks back it will let them in
+  localStorage.setItem('ram_approved', 'true');
+  localStorage.setItem('ram_pending', 'false');
+  // Add to member roster if not already there
+  const members = getAdminData('members', []);
+  if (!members.find(m => m.callsign === apps[i].callsign)) {
+    members.push({ callsign: apps[i].callsign, rank: 'Cadet', division: 'UNASSIGNED', sp: 0 });
+    setAdminData('members', members);
+  }
+  renderAdminApplications();
+  renderAdminMembers();
+  alert('✓ ' + apps[i].callsign + ' approved. They can now access the Academy. Notify them on Discord: ' + apps[i].discord);
+}
+
+function rejectApplication(i) {
+  if (!confirm('Reject this application?')) return;
+  const apps = getAdminData('applications', []);
+  apps[i].status = 'Rejected';
+  setAdminData('applications', apps);
+  renderAdminApplications();
+}
 
 // ── MEMBERS ──
 function renderAdminMembers() {
@@ -1775,24 +1842,104 @@ function clearCadetSession() {
   const callsign = localStorage.getItem('ram_callsign');
   if (!callsign) { alert('No cadet session found.'); return; }
   if (!confirm('Clear session for ' + callsign + '? This removes their enrollment, progress, and division data.')) return;
-  ['ram_callsign','ram_checks','ram_mods','ram_div','ram_divOk','ram_graduated'].forEach(k => localStorage.removeItem(k));
+  ['ram_callsign','ram_checks','ram_mods','ram_div','ram_divOk','ram_graduated','ram_discord','ram_rsi','ram_pending','ram_approved'].forEach(k => localStorage.removeItem(k));
   renderAdminAcademy();
   alert('Session cleared.');
 }
 
-function enrollCadet() {
-  const input = document.getElementById('callsign-input');
-  const err = document.getElementById('enroll-error');
-  const val = input.value.trim().toUpperCase();
-  if (!val || val.length < 2) {
+// ── ENROLLMENT STEP 1: Callsign + usernames ──
+function enrollStep1() {
+  const callsign = document.getElementById('callsign-input').value.trim().toUpperCase();
+  const discord  = document.getElementById('discord-input').value.trim();
+  const rsi      = document.getElementById('rsi-input').value.trim();
+  const err      = document.getElementById('enroll-error');
+
+  if (!callsign || callsign.length < 2) {
     err.textContent = '// ERROR: CALLSIGN REQUIRED — MINIMUM 2 CHARACTERS';
-    input.style.borderColor = 'rgba(232,64,64,0.6)';
     return;
   }
-  localStorage.setItem('ram_callsign', val);
-  document.getElementById('enroll-gate').style.display = 'none';
-  updateCallsignDisplay(val);
+  if (!discord) { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
+  if (!rsi)     { err.textContent = '// ERROR: RSI USERNAME REQUIRED'; return; }
+
+  // Save to localStorage
+  localStorage.setItem('ram_callsign', callsign);
+  localStorage.setItem('ram_discord',  discord);
+  localStorage.setItem('ram_rsi',      rsi);
+  localStorage.setItem('ram_pending',  'true');
+
+  // Save enrollment application to admin data
+  const apps = getAdminData('applications', []);
+  // Remove any previous app from same callsign
+  const filtered = apps.filter(a => a.callsign !== callsign);
+  const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+  filtered.unshift({ callsign, discord, rsi, date: now, status: 'Pending', examPassed: false });
+  setAdminData('applications', filtered);
+
+  // Move to exam
+  document.getElementById('enroll-step-1').style.display = 'none';
+  document.getElementById('enroll-step-2').style.display = 'block';
 }
+
+// ── ENROLLMENT STEP 2: Entry exam ──
+function submitExam() {
+  const answers = { q1:'B', q2:'B', q3:'D', q4:'C', q5:'B' };
+  const err = document.getElementById('exam-error');
+  let wrong = [];
+
+  for (let i = 1; i <= 5; i++) {
+    const sel = document.querySelector('input[name="q' + i + '"]:checked');
+    if (!sel) { err.textContent = '// ERROR: PLEASE ANSWER ALL 5 QUESTIONS'; return; }
+    if (sel.value !== answers['q' + i]) wrong.push(i);
+  }
+
+  if (wrong.length > 0) {
+    err.textContent = '// ' + wrong.length + ' INCORRECT ANSWER' + (wrong.length > 1 ? 'S' : '') + ' — REVIEW AND RETRY';
+    // Highlight wrong questions
+    document.querySelectorAll('.exam-q').forEach((q, idx) => {
+      if (wrong.includes(idx + 1)) {
+        q.style.borderLeft = '2px solid #e84040';
+        q.style.paddingLeft = '12px';
+      } else {
+        q.style.borderLeft = '2px solid #1fc8a0';
+        q.style.paddingLeft = '12px';
+      }
+    });
+    return;
+  }
+
+  // Passed — update application
+  const callsign = localStorage.getItem('ram_callsign');
+  const apps = getAdminData('applications', []);
+  const idx = apps.findIndex(a => a.callsign === callsign);
+  if (idx !== -1) apps[idx].examPassed = true;
+  setAdminData('applications', apps);
+
+  // Move to pending screen
+  document.getElementById('enroll-step-2').style.display = 'none';
+  document.getElementById('enroll-step-3').style.display = 'block';
+  const cs = localStorage.getItem('ram_callsign');
+  const pd = document.getElementById('pending-callsign');
+  if (pd) pd.textContent = '// CALLSIGN: ' + cs + ' — EXAM PASSED — AWAITING APPROVAL';
+}
+
+// ── CHECK APPROVAL STATUS ──
+function checkApproval() {
+  const callsign = localStorage.getItem('ram_callsign');
+  const approved = localStorage.getItem('ram_approved') === 'true';
+  if (approved) {
+    document.getElementById('enroll-gate').style.display = 'none';
+    updateCallsignDisplay(callsign);
+    if (!academyInited) { initAcademy(); academyInited = true; }
+  } else {
+    const pd = document.getElementById('pending-callsign');
+    if (pd) {
+      pd.textContent = '// CALLSIGN: ' + callsign + ' — STILL PENDING ADMIRAL APPROVAL';
+      pd.style.color = '#e87820';
+    }
+  }
+}
+
+function enrollCadet() { enrollStep1(); }
 
 function updateCallsignDisplay(callsign) {
   const h1 = document.getElementById('acad-welcome-h1');
@@ -2018,47 +2165,135 @@ function initAcademy() {
 <div id="page-academy" style="display:none;">
 
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
-<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);">
-  <!-- grid bg -->
+<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);align-items:center;justify-content:center;backdrop-filter:blur(12px);overflow-y:auto;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:relative;max-width:540px;width:90%;text-align:center;padding:20px;">
-    <!-- Hex emblem -->
-    <div style="width:90px;height:90px;margin:0 auto 28px;">
-      <svg viewBox="0 0 90 90" fill="none">
-        <polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/>
-        <polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/>
-        <circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5">
-          <animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="45" cy="45" r="4" fill="#00c8ff"/>
-      </svg>
+
+  <!-- STEP 1: CALLSIGN + USERNAMES -->
+  <div id="enroll-step-1" style="position:relative;max-width:560px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="width:80px;height:80px;margin:0 auto 24px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;">Second Fleet Academy — Enrollment</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,6vw,56px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Cadet<br><span style="color:#00c8ff;">Enrollment</span></h2>
-    <p style="font-size:14px;color:#8ab8d8;line-height:1.8;margin:20px 0 8px;">Enter your callsign to enroll in the Second Fleet Academy. This is how the org will identify you on the roster, in ops, and on graduation day.</p>
-    <p style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:32px;">YOUR CALLSIGN IS YOUR IDENTITY IN RAM SPACE INDUSTRIES</p>
-    <!-- Input -->
-    <div style="position:relative;margin-bottom:16px;">
-      <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;">CALLSIGN //</div>
-      <input id="callsign-input" type="text" maxlength="24" placeholder="e.g. GHOST-7" autocomplete="off" spellcheck="false"
-        style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.25);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:16px;padding:16px 16px 16px 120px;outline:none;letter-spacing:0.1em;text-transform:uppercase;transition:border-color 0.2s;"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')enrollCadet()">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Second Fleet Academy — Step 1 of 3</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Create Your<br><span style="color:#00c8ff;">Member Account</span></h2>
+    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:16px 0 28px;">Your callsign is your permanent identity in RAM Space Industries. Your Discord and RSI usernames are required so the Admiral can verify your membership before approving your enrollment.</p>
+
+    <div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
+        <input id="callsign-input" type="text" maxlength="24" placeholder="e.g. GHOST-7" autocomplete="off" spellcheck="false"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;transition:border-color 0.2s;"
+          oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">DISCORD //</div>
+        <input id="discord-input" type="text" maxlength="48" placeholder="Your Discord username" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">RSI NAME //</div>
+        <input id="rsi-input" type="text" maxlength="48" placeholder="Your RSI display name" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
+      </div>
     </div>
-    <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:16px;"></div>
-    <button onclick="enrollCadet()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:16px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));box-shadow:0 0 30px rgba(0,200,255,0.35);transition:all 0.2s;"
-      onmouseover="this.style.background='#40dfff';this.style.boxShadow='0 0 50px rgba(0,200,255,0.6)'"
-      onmouseout="this.style.background='#00c8ff';this.style.boxShadow='0 0 30px rgba(0,200,255,0.35)'">
-      Enroll in the Academy
-    </button>
-    <button onclick="goToMain()" style="display:block;width:100%;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:12px;cursor:pointer;transition:all 0.2s;"
-      onmouseover="this.style.color='#8ab8d8';this.style.borderColor='#3a6aaa'"
-      onmouseout="this.style.color='#5a8aaa';this.style.borderColor='#1e3a5f'">
-      ← Return to Main Site
-    </button>
+    <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="enrollStep1()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue to Entry Exam →</button>
+    <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
+  </div>
+
+  <!-- STEP 2: ENTRY EXAM -->
+  <div id="enroll-step-2" style="display:none;position:relative;max-width:600px;width:90%;padding:40px 20px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-align:center;">Second Fleet Academy — Step 2 of 3</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-align:center;text-shadow:0 0 30px rgba(0,200,255,0.3);">Entry <span style="color:#00c8ff;">Exam</span></h2>
+    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin-bottom:28px;text-align:center;">Answer all 5 questions correctly to proceed. You can retry if you don't pass.</p>
+
+    <div id="exam-questions" style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Q1 -->
+      <div class="exam-q" data-correct="B">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 01 / 05</div>
+        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What is Star Citizen?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="exam-opt"><input type="radio" name="q1" value="A"> A fantasy RPG</label>
+          <label class="exam-opt"><input type="radio" name="q1" value="B"> A space simulation MMO by Cloud Imperium Games</label>
+          <label class="exam-opt"><input type="radio" name="q1" value="C"> A first person shooter</label>
+          <label class="exam-opt"><input type="radio" name="q1" value="D"> A strategy game</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="exam-q" data-correct="B">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 02 / 05</div>
+        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What do you plan to contribute to RAM Space Industries?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="exam-opt"><input type="radio" name="q2" value="A"> Nothing, just joining for fun</label>
+          <label class="exam-opt"><input type="radio" name="q2" value="B"> Active participation in ops, events, and org activities</label>
+          <label class="exam-opt"><input type="radio" name="q2" value="C"> I haven't decided yet</label>
+          <label class="exam-opt"><input type="radio" name="q2" value="D"> Just to see what it's like</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="exam-q" data-correct="D">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 03 / 05</div>
+        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">Which division handles healing, rescue, and medical gameplay?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="exam-opt"><input type="radio" name="q3" value="A"> CORE</label>
+          <label class="exam-opt"><input type="radio" name="q3" value="B"> HAUL</label>
+          <label class="exam-opt"><input type="radio" name="q3" value="C"> HORIZON</label>
+          <label class="exam-opt"><input type="radio" name="q3" value="D"> PULSE</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="exam-q" data-correct="C">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 04 / 05</div>
+        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">If you have a dispute with another member, what should you do?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="exam-opt"><input type="radio" name="q4" value="A"> Handle it yourself in game</label>
+          <label class="exam-opt"><input type="radio" name="q4" value="B"> Leave the org</label>
+          <label class="exam-opt"><input type="radio" name="q4" value="C"> Bring it to a Lieutenant or above</label>
+          <label class="exam-opt"><input type="radio" name="q4" value="D"> Post about it publicly</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="exam-q" data-correct="B">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 05 / 05</div>
+        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What is most important to remember when on a live fleet op?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="exam-opt"><input type="radio" name="q5" value="A"> Do whatever you want</label>
+          <label class="exam-opt"><input type="radio" name="q5" value="B"> Follow your Captain's orders and keep voice comms clear</label>
+          <label class="exam-opt"><input type="radio" name="q5" value="C"> Talk as much as possible</label>
+          <label class="exam-opt"><input type="radio" name="q5" value="D"> Only listen to people you know</label>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="exam-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;margin:16px 0 8px;min-height:18px;"></div>
+    <button onclick="submitExam()" style="width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Submit Exam →</button>
+  </div>
+
+  <!-- STEP 3: PENDING APPROVAL -->
+  <div id="enroll-step-3" style="display:none;position:relative;max-width:520px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="width:80px;height:80px;margin:0 auto 24px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(31,200,160,0.5)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(31,200,160,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(31,200,160,0.15)" stroke="#1fc8a0" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#1fc8a0"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#1fc8a0;text-transform:uppercase;margin-bottom:12px;">Enrollment Submitted</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:16px;">Pending<br><span style="color:#1fc8a0;">Admiral Approval</span></h2>
+    <p style="font-size:14px;color:#8ab8d8;line-height:1.8;margin-bottom:24px;">Your enrollment application has been submitted. The Admiral will verify your Discord and RSI membership before approving your access to the Academy. You will be notified on Discord.</p>
+    <div id="pending-callsign" style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#00c8ff;letter-spacing:0.15em;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);padding:14px;margin-bottom:24px;"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:24px;">Check back here after the Admiral approves your application.</div>
+    <button onclick="checkApproval()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.2s;margin-bottom:10px;" onmouseover="this.style.background='#40e8c0'" onmouseout="this.style.background='#1fc8a0'">Check Approval Status</button>
+    <button onclick="goToMain()" style="display:block;width:100%;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
   </div>
 </div>
+
+<style>
+.exam-opt { display:flex; align-items:center; gap:10px; font-size:13px; color:#8ab8d8; padding:10px 14px; border:1px solid #1e3a5f; cursor:pointer; transition:all 0.15s; font-family:'Barlow',sans-serif; }
+.exam-opt:hover { border-color:rgba(0,200,255,0.3); color:#e8f4ff; background:rgba(0,200,255,0.04); }
+.exam-opt input[type="radio"] { accent-color:#00c8ff; flex-shrink:0; }
+</style>
 
 <!-- ══ ACADEMY NAV ══ -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
@@ -2302,13 +2537,13 @@ function initAcademy() {
         <button class="acad-mark-btn" onclick="markRead(1)">Mark as Read</button></div></div>
 
       <div class="acad-mod" id="mod-2"><div class="acad-mod-header" onclick="toggleMod(2)"><div class="acad-mod-num">02</div><div class="acad-mod-title">Rank Structure &amp; Progression</div><div class="acad-mod-status" id="ms-2">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>RAMSORG uses a nine-rank system across three tiers. Understanding where you sit and how to move up is essential.</p>
+        <div class="acad-mod-body"><p>RAMSORG uses a ten-rank system across four tiers. Understanding where you sit and how to move up is essential.</p>
         <h4>The Three Tiers</h4><ul><li><strong style="color:#00aaff">Command Tier</strong> — Admiral, Fleet Commander, Captain. Set strategy, run fleet ops, final authority.</li><li><strong style="color:#8ab8d8">Officer Tier</strong> — Division Head, Lieutenant, Specialist. Leadership and mentorship within each division.</li><li><strong style="color:#1fc8a0">Crew Tier</strong> — Senior Crew, Crew Member, Cadet. Where you start. The backbone of every op.</li></ul>
         <h4>How You Advance</h4><p>Rank is earned through Standing Points (SP) — awarded for attending events, completing ops, recruiting members, and teaching in the Academy.</p>
         <div class="acad-callout"><strong>Your current rank:</strong> Cadet. Next milestone: Crew Member — earned by completing all Academy stages and attending your first live op.</div>
         <button class="acad-mark-btn" onclick="markRead(2)">Mark as Read</button></div></div>
 
-      <div class="acad-mod" id="mod-3"><div class="acad-mod-header" onclick="toggleMod(3)"><div class="acad-mod-num">03</div><div class="acad-mod-title">The Seven Divisions</div><div class="acad-mod-status" id="ms-3">Unread</div><div class="acad-mod-chevron">▾</div></div>
+      <div class="acad-mod" id="mod-3"><div class="acad-mod-header" onclick="toggleMod(3)"><div class="acad-mod-num">03</div><div class="acad-mod-title">The Six Divisions</div><div class="acad-mod-status" id="ms-3">Unread</div><div class="acad-mod-chevron">▾</div></div>
         <div class="acad-mod-body"><p>Every member of RAMSORG belongs to a division. Read this before picking in the Division Select tab.</p>
         <h4>SHIELD — Security &amp; Combat</h4><ul><li>Fighter pilots, gunners, marines, medics protecting the org's assets.</li><li>Escort missions, bounty hunting, PvP response, base defense.</li><li>Best for: combat, dogfighting, FPS gameplay.</li></ul>
         <h4>HAUL — Logistics &amp; Cargo</h4><ul><li>Cargo pilots, refuelers, trade analysts keeping the org funded.</li><li>Freight convoys, trade route optimization, supply missions.</li><li>Best for: trading, hauling, economic gameplay.</li></ul>
@@ -2521,10 +2756,19 @@ function initAcademy() {
 <!-- Admin Tab Bar -->
 <div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
   <button class="admin-tab active" onclick="showAdminTab('members')"><span class="admin-tab-dot"></span>Members</button>
+  <button class="admin-tab" onclick="showAdminTab('applications')"><span class="admin-tab-dot"></span>Applications</button>
   <button class="admin-tab" onclick="showAdminTab('events')"><span class="admin-tab-dot"></span>Events</button>
   <button class="admin-tab" onclick="showAdminTab('instructors')"><span class="admin-tab-dot"></span>Instructors</button>
   <button class="admin-tab" onclick="showAdminTab('announcements')"><span class="admin-tab-dot"></span>Announcements</button>
   <button class="admin-tab" onclick="showAdminTab('academy')"><span class="admin-tab-dot"></span>Academy Progress</button>
+</div>
+
+<!-- ── APPLICATIONS ── -->
+<div class="admin-panel" id="admin-panel-applications">
+  <div class="admin-section-label">Enrollment</div>
+  <div class="admin-panel-title">Applications</div>
+  <p class="admin-panel-sub">Review enrollment applications from new cadets. Verify their Discord and RSI membership before approving. Approving adds them to the member roster and grants them Academy access.</p>
+  <div id="admin-application-list"></div>
 </div>
 
 <!-- ── MEMBERS ── -->
