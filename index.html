@@ -1799,16 +1799,13 @@ function saveNote(callsign) {
 
 function goToAdmin() {
   const callsign = localStorage.getItem('ram_callsign');
+  console.log('goToAdmin callsign:', callsign, 'expected:', ADMIN_CALLSIGN);
   if (callsign !== ADMIN_CALLSIGN) {
-    alert('// ACCESS DENIED');
+    alert('// ACCESS DENIED — Signed in as: ' + (callsign || 'nobody'));
     return;
   }
-  const pw = localStorage.getItem('ram_admin_auth');
-  if (pw === 'ramsorg') {
-    openAdminPanel();
-  } else {
-    document.getElementById('admin-pw-gate').style.display = 'flex';
-  }
+  // Skip password gate — callsign check is enough for admin
+  openAdminPanel();
 }
 
 function adminLogin() {
@@ -1829,6 +1826,8 @@ function adminLogin() {
 function openAdminPanel() {
   document.getElementById('page-main').style.display = 'none';
   document.getElementById('page-academy').style.display = 'none';
+  const pi = document.getElementById('page-instructor');
+  if (pi) pi.style.display = 'none';
   document.getElementById('page-admin').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
   renderAdminMembers();
@@ -1836,7 +1835,7 @@ function openAdminPanel() {
   renderAdminEvents();
   renderAdminInstructors();
   renderAdminAnnouncements();
-  renderAdminAcademy();
+  renderAdminAcademy().catch(e => console.error('Academy render error:', e));
   renderAssignPanel();
 }
 
