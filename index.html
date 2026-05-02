@@ -1495,6 +1495,715 @@ footer {
 </footer>
 
 </div><!-- /page-main -->
+
+<!-- ════════════════════════════════════════
+     ACADEMY PORTAL — hidden on load
+════════════════════════════════════════ -->
+<div id="page-academy" style="display:none;">
+
+<!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
+<!-- ══ SIGNUP / SIGN IN OVERLAY — from RSI dropdown ══ -->
+<div id="signup-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(14px);">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:440px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="width:72px;height:72px;margin:0 auto 22px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">RAM Space Industries</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:6px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Signup /<br><span style="color:#00c8ff;">Sign In</span></h2>
+    <p style="font-size:13px;color:#5a8aaa;line-height:1.7;margin:14px 0 24px;">Enter your callsign. New members will create an account — returning members will sign in.</p>
+
+    <!-- Mode tabs -->
+    <div style="display:flex;gap:2px;margin-bottom:20px;">
+      <button id="ss-tab-new" onclick="setSsMode('new')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid rgba(0,200,255,0.4);background:rgba(0,200,255,0.1);color:#00c8ff;cursor:pointer;">New Member</button>
+      <button id="ss-tab-ret" onclick="setSsMode('return')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid #1e3a5f;background:transparent;color:#5a8aaa;cursor:pointer;">Returning</button>
+    </div>
+
+    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
+        <input id="ss-callsign" type="text" maxlength="24" placeholder="Your callsign" autocomplete="off" spellcheck="false"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+      <!-- Password field — only for returning members -->
+      <div id="ss-password-wrap" style="display:none;position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
+        <input id="ss-password" type="password" placeholder="Your password" autocomplete="current-password"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
+          onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+      <!-- Password set — only for new members -->
+      <div id="ss-newpass-wrap" style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
+        <input id="ss-newpassword" type="password" placeholder="Choose a password (min 6 chars)" autocomplete="new-password"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
+          onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+    </div>
+
+    <div id="ss-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;min-height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="doSignupSignin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'" id="ss-submit-btn">Create Account →</button>
+    <button onclick="document.getElementById('signup-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;">← Cancel</button>
+  </div>
+</div>
+
+<!-- ══ ACADEMY ENROLLMENT GATE — only shown first time going to academy after signing in ══ -->
+<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+
+  <!-- STEP 1: ACADEMY ENROLLMENT — Discord + RSI (no callsign, already signed in) -->
+  <div id="enroll-step-1" style="position:relative;max-width:560px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="width:80px;height:80px;margin:0 auto 24px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Second Fleet Academy — Enrollment Step 1 of 2</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Academy<br><span style="color:#00c8ff;">Enrollment</span></h2>
+    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:16px 0 6px;">Provide your Discord and RSI usernames so the Admiral can verify your membership before approving your Academy access.</p>
+    <div id="enroll-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:22px;"></div>
+
+    <div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">DISCORD //</div>
+        <input id="discord-input" type="text" maxlength="48" placeholder="Your Discord username" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">RSI NAME //</div>
+        <input id="rsi-input" type="text" maxlength="48" placeholder="Your RSI display name" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
+      </div>
+    </div>
+    <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="enrollStep1()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue to Entry Exam →</button>
+    <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
+  </div>
+
+<!-- ══ ACADEMY NAV ══ -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/>
+      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/>
+      <circle cx="16" cy="16" r="2.5" fill="#00c8ff"/>
+    </svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="acad-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#5a8aaa;text-transform:uppercase;"></div>
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;transition:color 0.2s;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:4px 12px;text-transform:uppercase;">Cadet Portal</div>
+    <button id="inst-panel-btn" onclick="goToInstructor()" style="display:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.12em;color:#04070f;background:#00c8ff;border:none;padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">⬡ Instructor Panel</button>
+    <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:6px 14px;text-decoration:none;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#00c8ff';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#00c8ff'">Discord</a>
+  </div>
+</nav>
+
+<!-- ══ PAGE HEADER ══ -->
+<div style="padding:120px 80px 60px;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;background:#060c18;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;">
+    <span style="display:block;width:32px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.6);"></span>Second Fleet Academy — Cadet Portal
+  </div>
+  <h1 id="acad-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,7vw,80px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;letter-spacing:0.01em;margin-bottom:16px;position:relative;text-shadow:0 0 40px rgba(0,200,255,0.3);">Welcome,<br><em style="font-style:normal;color:#00c8ff;text-shadow:0 0 30px rgba(0,200,255,0.6);">Cadet.</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:600px;line-height:1.8;position:relative;">Complete orientation, pick your division, and earn your place in RAM. Return any time to study new modules or pursue advanced certifications.</p>
+</div>
+
+<!-- ══ TAB BAR ══ -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.15);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="acad-tab active" onclick="showPanel('orientation')"><span class="acad-dot"></span>Orientation</button>
+  <button class="acad-tab" onclick="showPanel('checklist')"><span class="acad-dot"></span>Checklist</button>
+  <button class="acad-tab" onclick="showPanel('division')"><span class="acad-dot"></span>Division Select</button>
+  <button class="acad-tab" onclick="showPanel('instructors')"><span class="acad-dot"></span>Instructors</button>
+  <button class="acad-tab" onclick="showPanel('graduation')"><span class="acad-dot"></span>Graduation</button>
+</div>
+
+<style>
+/* ── Academy scoped styles — no conflicts with main site ── */
+.acad-tab{display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,180,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;}
+.acad-tab:hover{color:#8ab8d8;background:rgba(0,100,200,0.08);}
+.acad-tab.active{color:#00c8ff;border-bottom-color:#00c8ff;}
+.acad-dot{width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0;}
+.acad-tab.active .acad-dot{background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7);}
+
+.acad-layout{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 110px);}
+.acad-sidebar{background:#060c18;border-right:1px solid rgba(0,180,255,0.1);padding:24px 0;position:sticky;top:110px;height:calc(100vh - 110px);overflow-y:auto;}
+.acad-sidebar::-webkit-scrollbar{width:3px;}
+.acad-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f;}
+.acad-sidebar-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#3a6080;text-transform:uppercase;padding:0 20px;margin-bottom:6px;}
+.acad-sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8ab8d8;text-transform:uppercase;transition:all 0.15s;cursor:pointer;border-left:2px solid transparent;border-right:none;border-top:none;border-bottom:none;background:none;width:100%;text-align:left;}
+.acad-sidebar-btn:hover{color:#e8f4ff;background:rgba(0,100,200,0.08);}
+.acad-sidebar-btn.active{color:#00c8ff;border-left-color:#00c8ff;background:rgba(0,200,255,0.05);}
+.acad-sidebar-icon{font-size:11px;color:#3a6080;flex-shrink:0;}
+.acad-sidebar-section{margin-bottom:24px;}
+
+.acad-panel{display:none;padding:52px 68px;border-bottom:1px solid rgba(0,180,255,0.1);}
+.acad-panel.active{display:block;animation:acadIn 0.3s ease both;}
+@keyframes acadIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.acad-panel-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.acad-panel-tag::before{content:'';display:block;width:20px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.5);}
+.acad-panel-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:12px;}
+.acad-panel-sub{font-size:15px;color:#8ab8d8;max-width:580px;line-height:1.8;margin-bottom:40px;}
+
+/* Info cards */
+.acad-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:32px;}
+.acad-info-card{background:#0c1828;border:1px solid #1e3a5f;padding:18px 20px;}
+.acad-info-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:6px;}
+.acad-info-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#00c8ff;line-height:1;}
+.acad-info-sub{font-size:12px;color:#5a8aaa;margin-top:4px;}
+
+/* Module blocks */
+.acad-mod{background:#0c1828;border:1px solid #1e3a5f;margin-bottom:2px;overflow:hidden;transition:border-color 0.2s;}
+.acad-mod:hover{border-color:rgba(0,200,255,0.3);}
+.acad-mod-header{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;transition:background 0.2s;}
+.acad-mod-header:hover{background:rgba(0,100,200,0.06);}
+.acad-mod-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:#3a6080;letter-spacing:0.1em;min-width:32px;}
+.acad-mod-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;flex:1;}
+.acad-mod-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;}
+.acad-mod-status.done{color:#1fc8a0;}
+.acad-mod-chevron{color:#3a6080;font-size:11px;transition:transform 0.2s;}
+.acad-mod.open .acad-mod-chevron{transform:rotate(180deg);}
+.acad-mod-body{display:none;padding:0 22px 26px;border-top:1px solid #1e3a5f;background:#091220;}
+.acad-mod.open .acad-mod-body{display:block;}
+.acad-mod-body p{font-size:14px;color:#c8e0f4;line-height:1.8;margin:14px 0;}
+.acad-mod-body h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 6px;}
+.acad-mod-body ul{list-style:none;margin:8px 0;}
+.acad-mod-body ul li{font-size:14px;color:#8ab8d8;line-height:1.7;padding:3px 0;display:flex;align-items:flex-start;gap:10px;}
+.acad-mod-body ul li::before{content:'▸';color:#00c8ff;flex-shrink:0;font-size:10px;margin-top:5px;}
+.acad-callout{background:rgba(0,200,255,0.05);border-left:2px solid #00c8ff;padding:14px 18px;margin:16px 0;font-size:13px;color:#8ab8d8;line-height:1.7;}
+.acad-callout strong{color:#00c8ff;}
+.acad-mark-btn{margin-top:18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:10px 24px;cursor:pointer;transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));box-shadow:0 0 16px rgba(0,200,255,0.25);}
+.acad-mark-btn:hover{background:#40dfff;box-shadow:0 0 24px rgba(0,200,255,0.4);}
+.acad-mark-btn.done{background:#091220;color:#1fc8a0;border:1px solid #1fc8a0;clip-path:none;cursor:default;box-shadow:none;}
+
+/* Checklist */
+.acad-prog-wrap{background:#091220;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
+.acad-prog-count{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#1fc8a0;white-space:nowrap;}
+.acad-prog-track{flex:1;height:3px;background:#1e3a5f;}
+.acad-prog-fill{height:100%;background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.5);transition:width 0.5s ease;}
+.acad-prog-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;white-space:nowrap;}
+.acad-check-list{display:flex;flex-direction:column;gap:2px;}
+.acad-check-item{display:flex;align-items:flex-start;gap:14px;background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;transition:all 0.2s;cursor:pointer;}
+.acad-check-item:hover{border-color:rgba(0,200,255,0.25);}
+.acad-check-item.checked{border-color:#1fc8a0;background:rgba(31,200,160,0.04);}
+.acad-check-box{width:20px;height:20px;border:1.5px solid #1e3a5f;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;transition:all 0.2s;}
+.acad-check-item.checked .acad-check-box{border-color:#1fc8a0;background:rgba(31,200,160,0.15);}
+.acad-check-tick{color:#1fc8a0;font-size:12px;display:none;}
+.acad-check-item.checked .acad-check-tick{display:block;}
+.acad-check-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
+.acad-check-item.checked .acad-check-title{color:#1fc8a0;text-decoration:line-through;text-decoration-color:rgba(31,200,160,0.4);}
+.acad-check-desc{font-size:13px;color:#8ab8d8;line-height:1.6;}
+.acad-check-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#3a6080;border:1px solid #1e3a5f;padding:2px 8px;margin-top:8px;display:inline-block;}
+.acad-check-tag.req{border-color:rgba(0,200,255,0.3);color:#00c8ff;}
+
+/* Division cards */
+.acad-div-intro{background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:16px 20px;margin-bottom:26px;font-size:14px;color:#8ab8d8;line-height:1.7;}
+.acad-div-intro strong{color:#00c8ff;}
+.acad-div-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.acad-div-card{border:1px solid #1e3a5f;background:#0c1828;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+.acad-div-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,50,120,0.4);}
+.acad-div-card.selected{box-shadow:0 0 0 1px var(--dc);border-color:var(--dc);}
+.acad-div-card-top{padding:24px 24px 16px;border-bottom:1px solid #1e3a5f;}
+.acad-div-accent{height:2px;width:100%;margin-bottom:16px;}
+.acad-div-code{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;letter-spacing:0.05em;margin-bottom:4px;}
+.acad-div-name{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#5a8aaa;text-transform:uppercase;margin-bottom:12px;}
+.acad-div-desc{font-size:13px;color:#8ab8d8;line-height:1.7;}
+.acad-div-card-bottom{padding:16px 24px;}
+.acad-div-roles-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-roles{display:flex;flex-wrap:wrap;gap:5px;}
+.acad-div-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.05em;padding:3px 8px;border:1px solid #1e3a5f;color:#5a8aaa;text-transform:uppercase;}
+.acad-div-badge{position:absolute;top:12px;right:12px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;display:none;}
+.acad-div-card.selected .acad-div-badge{display:block;}
+.acad-div-confirm{display:none;margin-top:8px;}.acad-div-confirm.visible{display:block;}
+.acad-div-confirm-box{background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.25);padding:22px 26px;}
+.acad-div-confirm-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-confirm-note{font-size:14px;color:#8ab8d8;line-height:1.7;margin-bottom:18px;}
+.acad-div-confirm-note strong{color:#00c8ff;}
+.acad-div-confirm-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:12px 28px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background 0.2s;box-shadow:0 0 16px rgba(0,200,255,0.25);}
+.acad-div-confirm-btn:hover{background:#40dfff;}
+.acad-div-locked{display:none;}.acad-div-locked.visible{display:block;}
+.acad-div-locked-box{background:rgba(31,200,160,0.04);border:1px solid #1fc8a0;padding:22px 26px;}
+.acad-div-locked-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#1fc8a0;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-locked-note{font-size:14px;color:#8ab8d8;line-height:1.7;}
+.acad-div-locked-note strong{color:#1fc8a0;}
+.acad-div-change-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:transparent;border:1px solid #1e3a5f;padding:7px 14px;cursor:pointer;margin-top:14px;transition:all 0.2s;}
+.acad-div-change-btn:hover{color:#8ab8d8;border-color:#3a6080;}
+
+/* Instructors */
+.acad-inst-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.acad-inst-card{background:#0c1828;border:1px solid #1e3a5f;padding:22px;transition:border-color 0.2s;}
+.acad-inst-card:hover{border-color:rgba(0,200,255,0.3);}
+.acad-inst-avatar{width:46px;height:46px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#00c8ff;margin-bottom:12px;clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);}
+.acad-inst-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
+.acad-inst-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;}
+.acad-inst-div{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 10px;border:1px solid rgba(0,200,255,0.3);color:#00c8ff;display:inline-block;margin-bottom:12px;}
+.acad-inst-sessions{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;}
+.acad-inst-sessions span{color:#00c8ff;}
+.acad-inst-commend{margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#1fc8a0;border:1px solid rgba(31,200,160,0.3);padding:3px 8px;display:inline-block;}
+.acad-inst-vacant{background:#091220;border:1px dashed #1e3a5f;padding:22px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:155px;cursor:pointer;transition:border-color 0.2s;}
+.acad-inst-vacant:hover{border-color:#3a6080;}
+.acad-inst-vacant-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;}
+.acad-hall-note{font-size:14px;color:#8ab8d8;line-height:1.7;background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:14px 18px;margin-top:24px;}
+.acad-hall-note strong{color:#00c8ff;}
+
+/* Graduation */
+.acad-grad-locked{text-align:center;padding:60px 40px;}
+.acad-grad-locked h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:12px;}
+.acad-grad-locked p{font-size:14px;color:#8ab8d8;max-width:440px;margin:0 auto 28px;line-height:1.7;}
+.acad-grad-list{list-style:none;text-align:left;max-width:340px;margin:0 auto 28px;display:flex;flex-direction:column;gap:8px;}
+.acad-grad-list li{display:flex;align-items:center;gap:12px;font-family:'Share Tech Mono',monospace;font-size:12px;color:#5a8aaa;letter-spacing:0.05em;}
+.acad-gcheck{width:16px;height:16px;border:1px solid #1e3a5f;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.acad-grad-list li.done .acad-gcheck{border-color:#1fc8a0;color:#1fc8a0;}
+.acad-grad-ready{text-align:center;padding:60px 40px;display:none;}
+.acad-grad-ready h3{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-shadow:0 0 30px rgba(0,200,255,0.4);}
+.acad-grad-ready p{font-size:14px;color:#8ab8d8;max-width:480px;margin:0 auto 28px;line-height:1.7;}
+.acad-grad-btn{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px 36px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.2s;text-decoration:none;display:inline-block;box-shadow:0 0 24px rgba(0,200,255,0.35);}
+.acad-grad-btn:hover{background:#40dfff;box-shadow:0 0 40px rgba(0,200,255,0.5);}
+
+@media(max-width:900px){
+  .acad-layout{grid-template-columns:1fr;}
+  .acad-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;flex-wrap:wrap;padding:8px 16px;gap:4px;}
+  .acad-sidebar-section{display:contents;}
+  .acad-sidebar-label{display:none;}
+  .acad-sidebar-btn{padding:7px 10px;border-left:none;border-bottom:2px solid transparent;font-size:10px;}
+  .acad-sidebar-btn.active{border-bottom-color:#00c8ff;border-left-color:transparent;}
+  .acad-panel{padding:32px 20px;}
+  .acad-div-grid{grid-template-columns:1fr;}
+  .acad-inst-grid{grid-template-columns:1fr 1fr;}
+  .acad-info-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:540px){.acad-inst-grid{grid-template-columns:1fr;}}
+</style>
+
+<!-- ══ PORTAL LAYOUT ══ -->
+<div class="acad-layout">
+  <aside class="acad-sidebar">
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Orientation</div>
+      <button class="acad-sidebar-btn active" onclick="showPanel('orientation')"><span class="acad-sidebar-icon">◈</span>Orientation</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Progress</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('checklist')"><span class="acad-sidebar-icon">◻</span>Checklist</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Division</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('division')"><span class="acad-sidebar-icon">◆</span>Division Select</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Faculty</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('instructors')"><span class="acad-sidebar-icon">★</span>Instructors</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Graduate</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('graduation')"><span class="acad-sidebar-icon">◇</span>Graduation</button>
+    </div>
+  </aside>
+
+  <main style="min-width:0;">
+
+    <!-- ORIENTATION -->
+    <div class="acad-panel active" id="panel-orientation">
+      <div class="acad-panel-tag">Module 01</div>
+      <div class="acad-panel-title">Orientation Briefing</div>
+      <p class="acad-panel-sub">Read each module and mark it complete. Progress saves in your browser.</p>
+      <div class="acad-info-grid">
+        <div class="acad-info-card"><div class="acad-info-label">Modules</div><div class="acad-info-val" id="mod-count">0/6</div><div class="acad-info-sub">Complete all to advance</div></div>
+        <div class="acad-info-card"><div class="acad-info-label">Est. Read Time</div><div class="acad-info-val">~15</div><div class="acad-info-sub">Minutes total</div></div>
+        <div class="acad-info-card"><div class="acad-info-label">Status</div><div class="acad-info-val" id="orient-status" style="font-size:18px;color:#3a6080;">In Progress</div><div class="acad-info-sub">Read all to complete</div></div>
+      </div>
+
+      <div class="acad-mod" id="mod-1"><div class="acad-mod-header" onclick="toggleMod(1)"><div class="acad-mod-num">01</div><div class="acad-mod-title">Welcome to RAM Space Industries</div><div class="acad-mod-status" id="ms-1">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Welcome, Cadet. You have taken the first step toward joining RAM Space Industries. Before you earn your division assignment and your crew rank, you need to understand who we are, how we operate, and what we expect of every person who flies under the RAMSORG tag.</p>
+        <h4>Who We Are</h4><p>RAM Space Industries was founded on a simple idea: that the right crew, given the right mission, has no ceiling. We are lawful, role-play friendly, and active across every major gameplay loop.</p>
+        <h4>The RAM Doctrine</h4><ul><li><strong style="color:#00c8ff">Reliability</strong> — If you sign up, you show up. Your crew plans around you.</li><li><strong style="color:#00c8ff">Adaptability</strong> — The verse changes with every patch. Stay flexible.</li><li><strong style="color:#00c8ff">Mastery</strong> — Know your role. Do it well.</li></ul>
+        <div class="acad-callout"><strong>Cadet note:</strong> Cadet is your rank while you complete the Academy. Once you graduate you become a Crew Member and receive your official division assignment.</div>
+        <button class="acad-mark-btn" onclick="markRead(1)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-2"><div class="acad-mod-header" onclick="toggleMod(2)"><div class="acad-mod-num">02</div><div class="acad-mod-title">Rank Structure &amp; Progression</div><div class="acad-mod-status" id="ms-2">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG uses a ten-rank system across four tiers. Understanding where you sit and how to move up is essential.</p>
+        <h4>The Three Tiers</h4><ul><li><strong style="color:#00aaff">Command Tier</strong> — Admiral, Fleet Commander, Captain. Set strategy, run fleet ops, final authority.</li><li><strong style="color:#8ab8d8">Officer Tier</strong> — Division Head, Lieutenant, Specialist. Leadership and mentorship within each division.</li><li><strong style="color:#1fc8a0">Crew Tier</strong> — Senior Crew, Crew Member, Cadet. Where you start. The backbone of every op.</li></ul>
+        <h4>How You Advance</h4><p>Rank is earned through Standing Points (SP) — awarded for attending events, completing ops, recruiting members, and teaching in the Academy.</p>
+        <div class="acad-callout"><strong>Your current rank:</strong> Cadet. Next milestone: Crew Member — earned by completing all Academy stages and attending your first live op.</div>
+        <button class="acad-mark-btn" onclick="markRead(2)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-3"><div class="acad-mod-header" onclick="toggleMod(3)"><div class="acad-mod-num">03</div><div class="acad-mod-title">The Six Divisions</div><div class="acad-mod-status" id="ms-3">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Every member of RAMSORG belongs to a division. Read this before picking in the Division Select tab.</p>
+        <h4>SHIELD — Security &amp; Combat</h4><ul><li>Fighter pilots, gunners, marines, medics protecting the org's assets.</li><li>Escort missions, bounty hunting, PvP response, base defense.</li><li>Best for: combat, dogfighting, FPS gameplay.</li></ul>
+        <h4>HAUL — Logistics &amp; Cargo</h4><ul><li>Cargo pilots, refuelers, trade analysts keeping the org funded.</li><li>Freight convoys, trade route optimization, supply missions.</li><li>Best for: trading, hauling, economic gameplay.</li></ul>
+        <h4>SCOUT — Exploration &amp; Recon</h4><ul><li>Pathfinders, salvagers, cartographers mapping the verse.</li><li>Deep space surveys, jump point scouting, salvage sweeps.</li><li>Best for: exploration, discovery, solo or small-team play.</li></ul>
+        <h4>FORGE — Engineering &amp; Industry</h4><ul><li>Miners, ship engineers, base builders, repair specialists.</li><li>Mining operations, ship repair during fleet ops, base construction.</li><li>Best for: industry, engineering, and support roles.</li></ul>
+        <div class="acad-callout"><strong>Important:</strong> Your primary division is your starting point — not your cage. After reaching Crew Member rank, return here to cross-train in secondary divisions.</div>
+        <button class="acad-mark-btn" onclick="markRead(3)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-4"><div class="acad-mod-header" onclick="toggleMod(4)"><div class="acad-mod-num">04</div><div class="acad-mod-title">Events, Ops &amp; How We Run Them</div><div class="acad-mod-status" id="ms-4">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG runs a structured weekly event schedule. Know these before your first live op.</p>
+        <h4>Weekly Rhythm</h4><ul><li><strong style="color:#00c8ff">Monday — Open Contracts Night:</strong> Informal. No assigned roles. Great for your first session.</li><li><strong style="color:#00c8ff">Wednesday — Division Ops:</strong> Structured. Each division runs its own focused activity.</li><li><strong style="color:#00c8ff">Saturday — Fleet Op:</strong> Main event. Multi-ship, all divisions. Earns the most SP.</li><li><strong style="color:#00c8ff">Monthly — Org Meeting:</strong> Voice meeting. Promotions, strategy, next month planned.</li></ul>
+        <h4>Fleet Op Flow</h4><ul><li>Announced 3+ days ahead in <strong style="color:#e8f4ff">#fleet-ops-announcements</strong>.</li><li>Sign up by reacting with your division emoji or posting your role.</li><li>Captain assigns positions 24 hours before.</li><li>Everyone joins voice for a muster brief — objective, callsigns, rules of engagement.</li><li>After the op: after-action report. This is how SP are awarded.</li></ul>
+        <div class="acad-callout"><strong>Comms rule:</strong> In a live op, keep voice clear. Call out threats, statuses, positions — nothing else until debrief.</div>
+        <button class="acad-mark-btn" onclick="markRead(4)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-5"><div class="acad-mod-header" onclick="toggleMod(5)"><div class="acad-mod-num">05</div><div class="acad-mod-title">Standing Points &amp; The Org Economy</div><div class="acad-mod-status" id="ms-5">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Standing Points (SP) track your contribution and progress toward rank.</p>
+        <h4>How You Earn SP</h4><ul><li>Casual event attendance — <strong style="color:#00c8ff">+1 SP</strong></li><li>Division Op completion — <strong style="color:#00c8ff">+2 SP</strong></li><li>Fleet Op participation — <strong style="color:#00c8ff">+3 SP</strong></li><li>MVP / Commendation — <strong style="color:#00c8ff">+2 SP bonus</strong></li><li>Recruiting a new member — <strong style="color:#00c8ff">+3 SP</strong></li><li>Teaching an Academy module — <strong style="color:#00c8ff">+4 SP</strong></li><li>Org fund contributions — <strong style="color:#00c8ff">+1–5 SP</strong> at leadership discretion</li></ul>
+        <h4>Rank Thresholds</h4><ul><li>5 SP — eligible for Crew Member</li><li>20 SP — eligible for Senior Crew</li><li>40 SP — eligible for Specialist</li><li>60 SP — eligible for Lieutenant / Division Head</li></ul>
+        <button class="acad-mark-btn" onclick="markRead(5)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-6"><div class="acad-mod-header" onclick="toggleMod(6)"><div class="acad-mod-num">06</div><div class="acad-mod-title">Code of Conduct &amp; Discord</div><div class="acad-mod-status" id="ms-6">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG runs on trust, respect, and Discord. These rules apply to every member from Cadet to Admiral.</p>
+        <h4>Code of Conduct</h4><ul><li>Treat every member with respect. Zero tolerance for harassment.</li><li>No griefing org members or allies. Disputes go to a Division Head.</li><li>If you commit to an op, show up. Notify leadership in advance if you can't.</li><li>Follow your Captain's orders in an op. Save disagreements for debrief.</li><li>No unauthorized PvP — check rules of engagement before engaging.</li></ul>
+        <h4>Required: Join Discord</h4><p>Join at: <strong style="color:#00c8ff">discord.gg/Xhaj3nRAEp</strong> — required before your first op.</p>
+        <h4>Key Channels</h4><ul><li><strong style="color:#e8f4ff">#org-announcements</strong> — Official org news.</li><li><strong style="color:#e8f4ff">#fleet-ops-announcements</strong> — All ops posted here first.</li><li><strong style="color:#e8f4ff">#academy-orientation</strong> — Your home channel as a Cadet.</li><li><strong style="color:#e8f4ff">#academy-graduation-log</strong> — Graduates posted here.</li><li><strong style="color:#e8f4ff">#standing-points-log</strong> — SP tracking.</li></ul>
+        <div class="acad-callout"><strong>Final note:</strong> The Academy exists because the First Fleet learned everything the hard way. You have the advantage of everything they figured out. Use it.</div>
+        <button class="acad-mark-btn" onclick="markRead(6)">Mark as Read</button></div></div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="acad-panel" id="panel-checklist">
+      <div class="acad-panel-tag">Stage Tracker</div>
+      <div class="acad-panel-title">Cadet Checklist</div>
+      <p class="acad-panel-sub">Click each item to mark it complete. Progress saves in your browser.</p>
+      <div class="acad-prog-wrap"><div class="acad-prog-count" id="check-count">0/9</div><div class="acad-prog-track"><div class="acad-prog-fill" id="check-fill" style="width:0%"></div></div><div class="acad-prog-label">Tasks Complete</div></div>
+      <div class="acad-check-list">
+        <div class="acad-check-item" id="ci-1" onclick="toggleCheck('ci-1')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Join the Discord Server</div><div class="acad-check-desc">Join at discord.gg/Xhaj3nRAEp — required before anything else.</div><span class="acad-check-tag req">Required First</span></div></div>
+        <div class="acad-check-item" id="ci-2" onclick="toggleCheck('ci-2')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Read All 6 Orientation Modules</div><div class="acad-check-desc">Complete every module in the Orientation tab. Mark each one read.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-3" onclick="toggleCheck('ci-3')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Apply on the RSI Org Page</div><div class="acad-check-desc">Apply at robertsspaceindustries.com/orgs/RAMSORG and wait for approval.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-4" onclick="toggleCheck('ci-4')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Choose Your Primary Division</div><div class="acad-check-desc">Select SHIELD, HAUL, SCOUT, or FORGE in the Division Select tab.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-5" onclick="toggleCheck('ci-5')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Complete Division Foundations</div><div class="acad-check-desc">Read your division's foundations module in Discord or get briefed by your Division Head.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-6" onclick="toggleCheck('ci-6')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Attend Your First Live Op</div><div class="acad-check-desc">Monday casual night is a great first one. Your mentor will be with you.</div><span class="acad-check-tag">Live Required</span></div></div>
+        <div class="acad-check-item" id="ci-7" onclick="toggleCheck('ci-7')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Receive Mentor Sign-Off</div><div class="acad-check-desc">After your Live Ops Qualification, your mentor logs completion in #academy-graduation-log.</div><span class="acad-check-tag">Mentor Required</span></div></div>
+        <div class="acad-check-item" id="ci-8" onclick="toggleCheck('ci-8')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Earn 5 Standing Points</div><div class="acad-check-desc">Attend ops, contribute, recruit a friend. 5 SP unlocks Crew Member eligibility.</div><span class="acad-check-tag">SP Track</span></div></div>
+        <div class="acad-check-item" id="ci-9" onclick="toggleCheck('ci-9')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Graduation — Promoted by Division Head</div><div class="acad-check-desc">Your Division Head promotes you to Crew Member in Discord. You're RAM.</div><span class="acad-check-tag">Milestone</span></div></div>
+      </div>
+    </div>
+
+    <!-- DIVISION SELECT -->
+    <div class="acad-panel" id="panel-division">
+      <div class="acad-panel-tag">Division Select</div>
+      <div class="acad-panel-title">Choose Your Lane</div>
+      <p class="acad-panel-sub">Pick your primary division. Return any time to study additional divisions after reaching Crew Member rank.</p>
+      <div class="acad-div-intro"><strong>Primary division only</strong> — not your only division. After reaching Crew Member rank, come back to study secondary modules. The best crew members in RAMSORG know more than one lane.</div>
+      <div id="div-ui">
+        <div class="acad-div-grid">
+          <div class="acad-div-card" id="dv-VANGUARD" style="--dc:#e84040;" onclick="pickDiv('VANGUARD')"><div class="acad-div-badge" style="border-color:#e84040;color:#e84040;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#e84040;box-shadow:0 0 8px rgba(232,64,64,0.4);"></div><div class="acad-div-code" style="color:#e84040;">VANGUARD</div><div class="acad-div-name">Combat &amp; Security</div><div class="acad-div-desc">The org's fighting force. PvP, bounty hunting, dogfighting, ground combat, and protecting the fleet. If there's a fight, VANGUARD is already there.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Fighter Pilot</span><span class="acad-div-role">Gunner</span><span class="acad-div-role">Marine</span><span class="acad-div-role">Boarding Specialist</span><span class="acad-div-role">Bounty Hunter</span><span class="acad-div-role">Escort Pilot</span></div></div></div>
+          <div class="acad-div-card" id="dv-CLAIM" style="--dc:#c08b20;" onclick="pickDiv('CLAIM')"><div class="acad-div-badge" style="border-color:#c08b20;color:#c08b20;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#c08b20;box-shadow:0 0 8px rgba(192,139,32,0.4);"></div><div class="acad-div-code" style="color:#c08b20;">CLAIM</div><div class="acad-div-name">Collection</div><div class="acad-div-desc">Mining and salvage operations. Rock mining, ship mining, cave mining, and stripping wrecks. CLAIM feeds the org economy.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Mining Pilot</span><span class="acad-div-role">Ship Miner</span><span class="acad-div-role">Cave Miner</span><span class="acad-div-role">Salvage Pilot</span><span class="acad-div-role">Salvage Technician</span></div></div></div>
+          <div class="acad-div-card" id="dv-PULSE" style="--dc:#60c8ff;" onclick="pickDiv('PULSE')"><div class="acad-div-badge" style="border-color:#60c8ff;color:#60c8ff;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#60c8ff;box-shadow:0 0 8px rgba(96,200,255,0.4);"></div><div class="acad-div-code" style="color:#60c8ff;">PULSE</div><div class="acad-div-name">Medical</div><div class="acad-div-desc">Keeping the crew alive. Healing, rescue operations, and field medical response. No op runs without PULSE on standby.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Medic</span><span class="acad-div-role">Combat Medic</span><span class="acad-div-role">Trauma Specialist</span><span class="acad-div-role">Rescue Pilot</span></div></div></div>
+          <div class="acad-div-card" id="dv-HAUL" style="--dc:#1fc8a0;" onclick="pickDiv('HAUL')"><div class="acad-div-badge" style="border-color:#1fc8a0;color:#1fc8a0;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.4);"></div><div class="acad-div-code" style="color:#1fc8a0;">HAUL</div><div class="acad-div-name">Logistics</div><div class="acad-div-desc">Cargo hauling, trade routes, and supply chain management. HAUL keeps the org funded and the fleet supplied across the verse.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Cargo Pilot</span><span class="acad-div-role">Refueling Technician</span><span class="acad-div-role">Trade Analyst</span><span class="acad-div-role">Quartermaster</span><span class="acad-div-role">Convoy Lead</span></div></div></div>
+          <div class="acad-div-card" id="dv-CORE" style="--dc:#e87820;" onclick="pickDiv('CORE')"><div class="acad-div-badge" style="border-color:#e87820;color:#e87820;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#e87820;box-shadow:0 0 8px rgba(232,120,32,0.4);"></div><div class="acad-div-code" style="color:#e87820;">CORE</div><div class="acad-div-name">Engineering</div><div class="acad-div-desc">Ship systems, field repairs, and refueling support. CORE keeps every vessel in the fleet operational before, during, and after every op.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Ship Engineer</span><span class="acad-div-role">Repair Technician</span><span class="acad-div-role">Systems Technician</span><span class="acad-div-role">Base Builder</span></div></div></div>
+          <div class="acad-div-card" id="dv-HORIZON" style="--dc:#4a9eff;" onclick="pickDiv('HORIZON')"><div class="acad-div-badge" style="border-color:#4a9eff;color:#4a9eff;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#4a9eff;box-shadow:0 0 8px rgba(74,158,255,0.4);"></div><div class="acad-div-code" style="color:#4a9eff;">HORIZON</div><div class="acad-div-name">Exploration</div><div class="acad-div-desc">Pushing further into the unknown. System surveying, jump point discovery, and cartography. HORIZON finds the routes the rest of the fleet will follow.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Pathfinder</span><span class="acad-div-role">Scout Pilot</span><span class="acad-div-role">Cartographer</span><span class="acad-div-role">Scanner / Sensor Op</span><span class="acad-div-role">Jump Point Surveyor</span></div></div></div>
+        </div>
+        <div class="acad-div-confirm" id="div-confirm"><div class="acad-div-confirm-box"><div class="acad-div-confirm-title" id="confirm-title">Confirm Division</div><div class="acad-div-confirm-note">You're setting <strong id="confirm-name">—</strong> as your primary division. Tell your Division Head on Discord so they can assign your role. <strong>You can always return to study additional divisions after reaching Crew Member rank.</strong></div><button class="acad-div-confirm-btn" onclick="confirmDiv()">Confirm Selection</button></div></div>
+      </div>
+      <div class="acad-div-locked" id="div-locked"><div class="acad-div-locked-box"><div class="acad-div-locked-title" id="locked-title">Division Confirmed</div><div class="acad-div-locked-note">Your primary division is <strong id="locked-name">—</strong>. Report to your Division Head on Discord — they'll assign your role and point you to your division's foundations module. <strong>Return here any time to study a secondary division.</strong></div><button class="acad-div-change-btn" onclick="resetDiv()">Change Selection</button></div></div>
+    </div>
+
+    <!-- INSTRUCTORS -->
+    <div class="acad-panel" id="panel-instructors">
+      <div class="acad-panel-tag">Faculty</div>
+      <div class="acad-panel-title">Instructor Roster</div>
+      <p class="acad-panel-sub">Certified instructors earn +4 SP per session and a permanent place on this roster. Five sessions earns an Instructor Commendation.</p>
+      <div class="acad-inst-grid">
+        <div class="acad-inst-card"><div class="acad-inst-avatar">AD</div><div class="acad-inst-name">Admiral</div><div class="acad-inst-role">Org Founder · Academy Commandant</div><span class="acad-inst-div">COMMAND</span><div class="acad-inst-sessions">Sessions Taught: <span>∞</span></div><div class="acad-inst-commend">Founder Commendation</div></div>
+        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
+        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
+      </div>
+      <div class="acad-hall-note"><strong>Want to be on this roster?</strong> Any Senior Crew or above can volunteer as an Academy Instructor. Message your Division Head on Discord. Every session earns +4 SP and a permanent entry here. Five sessions earns the Instructor Commendation.</div>
+    </div>
+
+    <!-- GRADUATION -->
+    <div class="acad-panel" id="panel-graduation">
+      <div class="acad-panel-tag">Final Stage</div>
+      <div class="acad-panel-title">Graduation</div>
+      <p class="acad-panel-sub">Complete all checklist stages to unlock graduation. Your Division Head officially promotes you to Crew Member.</p>
+      <div class="acad-grad-locked" id="grad-locked">
+        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#1e3a5f" stroke-width="2" fill="none"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#1e3a5f" stroke-width="1" fill="none" opacity="0.5"/><text x="50" y="60" text-anchor="middle" font-size="28" fill="#3a6080">🔒</text></svg></div>
+        <h3>Not Yet, Cadet</h3>
+        <p>Complete all required stages before your Division Head can promote you. Track your progress in the Checklist tab.</p>
+        <ul class="acad-grad-list" id="grad-list">
+          <li id="gi-1"><div class="acad-gcheck"></div>Join Discord Server</li>
+          <li id="gi-2"><div class="acad-gcheck"></div>Complete Orientation Modules</li>
+          <li id="gi-3"><div class="acad-gcheck"></div>Apply on RSI Org Page</li>
+          <li id="gi-4"><div class="acad-gcheck"></div>Choose Primary Division</li>
+          <li id="gi-5"><div class="acad-gcheck"></div>Division Foundations</li>
+          <li id="gi-6"><div class="acad-gcheck"></div>Live Ops Qualification</li>
+          <li id="gi-7"><div class="acad-gcheck"></div>Mentor Sign-Off</li>
+          <li id="gi-8"><div class="acad-gcheck"></div>Earn 5 Standing Points</li>
+        </ul>
+      </div>
+      <div class="acad-grad-ready" id="grad-ready">
+        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#00c8ff" stroke-width="2" fill="rgba(0,200,255,0.05)"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#00c8ff" stroke-width="1" fill="none" opacity="0.4"/><path d="M35 50 L45 62 L65 40" stroke="#00c8ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Ready to Graduate</h3>
+        <p>All stages complete. Contact your Division Head on Discord — they'll promote you to Crew Member and post your graduation in #academy-graduation-log.</p>
+        <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="acad-grad-btn">Open Discord →</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</div><!-- /page-academy -->
+<!-- ══ ADMIN PASSWORD GATE ══ -->
+<div id="admin-pw-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(12px);">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:420px;width:90%;text-align:center;padding:20px;">
+    <div style="width:70px;height:70px;margin:0 auto 24px;">
+      <svg viewBox="0 0 70 70" fill="none"><polygon points="35,3 67,20 67,50 35,67 3,50 3,20" stroke="rgba(232,64,64,0.5)" stroke-width="1.5" fill="none"/><polygon points="35,14 56,26 56,44 35,56 14,44 14,26" stroke="rgba(232,64,64,0.2)" stroke-width="1" fill="none"/><circle cx="35" cy="35" r="5" fill="rgba(232,64,64,0.2)" stroke="#e84040" stroke-width="1.5"><animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle><circle cx="35" cy="35" r="2.5" fill="#e84040"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Restricted Access</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:24px;">Admiral<br><span style="color:#e84040;">Command</span></h2>
+    <div style="position:relative;margin-bottom:12px;">
+      <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;">AUTH //</div>
+      <input id="admin-pw-input" type="password" placeholder="Enter access code"
+        style="width:100%;background:rgba(232,64,64,0.05);border:1px solid rgba(232,64,64,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 90px;outline:none;letter-spacing:0.15em;transition:border-color 0.2s;"
+        onkeydown="if(event.key==='Enter')adminLogin()">
+    </div>
+    <div id="admin-pw-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:14px;"></div>
+    <button onclick="adminLogin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#e84040;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(232,64,64,0.3);transition:all 0.2s;" onmouseover="this.style.background='#ff6060'" onmouseout="this.style.background='#e84040'">Authenticate</button>
+    <button onclick="document.getElementById('admin-pw-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Cancel</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN PAGE ══ -->
+<div id="page-admin" style="display:none;">
+
+<!-- Admin Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);box-shadow:0 1px 30px rgba(120,0,0,0.15);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/>
+      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e84040" stroke-width="0.8" fill="rgba(232,64,64,0.06)"/>
+      <circle cx="16" cy="16" r="2.5" fill="#e84040"/>
+    </svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Admiral Command</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#e84040'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
+    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,64,64,0.1)'" onmouseout="this.style.background='none'">Logout</button>
+  </div>
+</nav>
+
+<!-- Admin Header -->
+<div style="padding:100px 72px 48px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e84040,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;">
+    <span style="display:block;width:32px;height:1px;background:#e84040;"></span>Admiral Command Panel
+  </div>
+  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,72px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 40px rgba(232,64,64,0.2);">Command<br><em style="font-style:normal;color:#e84040;">Centre</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, events, instructors, announcements, and academy progress. All changes save locally to this browser.</p>
+</div>
+
+<!-- Admin Tab Bar -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="admin-tab active" onclick="showAdminTab('members')"><span class="admin-tab-dot"></span>Members</button>
+  <button class="admin-tab" onclick="showAdminTab('applications')"><span class="admin-tab-dot"></span>Applications</button>
+  <button class="admin-tab" onclick="showAdminTab('events')"><span class="admin-tab-dot"></span>Events</button>
+  <button class="admin-tab" onclick="showAdminTab('instructors')"><span class="admin-tab-dot"></span>Instructors</button>
+  <button class="admin-tab" onclick="showAdminTab('announcements')"><span class="admin-tab-dot"></span>Announcements</button>
+  <button class="admin-tab" onclick="showAdminTab('academy')"><span class="admin-tab-dot"></span>Academy Progress</button>
+</div>
+
+<!-- ── APPLICATIONS ── -->
+<div class="admin-panel" id="admin-panel-applications">
+  <div class="admin-section-label">Enrollment</div>
+  <div class="admin-panel-title">Applications</div>
+  <p class="admin-panel-sub">Review enrollment applications from new cadets. Verify their Discord and RSI membership before approving. Approving adds them to the member roster and grants them Academy access.</p>
+  <div id="admin-application-list"></div>
+</div>
+
+<!-- ── MEMBERS ── -->
+<div class="admin-panel active" id="admin-panel-members">
+  <div class="admin-section-label">Roster</div>
+  <div class="admin-panel-title">Member Management</div>
+  <p class="admin-panel-sub">View all members, promote ranks, and award Standing Points. All changes save locally.</p>
+  <div id="admin-member-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Add New Member</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-callsign" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
+      <select class="admin-select" id="new-division">
+        <option value="VANGUARD">VANGUARD — Combat &amp; Security</option>
+        <option value="CLAIM">CLAIM — Collection</option>
+        <option value="PULSE">PULSE — Medical</option>
+        <option value="HAUL">HAUL — Logistics</option>
+        <option value="CORE">CORE — Engineering</option>
+        <option value="HORIZON">HORIZON — Exploration</option>
+        <option value="SHADE">SHADE — Covert (Admin only)</option>
+        <option value="COMMAND">COMMAND</option>
+      </select>
+    </div>
+    <button class="admin-submit" onclick="addMember()">Add Member</button>
+  </div>
+  <div class="admin-form" style="margin-top:12px;">
+    <div class="admin-form-title">// Assign Cadet to Instructor</div>
+    <div class="admin-form-grid">
+      <select class="admin-select" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
+      <select class="admin-select" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
+    </div>
+    <button class="admin-submit" onclick="assignCadetToInstructor()">Assign</button>
+  </div>
+</div>
+<div class="admin-panel" id="admin-panel-events">
+  <div class="admin-section-label">Operations</div>
+  <div class="admin-panel-title">Event Management</div>
+  <p class="admin-panel-sub">Schedule fleet ops, division ops, and casual nights. Track status from Scheduled → Live → Complete.</p>
+  <div id="admin-event-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Schedule New Event</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-event-name" placeholder="Event name" style="grid-column:1/-1;">
+      <select class="admin-select" id="new-event-type">
+        <option value="Fleet Op">Fleet Op — Saturday</option>
+        <option value="Division Op">Division Op — Wednesday</option>
+        <option value="Casual Night">Casual Night — Monday</option>
+        <option value="Org Meeting">Org Meeting — Monthly</option>
+        <option value="Special Op">Special Op</option>
+      </select>
+      <input class="admin-input" id="new-event-date" type="date">
+    </div>
+    <textarea class="admin-textarea" id="new-event-notes" placeholder="Briefing notes (optional)..." style="margin-bottom:14px;"></textarea>
+    <button class="admin-submit" onclick="addEvent()">Schedule Event</button>
+  </div>
+</div>
+
+<!-- ── INSTRUCTORS ── -->
+<div class="admin-panel" id="admin-panel-instructors">
+  <div class="admin-section-label">Faculty</div>
+  <div class="admin-panel-title">Instructor Management</div>
+  <p class="admin-panel-sub">Add and manage Academy instructors. Logging a session awards their Standing Points automatically. 5 sessions unlocks a Commendation.</p>
+  <div id="admin-instructor-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Add New Instructor</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-instructor-name" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
+      <input class="admin-input" id="new-instructor-role" placeholder="Role / title">
+      <select class="admin-select" id="new-instructor-div">
+        <option value="SHIELD">SHIELD</option>
+        <option value="HAUL">HAUL</option>
+        <option value="SCOUT">SCOUT</option>
+        <option value="FORGE">FORGE</option>
+        <option value="COMMAND">COMMAND</option>
+      </select>
+    </div>
+    <button class="admin-submit" onclick="addInstructor()">Add Instructor</button>
+  </div>
+</div>
+
+<!-- ── ANNOUNCEMENTS ── -->
+<div class="admin-panel" id="admin-panel-announcements">
+  <div class="admin-section-label">Comms</div>
+  <div class="admin-panel-title">Announcements</div>
+  <p class="admin-panel-sub">Post org-wide announcements. These will display on the main site news feed when that feature goes live.</p>
+  <div id="admin-announcement-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Post New Announcement</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-ann-title" placeholder="Announcement title" style="grid-column:1/-1;">
+      <select class="admin-select" id="new-ann-type">
+        <option value="GENERAL">General</option>
+        <option value="OP">Fleet Op</option>
+        <option value="URGENT">Urgent</option>
+        <option value="ACADEMY">Academy</option>
+      </select>
+    </div>
+    <textarea class="admin-textarea" id="new-ann-body" placeholder="Announcement body..." style="margin-bottom:14px;"></textarea>
+    <button class="admin-submit" onclick="addAnnouncement()">Post Announcement</button>
+  </div>
+</div>
+
+<!-- ── ACADEMY PROGRESS ── -->
+<div class="admin-panel" id="admin-panel-academy">
+  <div class="admin-section-label">Intel</div>
+  <div class="admin-panel-title">Academy Progress</div>
+  <p class="admin-panel-sub">View enrolled cadets and track their progress through the orientation pipeline in real time.</p>
+  <div id="admin-academy-list"></div>
+  <div class="admin-form" style="margin-top:16px;">
+    <div class="admin-form-title">// Remove Cadet from Firestore</div>
+    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Permanently removes a cadet account from Firestore and all local data. Use this to clear test profiles or remove a member completely.</p>
+    <input class="admin-input" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
+    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Remove Cadet</button>
+  </div>
+</div>
+
+</div><!-- /page-admin -->
+
+<!-- ══ INSTRUCTOR PANEL PAGE ══ -->
+<div id="page-instructor" style="display:none;">
+
+<style>
+.inst-panel { display:none; padding:48px 68px; border-bottom:1px solid rgba(0,200,255,0.1); }
+.inst-panel.active { display:block; animation:acadIn 0.3s ease both; }
+.inst-tab { display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,200,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%; }
+.inst-tab:hover { color:#8ab8d8;background:rgba(0,100,200,0.06); }
+.inst-tab.active { color:#00c8ff;border-bottom-color:#00c8ff; }
+.inst-tab-dot { width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0; }
+.inst-tab.active .inst-tab-dot { background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7); }
+.inst-cadet-row { background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:2px;transition:border-color 0.2s; }
+.inst-cadet-row:hover { border-color:rgba(0,200,255,0.25); }
+.inst-cadet-name { font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px; }
+.inst-cadet-meta { font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;margin-bottom:10px; }
+.inst-progress-bar { height:3px;background:#1e3a5f;margin-bottom:10px; }
+.inst-progress-fill { height:100%;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.4);transition:width 0.5s; }
+.inst-signoff-btn { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:7px 18px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:background 0.2s; }
+.inst-signoff-btn:hover { background:#40e8c0; }
+.inst-signoff-done { font-family:'Share Tech Mono',monospace;font-size:10px;color:#1fc8a0;letter-spacing:0.08em; }
+.inst-note-input { width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;transition:border-color 0.2s; }
+.inst-note-input:focus { border-color:rgba(0,200,255,0.3); }
+.inst-note-save { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:6px 14px;cursor:pointer;margin-top:6px;transition:all 0.2s; }
+.inst-note-save:hover { background:rgba(0,200,255,0.15); }
+.inst-empty { font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase; }
+</style>
+
+<!-- Instructor Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,200,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/><polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/><circle cx="16" cy="16" r="2.5" fill="#00c8ff"/></svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Instructor Panel</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div id="inst-callsign-nav" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;"></div>
+    <button onclick="goToAcademy()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Academy</button>
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5a8aaa;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">Main Site</button>
+  </div>
+</nav>
+
+<!-- Instructor Header -->
+<div style="padding:100px 68px 48px;background:#060c18;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;"><span style="display:block;width:32px;height:1px;background:#00c8ff;"></span>Second Fleet Academy</div>
+  <h1 id="inst-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 30px rgba(0,200,255,0.2);">Instructor<br><em style="font-style:normal;color:#00c8ff;">Command</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Your assigned cadets, their progress, and your sign-off tools. Only you can mark Live Ops Qualifications complete.</p>
+</div>
+
+<!-- Instructor Tab Bar -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="inst-tab active" onclick="showInstPanel('cadets')"><span class="inst-tab-dot"></span>My Cadets</button>
+  <button class="inst-tab" onclick="showInstPanel('roster')"><span class="inst-tab-dot"></span>Class Roster</button>
+</div>
+
+<!-- PANEL: MY CADETS -->
+<div class="inst-panel active" id="inst-panel-cadets">
+  <div class="acad-panel-tag">Assigned Cadets</div>
+  <div class="acad-panel-title">My Cadets</div>
+  <p class="acad-panel-sub">Cadets the Admiral has assigned to you. Track their progress and give your Live Ops Qualification sign-off when they complete their first live op with you.</p>
+  <div id="inst-cadet-list"></div>
+</div>
+
+<!-- PANEL: CLASS ROSTER -->
+<div class="inst-panel" id="inst-panel-roster">
+  <div class="acad-panel-tag">Overview</div>
+  <div class="acad-panel-title">Class Roster</div>
+  <p class="acad-panel-sub">All cadets currently enrolled in the Academy. View-only — contact the Admiral to reassign cadets.</p>
+  <div id="inst-roster-list"></div>
+</div>
+
+</div><!-- /page-instructor -->
+
+
 <script>
 // ════════════════════════════════════════
 // ADMIN DATA (localStorage)
@@ -1918,7 +2627,8 @@ function adminLogout() {
 function showAdminTab(id) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('admin-panel-' + id).classList.add('active');
+  const panel = document.getElementById('admin-panel-' + id);
+  if (panel) panel.classList.add('active');
   document.querySelectorAll('.admin-tab').forEach(b => {
     if (b.getAttribute('onclick') === "showAdminTab('" + id + "')") b.classList.add('active');
   });
@@ -2652,10 +3362,8 @@ window.setupAdminAccount = async function() {
 };
 
 // Check admin button visibility once DOM is ready
-document.addEventListener("DOMContentLoaded", function() {
-  initFirebase();
-  window.openAdmin = openAdminPanel;
-});
+// initFirebase called at bottom of body after all scripts loaded
+window.openAdmin = openAdminPanel;
 
 // MAIN SITE — scroll reveal + connector
 // ════════════════════════════════════════
@@ -2861,713 +3569,6 @@ function initAcademy() {
 
 
 </script>
-
-<!-- ════════════════════════════════════════
-     ACADEMY PORTAL — hidden on load
-════════════════════════════════════════ -->
-<div id="page-academy" style="display:none;">
-
-<!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
-<!-- ══ SIGNUP / SIGN IN OVERLAY — from RSI dropdown ══ -->
-<div id="signup-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(14px);">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:relative;max-width:440px;width:90%;text-align:center;padding:40px 20px;">
-    <div style="width:72px;height:72px;margin:0 auto 22px;">
-      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">RAM Space Industries</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:6px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Signup /<br><span style="color:#00c8ff;">Sign In</span></h2>
-    <p style="font-size:13px;color:#5a8aaa;line-height:1.7;margin:14px 0 24px;">Enter your callsign. New members will create an account — returning members will sign in.</p>
-
-    <!-- Mode tabs -->
-    <div style="display:flex;gap:2px;margin-bottom:20px;">
-      <button id="ss-tab-new" onclick="setSsMode('new')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid rgba(0,200,255,0.4);background:rgba(0,200,255,0.1);color:#00c8ff;cursor:pointer;">New Member</button>
-      <button id="ss-tab-ret" onclick="setSsMode('return')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid #1e3a5f;background:transparent;color:#5a8aaa;cursor:pointer;">Returning</button>
-    </div>
-
-    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
-        <input id="ss-callsign" type="text" maxlength="24" placeholder="Your callsign" autocomplete="off" spellcheck="false"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
-          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doSignupSignin()">
-      </div>
-      <!-- Password field — only for returning members -->
-      <div id="ss-password-wrap" style="display:none;position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
-        <input id="ss-password" type="password" placeholder="Your password" autocomplete="current-password"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
-          onkeydown="if(event.key==='Enter')doSignupSignin()">
-      </div>
-      <!-- Password set — only for new members -->
-      <div id="ss-newpass-wrap" style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
-        <input id="ss-newpassword" type="password" placeholder="Choose a password (min 6 chars)" autocomplete="new-password"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
-          onkeydown="if(event.key==='Enter')doSignupSignin()">
-      </div>
-    </div>
-
-    <div id="ss-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;min-height:18px;margin-bottom:12px;text-align:left;"></div>
-    <button onclick="doSignupSignin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'" id="ss-submit-btn">Create Account →</button>
-    <button onclick="document.getElementById('signup-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;">← Cancel</button>
-  </div>
-</div>
-
-<!-- ══ ACADEMY ENROLLMENT GATE — only shown first time going to academy after signing in ══ -->
-<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-
-  <!-- STEP 1: ACADEMY ENROLLMENT — Discord + RSI (no callsign, already signed in) -->
-  <div id="enroll-step-1" style="position:relative;max-width:560px;width:90%;text-align:center;padding:40px 20px;">
-    <div style="width:80px;height:80px;margin:0 auto 24px;">
-      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Second Fleet Academy — Enrollment Step 1 of 2</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Academy<br><span style="color:#00c8ff;">Enrollment</span></h2>
-    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:16px 0 6px;">Provide your Discord and RSI usernames so the Admiral can verify your membership before approving your Academy access.</p>
-    <div id="enroll-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:22px;"></div>
-
-    <div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">DISCORD //</div>
-        <input id="discord-input" type="text" maxlength="48" placeholder="Your Discord username" autocomplete="off"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
-      </div>
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">RSI NAME //</div>
-        <input id="rsi-input" type="text" maxlength="48" placeholder="Your RSI display name" autocomplete="off"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;transition:border-color 0.2s;">
-      </div>
-    </div>
-    <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
-    <button onclick="enrollStep1()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue to Entry Exam →</button>
-    <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
-  </div>
-
-<!-- ══ ACADEMY NAV ══ -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
-  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/>
-      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/>
-      <circle cx="16" cy="16" r="2.5" fill="#00c8ff"/>
-    </svg>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:20px;">
-    <div id="acad-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#5a8aaa;text-transform:uppercase;"></div>
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;transition:color 0.2s;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:4px 12px;text-transform:uppercase;">Cadet Portal</div>
-    <button id="inst-panel-btn" onclick="goToInstructor()" style="display:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.12em;color:#04070f;background:#00c8ff;border:none;padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">⬡ Instructor Panel</button>
-    <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:6px 14px;text-decoration:none;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#00c8ff';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#00c8ff'">Discord</a>
-  </div>
-</nav>
-
-<!-- ══ PAGE HEADER ══ -->
-<div style="padding:120px 80px 60px;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;background:#060c18;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;">
-    <span style="display:block;width:32px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.6);"></span>Second Fleet Academy — Cadet Portal
-  </div>
-  <h1 id="acad-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,7vw,80px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;letter-spacing:0.01em;margin-bottom:16px;position:relative;text-shadow:0 0 40px rgba(0,200,255,0.3);">Welcome,<br><em style="font-style:normal;color:#00c8ff;text-shadow:0 0 30px rgba(0,200,255,0.6);">Cadet.</em></h1>
-  <p style="font-size:15px;color:#8ab8d8;max-width:600px;line-height:1.8;position:relative;">Complete orientation, pick your division, and earn your place in RAM. Return any time to study new modules or pursue advanced certifications.</p>
-</div>
-
-<!-- ══ TAB BAR ══ -->
-<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.15);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
-  <button class="acad-tab active" onclick="showPanel('orientation')"><span class="acad-dot"></span>Orientation</button>
-  <button class="acad-tab" onclick="showPanel('checklist')"><span class="acad-dot"></span>Checklist</button>
-  <button class="acad-tab" onclick="showPanel('division')"><span class="acad-dot"></span>Division Select</button>
-  <button class="acad-tab" onclick="showPanel('instructors')"><span class="acad-dot"></span>Instructors</button>
-  <button class="acad-tab" onclick="showPanel('graduation')"><span class="acad-dot"></span>Graduation</button>
-</div>
-
-<style>
-/* ── Academy scoped styles — no conflicts with main site ── */
-.acad-tab{display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,180,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;}
-.acad-tab:hover{color:#8ab8d8;background:rgba(0,100,200,0.08);}
-.acad-tab.active{color:#00c8ff;border-bottom-color:#00c8ff;}
-.acad-dot{width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0;}
-.acad-tab.active .acad-dot{background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7);}
-
-.acad-layout{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 110px);}
-.acad-sidebar{background:#060c18;border-right:1px solid rgba(0,180,255,0.1);padding:24px 0;position:sticky;top:110px;height:calc(100vh - 110px);overflow-y:auto;}
-.acad-sidebar::-webkit-scrollbar{width:3px;}
-.acad-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f;}
-.acad-sidebar-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#3a6080;text-transform:uppercase;padding:0 20px;margin-bottom:6px;}
-.acad-sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8ab8d8;text-transform:uppercase;transition:all 0.15s;cursor:pointer;border-left:2px solid transparent;border-right:none;border-top:none;border-bottom:none;background:none;width:100%;text-align:left;}
-.acad-sidebar-btn:hover{color:#e8f4ff;background:rgba(0,100,200,0.08);}
-.acad-sidebar-btn.active{color:#00c8ff;border-left-color:#00c8ff;background:rgba(0,200,255,0.05);}
-.acad-sidebar-icon{font-size:11px;color:#3a6080;flex-shrink:0;}
-.acad-sidebar-section{margin-bottom:24px;}
-
-.acad-panel{display:none;padding:52px 68px;border-bottom:1px solid rgba(0,180,255,0.1);}
-.acad-panel.active{display:block;animation:acadIn 0.3s ease both;}
-@keyframes acadIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-
-.acad-panel-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
-.acad-panel-tag::before{content:'';display:block;width:20px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.5);}
-.acad-panel-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:12px;}
-.acad-panel-sub{font-size:15px;color:#8ab8d8;max-width:580px;line-height:1.8;margin-bottom:40px;}
-
-/* Info cards */
-.acad-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:32px;}
-.acad-info-card{background:#0c1828;border:1px solid #1e3a5f;padding:18px 20px;}
-.acad-info-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:6px;}
-.acad-info-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#00c8ff;line-height:1;}
-.acad-info-sub{font-size:12px;color:#5a8aaa;margin-top:4px;}
-
-/* Module blocks */
-.acad-mod{background:#0c1828;border:1px solid #1e3a5f;margin-bottom:2px;overflow:hidden;transition:border-color 0.2s;}
-.acad-mod:hover{border-color:rgba(0,200,255,0.3);}
-.acad-mod-header{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;transition:background 0.2s;}
-.acad-mod-header:hover{background:rgba(0,100,200,0.06);}
-.acad-mod-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:#3a6080;letter-spacing:0.1em;min-width:32px;}
-.acad-mod-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;flex:1;}
-.acad-mod-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;}
-.acad-mod-status.done{color:#1fc8a0;}
-.acad-mod-chevron{color:#3a6080;font-size:11px;transition:transform 0.2s;}
-.acad-mod.open .acad-mod-chevron{transform:rotate(180deg);}
-.acad-mod-body{display:none;padding:0 22px 26px;border-top:1px solid #1e3a5f;background:#091220;}
-.acad-mod.open .acad-mod-body{display:block;}
-.acad-mod-body p{font-size:14px;color:#c8e0f4;line-height:1.8;margin:14px 0;}
-.acad-mod-body h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 6px;}
-.acad-mod-body ul{list-style:none;margin:8px 0;}
-.acad-mod-body ul li{font-size:14px;color:#8ab8d8;line-height:1.7;padding:3px 0;display:flex;align-items:flex-start;gap:10px;}
-.acad-mod-body ul li::before{content:'▸';color:#00c8ff;flex-shrink:0;font-size:10px;margin-top:5px;}
-.acad-callout{background:rgba(0,200,255,0.05);border-left:2px solid #00c8ff;padding:14px 18px;margin:16px 0;font-size:13px;color:#8ab8d8;line-height:1.7;}
-.acad-callout strong{color:#00c8ff;}
-.acad-mark-btn{margin-top:18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:10px 24px;cursor:pointer;transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));box-shadow:0 0 16px rgba(0,200,255,0.25);}
-.acad-mark-btn:hover{background:#40dfff;box-shadow:0 0 24px rgba(0,200,255,0.4);}
-.acad-mark-btn.done{background:#091220;color:#1fc8a0;border:1px solid #1fc8a0;clip-path:none;cursor:default;box-shadow:none;}
-
-/* Checklist */
-.acad-prog-wrap{background:#091220;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
-.acad-prog-count{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#1fc8a0;white-space:nowrap;}
-.acad-prog-track{flex:1;height:3px;background:#1e3a5f;}
-.acad-prog-fill{height:100%;background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.5);transition:width 0.5s ease;}
-.acad-prog-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;white-space:nowrap;}
-.acad-check-list{display:flex;flex-direction:column;gap:2px;}
-.acad-check-item{display:flex;align-items:flex-start;gap:14px;background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;transition:all 0.2s;cursor:pointer;}
-.acad-check-item:hover{border-color:rgba(0,200,255,0.25);}
-.acad-check-item.checked{border-color:#1fc8a0;background:rgba(31,200,160,0.04);}
-.acad-check-box{width:20px;height:20px;border:1.5px solid #1e3a5f;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;transition:all 0.2s;}
-.acad-check-item.checked .acad-check-box{border-color:#1fc8a0;background:rgba(31,200,160,0.15);}
-.acad-check-tick{color:#1fc8a0;font-size:12px;display:none;}
-.acad-check-item.checked .acad-check-tick{display:block;}
-.acad-check-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
-.acad-check-item.checked .acad-check-title{color:#1fc8a0;text-decoration:line-through;text-decoration-color:rgba(31,200,160,0.4);}
-.acad-check-desc{font-size:13px;color:#8ab8d8;line-height:1.6;}
-.acad-check-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#3a6080;border:1px solid #1e3a5f;padding:2px 8px;margin-top:8px;display:inline-block;}
-.acad-check-tag.req{border-color:rgba(0,200,255,0.3);color:#00c8ff;}
-
-/* Division cards */
-.acad-div-intro{background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:16px 20px;margin-bottom:26px;font-size:14px;color:#8ab8d8;line-height:1.7;}
-.acad-div-intro strong{color:#00c8ff;}
-.acad-div-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
-.acad-div-card{border:1px solid #1e3a5f;background:#0c1828;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
-.acad-div-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,50,120,0.4);}
-.acad-div-card.selected{box-shadow:0 0 0 1px var(--dc);border-color:var(--dc);}
-.acad-div-card-top{padding:24px 24px 16px;border-bottom:1px solid #1e3a5f;}
-.acad-div-accent{height:2px;width:100%;margin-bottom:16px;}
-.acad-div-code{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;letter-spacing:0.05em;margin-bottom:4px;}
-.acad-div-name{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#5a8aaa;text-transform:uppercase;margin-bottom:12px;}
-.acad-div-desc{font-size:13px;color:#8ab8d8;line-height:1.7;}
-.acad-div-card-bottom{padding:16px 24px;}
-.acad-div-roles-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:8px;}
-.acad-div-roles{display:flex;flex-wrap:wrap;gap:5px;}
-.acad-div-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.05em;padding:3px 8px;border:1px solid #1e3a5f;color:#5a8aaa;text-transform:uppercase;}
-.acad-div-badge{position:absolute;top:12px;right:12px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;display:none;}
-.acad-div-card.selected .acad-div-badge{display:block;}
-.acad-div-confirm{display:none;margin-top:8px;}.acad-div-confirm.visible{display:block;}
-.acad-div-confirm-box{background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.25);padding:22px 26px;}
-.acad-div-confirm-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:8px;}
-.acad-div-confirm-note{font-size:14px;color:#8ab8d8;line-height:1.7;margin-bottom:18px;}
-.acad-div-confirm-note strong{color:#00c8ff;}
-.acad-div-confirm-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:12px 28px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background 0.2s;box-shadow:0 0 16px rgba(0,200,255,0.25);}
-.acad-div-confirm-btn:hover{background:#40dfff;}
-.acad-div-locked{display:none;}.acad-div-locked.visible{display:block;}
-.acad-div-locked-box{background:rgba(31,200,160,0.04);border:1px solid #1fc8a0;padding:22px 26px;}
-.acad-div-locked-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#1fc8a0;text-transform:uppercase;margin-bottom:8px;}
-.acad-div-locked-note{font-size:14px;color:#8ab8d8;line-height:1.7;}
-.acad-div-locked-note strong{color:#1fc8a0;}
-.acad-div-change-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:transparent;border:1px solid #1e3a5f;padding:7px 14px;cursor:pointer;margin-top:14px;transition:all 0.2s;}
-.acad-div-change-btn:hover{color:#8ab8d8;border-color:#3a6080;}
-
-/* Instructors */
-.acad-inst-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
-.acad-inst-card{background:#0c1828;border:1px solid #1e3a5f;padding:22px;transition:border-color 0.2s;}
-.acad-inst-card:hover{border-color:rgba(0,200,255,0.3);}
-.acad-inst-avatar{width:46px;height:46px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#00c8ff;margin-bottom:12px;clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);}
-.acad-inst-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
-.acad-inst-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;}
-.acad-inst-div{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 10px;border:1px solid rgba(0,200,255,0.3);color:#00c8ff;display:inline-block;margin-bottom:12px;}
-.acad-inst-sessions{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;}
-.acad-inst-sessions span{color:#00c8ff;}
-.acad-inst-commend{margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#1fc8a0;border:1px solid rgba(31,200,160,0.3);padding:3px 8px;display:inline-block;}
-.acad-inst-vacant{background:#091220;border:1px dashed #1e3a5f;padding:22px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:155px;cursor:pointer;transition:border-color 0.2s;}
-.acad-inst-vacant:hover{border-color:#3a6080;}
-.acad-inst-vacant-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;}
-.acad-hall-note{font-size:14px;color:#8ab8d8;line-height:1.7;background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:14px 18px;margin-top:24px;}
-.acad-hall-note strong{color:#00c8ff;}
-
-/* Graduation */
-.acad-grad-locked{text-align:center;padding:60px 40px;}
-.acad-grad-locked h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:12px;}
-.acad-grad-locked p{font-size:14px;color:#8ab8d8;max-width:440px;margin:0 auto 28px;line-height:1.7;}
-.acad-grad-list{list-style:none;text-align:left;max-width:340px;margin:0 auto 28px;display:flex;flex-direction:column;gap:8px;}
-.acad-grad-list li{display:flex;align-items:center;gap:12px;font-family:'Share Tech Mono',monospace;font-size:12px;color:#5a8aaa;letter-spacing:0.05em;}
-.acad-gcheck{width:16px;height:16px;border:1px solid #1e3a5f;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
-.acad-grad-list li.done .acad-gcheck{border-color:#1fc8a0;color:#1fc8a0;}
-.acad-grad-ready{text-align:center;padding:60px 40px;display:none;}
-.acad-grad-ready h3{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-shadow:0 0 30px rgba(0,200,255,0.4);}
-.acad-grad-ready p{font-size:14px;color:#8ab8d8;max-width:480px;margin:0 auto 28px;line-height:1.7;}
-.acad-grad-btn{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px 36px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.2s;text-decoration:none;display:inline-block;box-shadow:0 0 24px rgba(0,200,255,0.35);}
-.acad-grad-btn:hover{background:#40dfff;box-shadow:0 0 40px rgba(0,200,255,0.5);}
-
-@media(max-width:900px){
-  .acad-layout{grid-template-columns:1fr;}
-  .acad-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;flex-wrap:wrap;padding:8px 16px;gap:4px;}
-  .acad-sidebar-section{display:contents;}
-  .acad-sidebar-label{display:none;}
-  .acad-sidebar-btn{padding:7px 10px;border-left:none;border-bottom:2px solid transparent;font-size:10px;}
-  .acad-sidebar-btn.active{border-bottom-color:#00c8ff;border-left-color:transparent;}
-  .acad-panel{padding:32px 20px;}
-  .acad-div-grid{grid-template-columns:1fr;}
-  .acad-inst-grid{grid-template-columns:1fr 1fr;}
-  .acad-info-grid{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:540px){.acad-inst-grid{grid-template-columns:1fr;}}
-</style>
-
-<!-- ══ PORTAL LAYOUT ══ -->
-<div class="acad-layout">
-  <aside class="acad-sidebar">
-    <div class="acad-sidebar-section">
-      <div class="acad-sidebar-label">Orientation</div>
-      <button class="acad-sidebar-btn active" onclick="showPanel('orientation')"><span class="acad-sidebar-icon">◈</span>Orientation</button>
-    </div>
-    <div class="acad-sidebar-section">
-      <div class="acad-sidebar-label">Progress</div>
-      <button class="acad-sidebar-btn" onclick="showPanel('checklist')"><span class="acad-sidebar-icon">◻</span>Checklist</button>
-    </div>
-    <div class="acad-sidebar-section">
-      <div class="acad-sidebar-label">Division</div>
-      <button class="acad-sidebar-btn" onclick="showPanel('division')"><span class="acad-sidebar-icon">◆</span>Division Select</button>
-    </div>
-    <div class="acad-sidebar-section">
-      <div class="acad-sidebar-label">Faculty</div>
-      <button class="acad-sidebar-btn" onclick="showPanel('instructors')"><span class="acad-sidebar-icon">★</span>Instructors</button>
-    </div>
-    <div class="acad-sidebar-section">
-      <div class="acad-sidebar-label">Graduate</div>
-      <button class="acad-sidebar-btn" onclick="showPanel('graduation')"><span class="acad-sidebar-icon">◇</span>Graduation</button>
-    </div>
-  </aside>
-
-  <main style="min-width:0;">
-
-    <!-- ORIENTATION -->
-    <div class="acad-panel active" id="panel-orientation">
-      <div class="acad-panel-tag">Module 01</div>
-      <div class="acad-panel-title">Orientation Briefing</div>
-      <p class="acad-panel-sub">Read each module and mark it complete. Progress saves in your browser.</p>
-      <div class="acad-info-grid">
-        <div class="acad-info-card"><div class="acad-info-label">Modules</div><div class="acad-info-val" id="mod-count">0/6</div><div class="acad-info-sub">Complete all to advance</div></div>
-        <div class="acad-info-card"><div class="acad-info-label">Est. Read Time</div><div class="acad-info-val">~15</div><div class="acad-info-sub">Minutes total</div></div>
-        <div class="acad-info-card"><div class="acad-info-label">Status</div><div class="acad-info-val" id="orient-status" style="font-size:18px;color:#3a6080;">In Progress</div><div class="acad-info-sub">Read all to complete</div></div>
-      </div>
-
-      <div class="acad-mod" id="mod-1"><div class="acad-mod-header" onclick="toggleMod(1)"><div class="acad-mod-num">01</div><div class="acad-mod-title">Welcome to RAM Space Industries</div><div class="acad-mod-status" id="ms-1">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>Welcome, Cadet. You have taken the first step toward joining RAM Space Industries. Before you earn your division assignment and your crew rank, you need to understand who we are, how we operate, and what we expect of every person who flies under the RAMSORG tag.</p>
-        <h4>Who We Are</h4><p>RAM Space Industries was founded on a simple idea: that the right crew, given the right mission, has no ceiling. We are lawful, role-play friendly, and active across every major gameplay loop.</p>
-        <h4>The RAM Doctrine</h4><ul><li><strong style="color:#00c8ff">Reliability</strong> — If you sign up, you show up. Your crew plans around you.</li><li><strong style="color:#00c8ff">Adaptability</strong> — The verse changes with every patch. Stay flexible.</li><li><strong style="color:#00c8ff">Mastery</strong> — Know your role. Do it well.</li></ul>
-        <div class="acad-callout"><strong>Cadet note:</strong> Cadet is your rank while you complete the Academy. Once you graduate you become a Crew Member and receive your official division assignment.</div>
-        <button class="acad-mark-btn" onclick="markRead(1)">Mark as Read</button></div></div>
-
-      <div class="acad-mod" id="mod-2"><div class="acad-mod-header" onclick="toggleMod(2)"><div class="acad-mod-num">02</div><div class="acad-mod-title">Rank Structure &amp; Progression</div><div class="acad-mod-status" id="ms-2">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>RAMSORG uses a ten-rank system across four tiers. Understanding where you sit and how to move up is essential.</p>
-        <h4>The Three Tiers</h4><ul><li><strong style="color:#00aaff">Command Tier</strong> — Admiral, Fleet Commander, Captain. Set strategy, run fleet ops, final authority.</li><li><strong style="color:#8ab8d8">Officer Tier</strong> — Division Head, Lieutenant, Specialist. Leadership and mentorship within each division.</li><li><strong style="color:#1fc8a0">Crew Tier</strong> — Senior Crew, Crew Member, Cadet. Where you start. The backbone of every op.</li></ul>
-        <h4>How You Advance</h4><p>Rank is earned through Standing Points (SP) — awarded for attending events, completing ops, recruiting members, and teaching in the Academy.</p>
-        <div class="acad-callout"><strong>Your current rank:</strong> Cadet. Next milestone: Crew Member — earned by completing all Academy stages and attending your first live op.</div>
-        <button class="acad-mark-btn" onclick="markRead(2)">Mark as Read</button></div></div>
-
-      <div class="acad-mod" id="mod-3"><div class="acad-mod-header" onclick="toggleMod(3)"><div class="acad-mod-num">03</div><div class="acad-mod-title">The Six Divisions</div><div class="acad-mod-status" id="ms-3">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>Every member of RAMSORG belongs to a division. Read this before picking in the Division Select tab.</p>
-        <h4>SHIELD — Security &amp; Combat</h4><ul><li>Fighter pilots, gunners, marines, medics protecting the org's assets.</li><li>Escort missions, bounty hunting, PvP response, base defense.</li><li>Best for: combat, dogfighting, FPS gameplay.</li></ul>
-        <h4>HAUL — Logistics &amp; Cargo</h4><ul><li>Cargo pilots, refuelers, trade analysts keeping the org funded.</li><li>Freight convoys, trade route optimization, supply missions.</li><li>Best for: trading, hauling, economic gameplay.</li></ul>
-        <h4>SCOUT — Exploration &amp; Recon</h4><ul><li>Pathfinders, salvagers, cartographers mapping the verse.</li><li>Deep space surveys, jump point scouting, salvage sweeps.</li><li>Best for: exploration, discovery, solo or small-team play.</li></ul>
-        <h4>FORGE — Engineering &amp; Industry</h4><ul><li>Miners, ship engineers, base builders, repair specialists.</li><li>Mining operations, ship repair during fleet ops, base construction.</li><li>Best for: industry, engineering, and support roles.</li></ul>
-        <div class="acad-callout"><strong>Important:</strong> Your primary division is your starting point — not your cage. After reaching Crew Member rank, return here to cross-train in secondary divisions.</div>
-        <button class="acad-mark-btn" onclick="markRead(3)">Mark as Read</button></div></div>
-
-      <div class="acad-mod" id="mod-4"><div class="acad-mod-header" onclick="toggleMod(4)"><div class="acad-mod-num">04</div><div class="acad-mod-title">Events, Ops &amp; How We Run Them</div><div class="acad-mod-status" id="ms-4">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>RAMSORG runs a structured weekly event schedule. Know these before your first live op.</p>
-        <h4>Weekly Rhythm</h4><ul><li><strong style="color:#00c8ff">Monday — Open Contracts Night:</strong> Informal. No assigned roles. Great for your first session.</li><li><strong style="color:#00c8ff">Wednesday — Division Ops:</strong> Structured. Each division runs its own focused activity.</li><li><strong style="color:#00c8ff">Saturday — Fleet Op:</strong> Main event. Multi-ship, all divisions. Earns the most SP.</li><li><strong style="color:#00c8ff">Monthly — Org Meeting:</strong> Voice meeting. Promotions, strategy, next month planned.</li></ul>
-        <h4>Fleet Op Flow</h4><ul><li>Announced 3+ days ahead in <strong style="color:#e8f4ff">#fleet-ops-announcements</strong>.</li><li>Sign up by reacting with your division emoji or posting your role.</li><li>Captain assigns positions 24 hours before.</li><li>Everyone joins voice for a muster brief — objective, callsigns, rules of engagement.</li><li>After the op: after-action report. This is how SP are awarded.</li></ul>
-        <div class="acad-callout"><strong>Comms rule:</strong> In a live op, keep voice clear. Call out threats, statuses, positions — nothing else until debrief.</div>
-        <button class="acad-mark-btn" onclick="markRead(4)">Mark as Read</button></div></div>
-
-      <div class="acad-mod" id="mod-5"><div class="acad-mod-header" onclick="toggleMod(5)"><div class="acad-mod-num">05</div><div class="acad-mod-title">Standing Points &amp; The Org Economy</div><div class="acad-mod-status" id="ms-5">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>Standing Points (SP) track your contribution and progress toward rank.</p>
-        <h4>How You Earn SP</h4><ul><li>Casual event attendance — <strong style="color:#00c8ff">+1 SP</strong></li><li>Division Op completion — <strong style="color:#00c8ff">+2 SP</strong></li><li>Fleet Op participation — <strong style="color:#00c8ff">+3 SP</strong></li><li>MVP / Commendation — <strong style="color:#00c8ff">+2 SP bonus</strong></li><li>Recruiting a new member — <strong style="color:#00c8ff">+3 SP</strong></li><li>Teaching an Academy module — <strong style="color:#00c8ff">+4 SP</strong></li><li>Org fund contributions — <strong style="color:#00c8ff">+1–5 SP</strong> at leadership discretion</li></ul>
-        <h4>Rank Thresholds</h4><ul><li>5 SP — eligible for Crew Member</li><li>20 SP — eligible for Senior Crew</li><li>40 SP — eligible for Specialist</li><li>60 SP — eligible for Lieutenant / Division Head</li></ul>
-        <button class="acad-mark-btn" onclick="markRead(5)">Mark as Read</button></div></div>
-
-      <div class="acad-mod" id="mod-6"><div class="acad-mod-header" onclick="toggleMod(6)"><div class="acad-mod-num">06</div><div class="acad-mod-title">Code of Conduct &amp; Discord</div><div class="acad-mod-status" id="ms-6">Unread</div><div class="acad-mod-chevron">▾</div></div>
-        <div class="acad-mod-body"><p>RAMSORG runs on trust, respect, and Discord. These rules apply to every member from Cadet to Admiral.</p>
-        <h4>Code of Conduct</h4><ul><li>Treat every member with respect. Zero tolerance for harassment.</li><li>No griefing org members or allies. Disputes go to a Division Head.</li><li>If you commit to an op, show up. Notify leadership in advance if you can't.</li><li>Follow your Captain's orders in an op. Save disagreements for debrief.</li><li>No unauthorized PvP — check rules of engagement before engaging.</li></ul>
-        <h4>Required: Join Discord</h4><p>Join at: <strong style="color:#00c8ff">discord.gg/Xhaj3nRAEp</strong> — required before your first op.</p>
-        <h4>Key Channels</h4><ul><li><strong style="color:#e8f4ff">#org-announcements</strong> — Official org news.</li><li><strong style="color:#e8f4ff">#fleet-ops-announcements</strong> — All ops posted here first.</li><li><strong style="color:#e8f4ff">#academy-orientation</strong> — Your home channel as a Cadet.</li><li><strong style="color:#e8f4ff">#academy-graduation-log</strong> — Graduates posted here.</li><li><strong style="color:#e8f4ff">#standing-points-log</strong> — SP tracking.</li></ul>
-        <div class="acad-callout"><strong>Final note:</strong> The Academy exists because the First Fleet learned everything the hard way. You have the advantage of everything they figured out. Use it.</div>
-        <button class="acad-mark-btn" onclick="markRead(6)">Mark as Read</button></div></div>
-    </div>
-
-    <!-- CHECKLIST -->
-    <div class="acad-panel" id="panel-checklist">
-      <div class="acad-panel-tag">Stage Tracker</div>
-      <div class="acad-panel-title">Cadet Checklist</div>
-      <p class="acad-panel-sub">Click each item to mark it complete. Progress saves in your browser.</p>
-      <div class="acad-prog-wrap"><div class="acad-prog-count" id="check-count">0/9</div><div class="acad-prog-track"><div class="acad-prog-fill" id="check-fill" style="width:0%"></div></div><div class="acad-prog-label">Tasks Complete</div></div>
-      <div class="acad-check-list">
-        <div class="acad-check-item" id="ci-1" onclick="toggleCheck('ci-1')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Join the Discord Server</div><div class="acad-check-desc">Join at discord.gg/Xhaj3nRAEp — required before anything else.</div><span class="acad-check-tag req">Required First</span></div></div>
-        <div class="acad-check-item" id="ci-2" onclick="toggleCheck('ci-2')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Read All 6 Orientation Modules</div><div class="acad-check-desc">Complete every module in the Orientation tab. Mark each one read.</div><span class="acad-check-tag req">Required</span></div></div>
-        <div class="acad-check-item" id="ci-3" onclick="toggleCheck('ci-3')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Apply on the RSI Org Page</div><div class="acad-check-desc">Apply at robertsspaceindustries.com/orgs/RAMSORG and wait for approval.</div><span class="acad-check-tag req">Required</span></div></div>
-        <div class="acad-check-item" id="ci-4" onclick="toggleCheck('ci-4')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Choose Your Primary Division</div><div class="acad-check-desc">Select SHIELD, HAUL, SCOUT, or FORGE in the Division Select tab.</div><span class="acad-check-tag req">Required</span></div></div>
-        <div class="acad-check-item" id="ci-5" onclick="toggleCheck('ci-5')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Complete Division Foundations</div><div class="acad-check-desc">Read your division's foundations module in Discord or get briefed by your Division Head.</div><span class="acad-check-tag req">Required</span></div></div>
-        <div class="acad-check-item" id="ci-6" onclick="toggleCheck('ci-6')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Attend Your First Live Op</div><div class="acad-check-desc">Monday casual night is a great first one. Your mentor will be with you.</div><span class="acad-check-tag">Live Required</span></div></div>
-        <div class="acad-check-item" id="ci-7" onclick="toggleCheck('ci-7')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Receive Mentor Sign-Off</div><div class="acad-check-desc">After your Live Ops Qualification, your mentor logs completion in #academy-graduation-log.</div><span class="acad-check-tag">Mentor Required</span></div></div>
-        <div class="acad-check-item" id="ci-8" onclick="toggleCheck('ci-8')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Earn 5 Standing Points</div><div class="acad-check-desc">Attend ops, contribute, recruit a friend. 5 SP unlocks Crew Member eligibility.</div><span class="acad-check-tag">SP Track</span></div></div>
-        <div class="acad-check-item" id="ci-9" onclick="toggleCheck('ci-9')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Graduation — Promoted by Division Head</div><div class="acad-check-desc">Your Division Head promotes you to Crew Member in Discord. You're RAM.</div><span class="acad-check-tag">Milestone</span></div></div>
-      </div>
-    </div>
-
-    <!-- DIVISION SELECT -->
-    <div class="acad-panel" id="panel-division">
-      <div class="acad-panel-tag">Division Select</div>
-      <div class="acad-panel-title">Choose Your Lane</div>
-      <p class="acad-panel-sub">Pick your primary division. Return any time to study additional divisions after reaching Crew Member rank.</p>
-      <div class="acad-div-intro"><strong>Primary division only</strong> — not your only division. After reaching Crew Member rank, come back to study secondary modules. The best crew members in RAMSORG know more than one lane.</div>
-      <div id="div-ui">
-        <div class="acad-div-grid">
-          <div class="acad-div-card" id="dv-VANGUARD" style="--dc:#e84040;" onclick="pickDiv('VANGUARD')"><div class="acad-div-badge" style="border-color:#e84040;color:#e84040;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#e84040;box-shadow:0 0 8px rgba(232,64,64,0.4);"></div><div class="acad-div-code" style="color:#e84040;">VANGUARD</div><div class="acad-div-name">Combat &amp; Security</div><div class="acad-div-desc">The org's fighting force. PvP, bounty hunting, dogfighting, ground combat, and protecting the fleet. If there's a fight, VANGUARD is already there.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Fighter Pilot</span><span class="acad-div-role">Gunner</span><span class="acad-div-role">Marine</span><span class="acad-div-role">Boarding Specialist</span><span class="acad-div-role">Bounty Hunter</span><span class="acad-div-role">Escort Pilot</span></div></div></div>
-          <div class="acad-div-card" id="dv-CLAIM" style="--dc:#c08b20;" onclick="pickDiv('CLAIM')"><div class="acad-div-badge" style="border-color:#c08b20;color:#c08b20;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#c08b20;box-shadow:0 0 8px rgba(192,139,32,0.4);"></div><div class="acad-div-code" style="color:#c08b20;">CLAIM</div><div class="acad-div-name">Collection</div><div class="acad-div-desc">Mining and salvage operations. Rock mining, ship mining, cave mining, and stripping wrecks. CLAIM feeds the org economy.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Mining Pilot</span><span class="acad-div-role">Ship Miner</span><span class="acad-div-role">Cave Miner</span><span class="acad-div-role">Salvage Pilot</span><span class="acad-div-role">Salvage Technician</span></div></div></div>
-          <div class="acad-div-card" id="dv-PULSE" style="--dc:#60c8ff;" onclick="pickDiv('PULSE')"><div class="acad-div-badge" style="border-color:#60c8ff;color:#60c8ff;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#60c8ff;box-shadow:0 0 8px rgba(96,200,255,0.4);"></div><div class="acad-div-code" style="color:#60c8ff;">PULSE</div><div class="acad-div-name">Medical</div><div class="acad-div-desc">Keeping the crew alive. Healing, rescue operations, and field medical response. No op runs without PULSE on standby.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Medic</span><span class="acad-div-role">Combat Medic</span><span class="acad-div-role">Trauma Specialist</span><span class="acad-div-role">Rescue Pilot</span></div></div></div>
-          <div class="acad-div-card" id="dv-HAUL" style="--dc:#1fc8a0;" onclick="pickDiv('HAUL')"><div class="acad-div-badge" style="border-color:#1fc8a0;color:#1fc8a0;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.4);"></div><div class="acad-div-code" style="color:#1fc8a0;">HAUL</div><div class="acad-div-name">Logistics</div><div class="acad-div-desc">Cargo hauling, trade routes, and supply chain management. HAUL keeps the org funded and the fleet supplied across the verse.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Cargo Pilot</span><span class="acad-div-role">Refueling Technician</span><span class="acad-div-role">Trade Analyst</span><span class="acad-div-role">Quartermaster</span><span class="acad-div-role">Convoy Lead</span></div></div></div>
-          <div class="acad-div-card" id="dv-CORE" style="--dc:#e87820;" onclick="pickDiv('CORE')"><div class="acad-div-badge" style="border-color:#e87820;color:#e87820;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#e87820;box-shadow:0 0 8px rgba(232,120,32,0.4);"></div><div class="acad-div-code" style="color:#e87820;">CORE</div><div class="acad-div-name">Engineering</div><div class="acad-div-desc">Ship systems, field repairs, and refueling support. CORE keeps every vessel in the fleet operational before, during, and after every op.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Ship Engineer</span><span class="acad-div-role">Repair Technician</span><span class="acad-div-role">Systems Technician</span><span class="acad-div-role">Base Builder</span></div></div></div>
-          <div class="acad-div-card" id="dv-HORIZON" style="--dc:#4a9eff;" onclick="pickDiv('HORIZON')"><div class="acad-div-badge" style="border-color:#4a9eff;color:#4a9eff;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#4a9eff;box-shadow:0 0 8px rgba(74,158,255,0.4);"></div><div class="acad-div-code" style="color:#4a9eff;">HORIZON</div><div class="acad-div-name">Exploration</div><div class="acad-div-desc">Pushing further into the unknown. System surveying, jump point discovery, and cartography. HORIZON finds the routes the rest of the fleet will follow.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Pathfinder</span><span class="acad-div-role">Scout Pilot</span><span class="acad-div-role">Cartographer</span><span class="acad-div-role">Scanner / Sensor Op</span><span class="acad-div-role">Jump Point Surveyor</span></div></div></div>
-        </div>
-        <div class="acad-div-confirm" id="div-confirm"><div class="acad-div-confirm-box"><div class="acad-div-confirm-title" id="confirm-title">Confirm Division</div><div class="acad-div-confirm-note">You're setting <strong id="confirm-name">—</strong> as your primary division. Tell your Division Head on Discord so they can assign your role. <strong>You can always return to study additional divisions after reaching Crew Member rank.</strong></div><button class="acad-div-confirm-btn" onclick="confirmDiv()">Confirm Selection</button></div></div>
-      </div>
-      <div class="acad-div-locked" id="div-locked"><div class="acad-div-locked-box"><div class="acad-div-locked-title" id="locked-title">Division Confirmed</div><div class="acad-div-locked-note">Your primary division is <strong id="locked-name">—</strong>. Report to your Division Head on Discord — they'll assign your role and point you to your division's foundations module. <strong>Return here any time to study a secondary division.</strong></div><button class="acad-div-change-btn" onclick="resetDiv()">Change Selection</button></div></div>
-    </div>
-
-    <!-- INSTRUCTORS -->
-    <div class="acad-panel" id="panel-instructors">
-      <div class="acad-panel-tag">Faculty</div>
-      <div class="acad-panel-title">Instructor Roster</div>
-      <p class="acad-panel-sub">Certified instructors earn +4 SP per session and a permanent place on this roster. Five sessions earns an Instructor Commendation.</p>
-      <div class="acad-inst-grid">
-        <div class="acad-inst-card"><div class="acad-inst-avatar">AD</div><div class="acad-inst-name">Admiral</div><div class="acad-inst-role">Org Founder · Academy Commandant</div><span class="acad-inst-div">COMMAND</span><div class="acad-inst-sessions">Sessions Taught: <span>∞</span></div><div class="acad-inst-commend">Founder Commendation</div></div>
-        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
-        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
-      </div>
-      <div class="acad-hall-note"><strong>Want to be on this roster?</strong> Any Senior Crew or above can volunteer as an Academy Instructor. Message your Division Head on Discord. Every session earns +4 SP and a permanent entry here. Five sessions earns the Instructor Commendation.</div>
-    </div>
-
-    <!-- GRADUATION -->
-    <div class="acad-panel" id="panel-graduation">
-      <div class="acad-panel-tag">Final Stage</div>
-      <div class="acad-panel-title">Graduation</div>
-      <p class="acad-panel-sub">Complete all checklist stages to unlock graduation. Your Division Head officially promotes you to Crew Member.</p>
-      <div class="acad-grad-locked" id="grad-locked">
-        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#1e3a5f" stroke-width="2" fill="none"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#1e3a5f" stroke-width="1" fill="none" opacity="0.5"/><text x="50" y="60" text-anchor="middle" font-size="28" fill="#3a6080">🔒</text></svg></div>
-        <h3>Not Yet, Cadet</h3>
-        <p>Complete all required stages before your Division Head can promote you. Track your progress in the Checklist tab.</p>
-        <ul class="acad-grad-list" id="grad-list">
-          <li id="gi-1"><div class="acad-gcheck"></div>Join Discord Server</li>
-          <li id="gi-2"><div class="acad-gcheck"></div>Complete Orientation Modules</li>
-          <li id="gi-3"><div class="acad-gcheck"></div>Apply on RSI Org Page</li>
-          <li id="gi-4"><div class="acad-gcheck"></div>Choose Primary Division</li>
-          <li id="gi-5"><div class="acad-gcheck"></div>Division Foundations</li>
-          <li id="gi-6"><div class="acad-gcheck"></div>Live Ops Qualification</li>
-          <li id="gi-7"><div class="acad-gcheck"></div>Mentor Sign-Off</li>
-          <li id="gi-8"><div class="acad-gcheck"></div>Earn 5 Standing Points</li>
-        </ul>
-      </div>
-      <div class="acad-grad-ready" id="grad-ready">
-        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#00c8ff" stroke-width="2" fill="rgba(0,200,255,0.05)"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#00c8ff" stroke-width="1" fill="none" opacity="0.4"/><path d="M35 50 L45 62 L65 40" stroke="#00c8ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h3>Ready to Graduate</h3>
-        <p>All stages complete. Contact your Division Head on Discord — they'll promote you to Crew Member and post your graduation in #academy-graduation-log.</p>
-        <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="acad-grad-btn">Open Discord →</a>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-</div><!-- /page-academy -->
-<!-- ══ ADMIN PASSWORD GATE ══ -->
-<div id="admin-pw-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(12px);">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:relative;max-width:420px;width:90%;text-align:center;padding:20px;">
-    <div style="width:70px;height:70px;margin:0 auto 24px;">
-      <svg viewBox="0 0 70 70" fill="none"><polygon points="35,3 67,20 67,50 35,67 3,50 3,20" stroke="rgba(232,64,64,0.5)" stroke-width="1.5" fill="none"/><polygon points="35,14 56,26 56,44 35,56 14,44 14,26" stroke="rgba(232,64,64,0.2)" stroke-width="1" fill="none"/><circle cx="35" cy="35" r="5" fill="rgba(232,64,64,0.2)" stroke="#e84040" stroke-width="1.5"><animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle><circle cx="35" cy="35" r="2.5" fill="#e84040"/></svg>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Restricted Access</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:24px;">Admiral<br><span style="color:#e84040;">Command</span></h2>
-    <div style="position:relative;margin-bottom:12px;">
-      <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;">AUTH //</div>
-      <input id="admin-pw-input" type="password" placeholder="Enter access code"
-        style="width:100%;background:rgba(232,64,64,0.05);border:1px solid rgba(232,64,64,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 90px;outline:none;letter-spacing:0.15em;transition:border-color 0.2s;"
-        onkeydown="if(event.key==='Enter')adminLogin()">
-    </div>
-    <div id="admin-pw-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:14px;"></div>
-    <button onclick="adminLogin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#e84040;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(232,64,64,0.3);transition:all 0.2s;" onmouseover="this.style.background='#ff6060'" onmouseout="this.style.background='#e84040'">Authenticate</button>
-    <button onclick="document.getElementById('admin-pw-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Cancel</button>
-  </div>
-</div>
-
-<!-- ══ ADMIN PAGE ══ -->
-<div id="page-admin" style="display:none;">
-
-<!-- Admin Nav -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);box-shadow:0 1px 30px rgba(120,0,0,0.15);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
-  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/>
-      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e84040" stroke-width="0.8" fill="rgba(232,64,64,0.06)"/>
-      <circle cx="16" cy="16" r="2.5" fill="#e84040"/>
-    </svg>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Admiral Command</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#e84040'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
-    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,64,64,0.1)'" onmouseout="this.style.background='none'">Logout</button>
-  </div>
-</nav>
-
-<!-- Admin Header -->
-<div style="padding:100px 72px 48px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;overflow:hidden;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e84040,transparent);opacity:0.3;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;">
-    <span style="display:block;width:32px;height:1px;background:#e84040;"></span>Admiral Command Panel
-  </div>
-  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,72px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 40px rgba(232,64,64,0.2);">Command<br><em style="font-style:normal;color:#e84040;">Centre</em></h1>
-  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, events, instructors, announcements, and academy progress. All changes save locally to this browser.</p>
-</div>
-
-<!-- Admin Tab Bar -->
-<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
-  <button class="admin-tab active" onclick="showAdminTab('members')"><span class="admin-tab-dot"></span>Members</button>
-  <button class="admin-tab" onclick="showAdminTab('applications')"><span class="admin-tab-dot"></span>Applications</button>
-  <button class="admin-tab" onclick="showAdminTab('events')"><span class="admin-tab-dot"></span>Events</button>
-  <button class="admin-tab" onclick="showAdminTab('instructors')"><span class="admin-tab-dot"></span>Instructors</button>
-  <button class="admin-tab" onclick="showAdminTab('announcements')"><span class="admin-tab-dot"></span>Announcements</button>
-  <button class="admin-tab" onclick="showAdminTab('academy')"><span class="admin-tab-dot"></span>Academy Progress</button>
-</div>
-
-<!-- ── APPLICATIONS ── -->
-<div class="admin-panel" id="admin-panel-applications">
-  <div class="admin-section-label">Enrollment</div>
-  <div class="admin-panel-title">Applications</div>
-  <p class="admin-panel-sub">Review enrollment applications from new cadets. Verify their Discord and RSI membership before approving. Approving adds them to the member roster and grants them Academy access.</p>
-  <div id="admin-application-list"></div>
-</div>
-
-<!-- ── MEMBERS ── -->
-<div class="admin-panel active" id="admin-panel-members">
-  <div class="admin-section-label">Roster</div>
-  <div class="admin-panel-title">Member Management</div>
-  <p class="admin-panel-sub">View all members, promote ranks, and award Standing Points. All changes save locally.</p>
-  <div id="admin-member-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Add New Member</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-callsign" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
-      <select class="admin-select" id="new-division">
-        <option value="VANGUARD">VANGUARD — Combat &amp; Security</option>
-        <option value="CLAIM">CLAIM — Collection</option>
-        <option value="PULSE">PULSE — Medical</option>
-        <option value="HAUL">HAUL — Logistics</option>
-        <option value="CORE">CORE — Engineering</option>
-        <option value="HORIZON">HORIZON — Exploration</option>
-        <option value="SHADE">SHADE — Covert (Admin only)</option>
-        <option value="COMMAND">COMMAND</option>
-      </select>
-    </div>
-    <button class="admin-submit" onclick="addMember()">Add Member</button>
-  </div>
-  <div class="admin-form" style="margin-top:12px;">
-    <div class="admin-form-title">// Assign Cadet to Instructor</div>
-    <div class="admin-form-grid">
-      <select class="admin-select" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
-      <select class="admin-select" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
-    </div>
-    <button class="admin-submit" onclick="assignCadetToInstructor()">Assign</button>
-  </div>
-</div>
-<div class="admin-panel" id="admin-panel-events">
-  <div class="admin-section-label">Operations</div>
-  <div class="admin-panel-title">Event Management</div>
-  <p class="admin-panel-sub">Schedule fleet ops, division ops, and casual nights. Track status from Scheduled → Live → Complete.</p>
-  <div id="admin-event-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Schedule New Event</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-event-name" placeholder="Event name" style="grid-column:1/-1;">
-      <select class="admin-select" id="new-event-type">
-        <option value="Fleet Op">Fleet Op — Saturday</option>
-        <option value="Division Op">Division Op — Wednesday</option>
-        <option value="Casual Night">Casual Night — Monday</option>
-        <option value="Org Meeting">Org Meeting — Monthly</option>
-        <option value="Special Op">Special Op</option>
-      </select>
-      <input class="admin-input" id="new-event-date" type="date">
-    </div>
-    <textarea class="admin-textarea" id="new-event-notes" placeholder="Briefing notes (optional)..." style="margin-bottom:14px;"></textarea>
-    <button class="admin-submit" onclick="addEvent()">Schedule Event</button>
-  </div>
-</div>
-
-<!-- ── INSTRUCTORS ── -->
-<div class="admin-panel" id="admin-panel-instructors">
-  <div class="admin-section-label">Faculty</div>
-  <div class="admin-panel-title">Instructor Management</div>
-  <p class="admin-panel-sub">Add and manage Academy instructors. Logging a session awards their Standing Points automatically. 5 sessions unlocks a Commendation.</p>
-  <div id="admin-instructor-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Add New Instructor</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-instructor-name" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
-      <input class="admin-input" id="new-instructor-role" placeholder="Role / title">
-      <select class="admin-select" id="new-instructor-div">
-        <option value="SHIELD">SHIELD</option>
-        <option value="HAUL">HAUL</option>
-        <option value="SCOUT">SCOUT</option>
-        <option value="FORGE">FORGE</option>
-        <option value="COMMAND">COMMAND</option>
-      </select>
-    </div>
-    <button class="admin-submit" onclick="addInstructor()">Add Instructor</button>
-  </div>
-</div>
-
-<!-- ── ANNOUNCEMENTS ── -->
-<div class="admin-panel" id="admin-panel-announcements">
-  <div class="admin-section-label">Comms</div>
-  <div class="admin-panel-title">Announcements</div>
-  <p class="admin-panel-sub">Post org-wide announcements. These will display on the main site news feed when that feature goes live.</p>
-  <div id="admin-announcement-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Post New Announcement</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-ann-title" placeholder="Announcement title" style="grid-column:1/-1;">
-      <select class="admin-select" id="new-ann-type">
-        <option value="GENERAL">General</option>
-        <option value="OP">Fleet Op</option>
-        <option value="URGENT">Urgent</option>
-        <option value="ACADEMY">Academy</option>
-      </select>
-    </div>
-    <textarea class="admin-textarea" id="new-ann-body" placeholder="Announcement body..." style="margin-bottom:14px;"></textarea>
-    <button class="admin-submit" onclick="addAnnouncement()">Post Announcement</button>
-  </div>
-</div>
-
-<!-- ── ACADEMY PROGRESS ── -->
-<div class="admin-panel" id="admin-panel-academy">
-  <div class="admin-section-label">Intel</div>
-  <div class="admin-panel-title">Academy Progress</div>
-  <p class="admin-panel-sub">View enrolled cadets and track their progress through the orientation pipeline in real time.</p>
-  <div id="admin-academy-list"></div>
-  <div class="admin-form" style="margin-top:16px;">
-    <div class="admin-form-title">// Remove Cadet from Firestore</div>
-    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Permanently removes a cadet account from Firestore and all local data. Use this to clear test profiles or remove a member completely.</p>
-    <input class="admin-input" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
-    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Remove Cadet</button>
-  </div>
-</div>
-
-</div><!-- /page-admin -->
-
-<!-- ══ INSTRUCTOR PANEL PAGE ══ -->
-<div id="page-instructor" style="display:none;">
-
-<style>
-.inst-panel { display:none; padding:48px 68px; border-bottom:1px solid rgba(0,200,255,0.1); }
-.inst-panel.active { display:block; animation:acadIn 0.3s ease both; }
-.inst-tab { display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,200,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%; }
-.inst-tab:hover { color:#8ab8d8;background:rgba(0,100,200,0.06); }
-.inst-tab.active { color:#00c8ff;border-bottom-color:#00c8ff; }
-.inst-tab-dot { width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0; }
-.inst-tab.active .inst-tab-dot { background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7); }
-.inst-cadet-row { background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:2px;transition:border-color 0.2s; }
-.inst-cadet-row:hover { border-color:rgba(0,200,255,0.25); }
-.inst-cadet-name { font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px; }
-.inst-cadet-meta { font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;margin-bottom:10px; }
-.inst-progress-bar { height:3px;background:#1e3a5f;margin-bottom:10px; }
-.inst-progress-fill { height:100%;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.4);transition:width 0.5s; }
-.inst-signoff-btn { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:7px 18px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:background 0.2s; }
-.inst-signoff-btn:hover { background:#40e8c0; }
-.inst-signoff-done { font-family:'Share Tech Mono',monospace;font-size:10px;color:#1fc8a0;letter-spacing:0.08em; }
-.inst-note-input { width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;transition:border-color 0.2s; }
-.inst-note-input:focus { border-color:rgba(0,200,255,0.3); }
-.inst-note-save { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:6px 14px;cursor:pointer;margin-top:6px;transition:all 0.2s; }
-.inst-note-save:hover { background:rgba(0,200,255,0.15); }
-.inst-empty { font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase; }
-</style>
-
-<!-- Instructor Nav -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,200,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
-  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/><polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/><circle cx="16" cy="16" r="2.5" fill="#00c8ff"/></svg>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Instructor Panel</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <div id="inst-callsign-nav" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;"></div>
-    <button onclick="goToAcademy()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Academy</button>
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5a8aaa;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">Main Site</button>
-  </div>
-</nav>
-
-<!-- Instructor Header -->
-<div style="padding:100px 68px 48px;background:#060c18;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;"><span style="display:block;width:32px;height:1px;background:#00c8ff;"></span>Second Fleet Academy</div>
-  <h1 id="inst-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 30px rgba(0,200,255,0.2);">Instructor<br><em style="font-style:normal;color:#00c8ff;">Command</em></h1>
-  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Your assigned cadets, their progress, and your sign-off tools. Only you can mark Live Ops Qualifications complete.</p>
-</div>
-
-<!-- Instructor Tab Bar -->
-<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
-  <button class="inst-tab active" onclick="showInstPanel('cadets')"><span class="inst-tab-dot"></span>My Cadets</button>
-  <button class="inst-tab" onclick="showInstPanel('roster')"><span class="inst-tab-dot"></span>Class Roster</button>
-</div>
-
-<!-- PANEL: MY CADETS -->
-<div class="inst-panel active" id="inst-panel-cadets">
-  <div class="acad-panel-tag">Assigned Cadets</div>
-  <div class="acad-panel-title">My Cadets</div>
-  <p class="acad-panel-sub">Cadets the Admiral has assigned to you. Track their progress and give your Live Ops Qualification sign-off when they complete their first live op with you.</p>
-  <div id="inst-cadet-list"></div>
-</div>
-
-<!-- PANEL: CLASS ROSTER -->
-<div class="inst-panel" id="inst-panel-roster">
-  <div class="acad-panel-tag">Overview</div>
-  <div class="acad-panel-title">Class Roster</div>
-  <p class="acad-panel-sub">All cadets currently enrolled in the Academy. View-only — contact the Admiral to reassign cadets.</p>
-  <div id="inst-roster-list"></div>
-</div>
-
-</div><!-- /page-instructor -->
-
+<script>initFirebase();</script>
 </body>
 </html>
