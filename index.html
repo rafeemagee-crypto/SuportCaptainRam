@@ -147,6 +147,15 @@ nav {
   color: var(--bg) !important;
 }
 
+.rsi-drop-btn {
+  display: block; width: 100%;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text2);
+  background: none; border: none; padding: 10px 18px;
+  cursor: pointer; text-align: left; transition: all 0.15s;
+}
+.rsi-drop-btn:hover { color: var(--amber); background: rgba(0,200,255,0.06); }
+
 /* ─── HERO ─── */
 .hero {
   min-height: 100vh;
@@ -963,6 +972,10 @@ footer {
   .div-grid { grid-template-columns: 1fr; }
 }
 </style>
+  <!-- Firebase compat SDKs — must load before main script -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 <div id="page-main">
@@ -972,12 +985,12 @@ footer {
   <div class="nav-logo">
     <div class="nav-emblem">
       <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e8a520" stroke-width="1.5" fill="none"/>
-        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e8a520" stroke-width="0.8" fill="rgba(232,165,32,0.06)"/>
-        <line x1="16" y1="2" x2="16" y2="30" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
-        <line x1="2" y1="10" x2="30" y2="22" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
-        <line x1="30" y1="10" x2="2" y2="22" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
-        <circle cx="16" cy="16" r="2.5" fill="#e8a520"/>
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/>
+        <line x1="16" y1="2" x2="16" y2="30" stroke="#00c8ff" stroke-width="0.5" opacity="0.4"/>
+        <line x1="2" y1="10" x2="30" y2="22" stroke="#00c8ff" stroke-width="0.5" opacity="0.4"/>
+        <line x1="30" y1="10" x2="2" y2="22" stroke="#00c8ff" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="16" cy="16" r="2.5" fill="#00c8ff"/>
       </svg>
     </div>
     <div class="nav-wordmark">RAM<span> SPACE INDUSTRIES</span></div>
@@ -989,9 +1002,40 @@ footer {
     <li><a href="#branches">Branches</a></li>
     <li><a href="#certs">Certifications</a></li>
     <li><a href="#ranks">Ranks</a></li>
-    <li><a onclick="goToAcademy()" class="nav-cta" style="cursor:pointer;">Academy</a></li>
     <li><a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="nav-cta">Join Discord</a></li>
-    <li><a id="admin-nav-btn" onclick="goToAdmin()" class="nav-cta" style="display:none;cursor:pointer;border-color:rgba(232,64,64,0.4);color:#e84040;" onmouseover="this.style.background='#e84040';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#e84040'">⬡ Admin</a></li>
+    <li id="admin-nav-btn-wrap" style="display:none;">
+      <a id="admin-nav-btn" onclick="goToAdmin()" class="nav-cta" style="cursor:pointer;border-color:rgba(232,64,64,0.4);color:#e84040;" onmouseover="this.style.background='#e84040';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#e84040'">⬡ Admin</a>
+    </li>
+
+    <!-- RSI PROFILE DROPDOWN -->
+    <li style="position:relative;">
+      <button id="rsi-btn" onclick="toggleRsiDropdown()" style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);border:1px solid var(--amber-d);padding:6px 14px;background:transparent;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;"
+        onmouseover="this.style.background='rgba(0,200,255,0.08)'" onmouseout="this.style.background='transparent'">
+        <span id="rsi-btn-label">RSI</span>
+        <span id="rsi-btn-arrow" style="font-size:9px;transition:transform 0.2s;">▾</span>
+      </button>
+
+      <!-- Dropdown panel -->
+      <div id="rsi-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:220px;background:#060c18;border:1px solid rgba(0,200,255,0.2);box-shadow:0 8px 40px rgba(0,50,120,0.5);z-index:2000;">
+        <!-- User info -->
+        <div id="rsi-dropdown-user" style="padding:14px 18px;border-bottom:1px solid rgba(0,200,255,0.1);">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Signed in as</div>
+          <div id="rsi-dropdown-callsign" style="font-family:var(--display);font-size:18px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.04em;">—</div>
+          <div id="rsi-dropdown-rank" style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.1em;margin-top:2px;">Not signed in</div>
+        </div>
+        <!-- Not signed in state -->
+        <div id="rsi-dropdown-guest" style="padding:10px 6px;">
+          <button onclick="goToAcademy();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Academy / Enroll</button>
+        </div>
+        <!-- Signed in state -->
+        <div id="rsi-dropdown-member" style="display:none;padding:10px 6px;">
+          <button onclick="goToAcademy();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Academy Portal</button>
+          <button id="rsi-drop-instructor" onclick="goToInstructor();toggleRsiDropdown()" class="rsi-drop-btn" style="display:none;">★ Instructor Panel</button>
+          <div style="height:1px;background:rgba(0,200,255,0.1);margin:6px 0;"></div>
+          <button onclick="signOutMember();toggleRsiDropdown()" class="rsi-drop-btn" style="color:var(--text3);">← Sign Out</button>
+        </div>
+      </div>
+    </li>
   </ul>
 </nav>
 
@@ -1408,42 +1452,134 @@ footer {
 </footer>
 
 </div><!-- /page-main -->
-
 <script>
+// ════════════════════════════════════════
+// FIREBASE INIT
+// ════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyABmROm7I5uBkWr7XFvsfHi0GHU12V-Jkk",
+  authDomain: "ramsorg-e0c22.firebaseapp.com",
+  projectId: "ramsorg-e0c22",
+  storageBucket: "ramsorg-e0c22.firebasestorage.app",
+  messagingSenderId: "218723692883",
+  appId: "1:218723692883:web:ce706bf6a7e886633d31a6"
+});
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+async function fsGet(col, id) {
+  try { const s = await db.collection(col).doc(id).get(); return s.exists ? s.data() : null; }
+  catch(e) { return null; }
+}
+async function fsSet(col, id, data) {
+  try { await db.collection(col).doc(id).set(data, { merge: true }); return true; }
+  catch(e) { return false; }
+}
+async function fsGetAll(col) {
+  try { const s = await db.collection(col).get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); }
+  catch(e) { return []; }
+}
+async function fsDelete(col, id) {
+  try { await db.collection(col).doc(id).delete(); return true; }
+  catch(e) { return false; }
+}
+async function createUserFn(email, pw) { return auth.createUserWithEmailAndPassword(email, pw); }
+async function signInFn(email, pw)     { return auth.signInWithEmailAndPassword(email, pw); }
+async function signOutFn()             { return auth.signOut(); }
+
+console.log('\u2713 Firebase ready');
+
+// ── ADMIN CONFIG ──
+const ADMIN_CALLSIGN = 'CAPTAINRAM';
+
+// Current user state
+let currentUser = null;
+let currentMember = null;
+
+async function fsGet(col, id)    { return fsGetFn    ? fsGetFn(col, id)       : null; }
+async function fsSet(col, id, d) { return fsSetFn    ? fsSetFn(col, id, d)    : false; }
+async function fsGetAll(col)     { return fsGetAllFn ? fsGetAllFn(col)         : []; }
+async function fsDelete(col, id) { return fsDeleteFn ? fsDeleteFn(col, id)    : false; }
+
 // ════════════════════════════════════════
 // PAGE SWITCHING
 // ════════════════════════════════════════
 let academyInited = false;
 
-function goToAcademy() {
+async function goToAcademy() {
   document.getElementById('page-main').style.display = 'none';
   document.getElementById('page-academy').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
   if (!academyInited) { initAcademy(); academyInited = true; }
 
-  const callsign = localStorage.getItem('ram_callsign');
-  const pending  = localStorage.getItem('ram_pending') === 'true';
-  const approved = localStorage.getItem('ram_approved') === 'true';
+  // Check if already signed in via Firebase
+  const user = auth ? auth.currentUser : null;
+  const cachedCallsign = localStorage.getItem('ram_callsign');
+  const cachedPassword = localStorage.getItem('ram_password');
 
-  if (!callsign) {
-    // Never enrolled — show step 1
-    document.getElementById('enroll-gate').style.display = 'flex'; document.getElementById('enroll-gate').style.flexDirection = 'column'; document.getElementById('enroll-gate').style.alignItems = 'center';
-    document.getElementById('enroll-step-1').style.display = 'block';
-    document.getElementById('enroll-step-2').style.display = 'none';
-    document.getElementById('enroll-step-3').style.display = 'none';
-  } else if (pending && !approved) {
-    // Enrolled but not yet approved — show pending screen
-    document.getElementById('enroll-gate').style.display = 'flex'; document.getElementById('enroll-gate').style.flexDirection = 'column'; document.getElementById('enroll-gate').style.alignItems = 'center';
-    document.getElementById('enroll-step-1').style.display = 'none';
-    document.getElementById('enroll-step-2').style.display = 'none';
-    document.getElementById('enroll-step-3').style.display = 'block';
+  if (user && cachedCallsign) {
+    // Already authenticated this session
+    await loadMemberAndEnter(cachedCallsign);
+    return;
+  }
+
+  if (cachedCallsign && cachedPassword) {
+    // Try auto-login with cached credentials
+    try {
+      const email = cachedCallsign.toLowerCase() + '@ramsorg.app';
+      const cred = await signInFn(email, cachedPassword);
+      currentUser = cred.user;
+      await loadMemberAndEnter(cachedCallsign);
+      return;
+    } catch(e) {
+      // Credentials stale — clear and show login
+      localStorage.removeItem('ram_password');
+    }
+  }
+
+  // No account — show enrollment/login choice
+  showEnrollGate('choice');
+}
+
+async function loadMemberAndEnter(callsign) {
+  // Load member from Firestore
+  const data = await fsGet('members', callsign);
+  if (!data) { showEnrollGate('step1'); return; }
+  currentMember = data;
+
+  if (!data.approved) {
+    showEnrollGate('pending');
     const pd = document.getElementById('pending-callsign');
     if (pd) pd.textContent = '// CALLSIGN: ' + callsign + ' — AWAITING ADMIRAL APPROVAL';
-  } else {
-    // Approved — go straight in
-    document.getElementById('enroll-gate').style.display = 'none';
-    updateCallsignDisplay(callsign);
+    return;
   }
+
+  // Approved — enter academy
+  document.getElementById('enroll-gate').style.display = 'none';
+  localStorage.setItem('ram_callsign', callsign);
+  updateCallsignDisplay(callsign);
+  if (data.isInstructor) {
+    const btn = document.getElementById('inst-panel-btn');
+    if (btn) btn.style.display = 'inline-block';
+  }
+  // Restore academy state from Firestore data
+  acadS.checks = data.checks || [];
+  acadS.mods   = data.mods   || [];
+  acadS.div    = data.division || null;
+  acadS.divOk  = data.division && data.division !== 'UNASSIGNED';
+  initAcademy();
+}
+
+function showEnrollGate(step) {
+  const gate = document.getElementById('enroll-gate');
+  gate.style.display = 'flex';
+  gate.style.flexDirection = 'column';
+  gate.style.alignItems = 'center';
+  document.getElementById('enroll-step-1').style.display = step === 'step1' || step === 'choice' ? 'block' : 'none';
+  document.getElementById('enroll-step-2').style.display = 'none';
+  document.getElementById('enroll-step-3').style.display = step === 'pending' ? 'block' : 'none';
+  const loginStep = document.getElementById('enroll-step-login');
+  if (loginStep) loginStep.style.display = step === 'login' ? 'block' : 'none';
 }
 function goToMain() {
   document.getElementById('page-academy').style.display = 'none';
@@ -1451,6 +1587,69 @@ function goToMain() {
   document.getElementById('page-instructor').style.display = 'none';
   document.getElementById('page-main').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// ── RSI DROPDOWN ──
+let dropdownOpen = false;
+function toggleRsiDropdown() {
+  dropdownOpen = !dropdownOpen;
+  const dd = document.getElementById('rsi-dropdown');
+  const arrow = document.getElementById('rsi-btn-arrow');
+  dd.style.display = dropdownOpen ? 'block' : 'none';
+  if (arrow) arrow.style.transform = dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  if (dropdownOpen) updateRsiDropdown();
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('#rsi-btn') && !e.target.closest('#rsi-dropdown')) {
+    dropdownOpen = false;
+    const dd = document.getElementById('rsi-dropdown');
+    const arrow = document.getElementById('rsi-btn-arrow');
+    if (dd) dd.style.display = 'none';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+});
+function updateRsiDropdown() {
+  const callsign = localStorage.getItem('ram_callsign');
+  const approved = localStorage.getItem('ram_approved') === 'true' || (currentMember && currentMember.approved);
+  const label = document.getElementById('rsi-btn-label');
+  const cs = document.getElementById('rsi-dropdown-callsign');
+  const rank = document.getElementById('rsi-dropdown-rank');
+  const guest = document.getElementById('rsi-dropdown-guest');
+  const member = document.getElementById('rsi-dropdown-member');
+  const instBtn = document.getElementById('rsi-drop-instructor');
+
+  if (callsign && approved) {
+    if (label) label.textContent = callsign;
+    if (cs) cs.textContent = callsign;
+    if (rank) rank.textContent = currentMember ? currentMember.rank : 'Cadet';
+    if (guest) guest.style.display = 'none';
+    if (member) member.style.display = 'block';
+    if (instBtn) instBtn.style.display = isInstructor() ? 'block' : 'none';
+  } else if (callsign) {
+    if (label) label.textContent = callsign;
+    if (cs) cs.textContent = callsign;
+    if (rank) rank.textContent = 'Pending Approval';
+    if (guest) guest.style.display = 'block';
+    if (member) member.style.display = 'none';
+  } else {
+    if (label) label.textContent = 'RSI';
+    if (cs) cs.textContent = '—';
+    if (rank) rank.textContent = 'Not signed in';
+    if (guest) guest.style.display = 'block';
+    if (member) member.style.display = 'none';
+  }
+}
+async function signOutMember() {
+  try { await signOutFn(); } catch(e) {}
+  currentUser = null; currentMember = null;
+  localStorage.removeItem('ram_callsign');
+  localStorage.removeItem('ram_password');
+  localStorage.removeItem('ram_approved');
+  const label = document.getElementById('rsi-btn-label');
+  if (label) label.textContent = 'RSI';
+  updateRsiDropdown();
+  goToMain();
 }
 
 // ── INSTRUCTOR PANEL ──
@@ -1565,9 +1764,16 @@ function renderInstRoster() {
   }).join('');
 }
 
-function giveSignOff(callsign) {
+async function giveSignOff(callsign) {
   setAdminData('inst_signoff_' + callsign, true);
-  // Also mark ci-7 (mentor sign-off) as complete on their checklist in admin data
+  // Update Firestore — add ci-7 to their checks
+  const data = await fsGet('members', callsign);
+  if (data) {
+    const checks = data.checks || [];
+    if (!checks.includes('ci-7')) checks.push('ci-7');
+    await fsSet('members', callsign, { checks });
+  }
+  // Also update local admin members
   const members = getAdminData('members', []);
   const idx = members.findIndex(m => m.callsign === callsign);
   if (idx !== -1) {
@@ -1585,6 +1791,11 @@ function saveNote(callsign) {
 
 
 function goToAdmin() {
+  const callsign = localStorage.getItem('ram_callsign');
+  if (callsign !== ADMIN_CALLSIGN) {
+    alert('// ACCESS DENIED');
+    return;
+  }
   const pw = localStorage.getItem('ram_admin_auth');
   if (pw === 'ramsorg') {
     openAdminPanel();
@@ -1638,12 +1849,6 @@ function showAdminTab(id) {
   });
 }
 
-// ── ADMIN DATA (localStorage) ──
-function getAdminData(key, def) {
-  try { return JSON.parse(localStorage.getItem('ram_admin_' + key) || 'null') || def; } catch(e) { return def; }
-}
-function setAdminData(key, val) { localStorage.setItem('ram_admin_' + key, JSON.stringify(val)); }
-
 // ── APPLICATIONS ──
 function renderAdminApplications() {
   const el = document.getElementById('admin-application-list');
@@ -1689,22 +1894,22 @@ function renderAdminApplications() {
   }).join('');
 }
 
-function approveApplication(i) {
+async function approveApplication(i) {
   const apps = getAdminData('applications', []);
   apps[i].status = 'Approved';
   setAdminData('applications', apps);
-  // Set approved flag — when the cadet checks back it will let them in
-  localStorage.setItem('ram_approved', 'true');
-  localStorage.setItem('ram_pending', 'false');
-  // Add to member roster if not already there
+  // Update Firestore member doc — set approved: true
+  const callsign = apps[i].callsign;
+  await fsSet('members', callsign, { approved: true, status: 'Approved', rank: 'Cadet' });
+  // Add to local admin members roster too
   const members = getAdminData('members', []);
-  if (!members.find(m => m.callsign === apps[i].callsign)) {
-    members.push({ callsign: apps[i].callsign, rank: 'Cadet', division: 'UNASSIGNED', sp: 0 });
+  if (!members.find(m => m.callsign === callsign)) {
+    members.push({ callsign, rank: 'Cadet', division: 'UNASSIGNED', sp: 0 });
     setAdminData('members', members);
   }
   renderAdminApplications();
   renderAdminMembers();
-  alert('✓ ' + apps[i].callsign + ' approved. They can now access the Academy. Notify them on Discord: ' + apps[i].discord);
+  alert('✓ ' + callsign + ' approved. They can now access the Academy. Notify them on Discord: ' + apps[i].discord);
 }
 
 function rejectApplication(i) {
@@ -1962,22 +2167,37 @@ function removeAnnouncement(i) {
 }
 
 // ── ACADEMY PROGRESS ──
-function renderAdminAcademy() {
+async function renderAdminAcademy() {
   const el = document.getElementById('admin-academy-list');
   if (!el) return;
+  el.innerHTML = '<div class="admin-empty">Loading...</div>';
 
+  // Merge Firestore members with local admin applications
+  const fsMembers = await fsGetAll('members');
   const apps = getAdminData('applications', []).filter(a => a.status === 'Approved');
-  const members = getAdminData('members', []);
 
-  if (!apps.length) {
+  // Merge — Firestore is source of truth, local apps fill in discord/rsi
+  const allCadets = fsMembers.filter(m => m.approved);
+  // Also include any locally approved that aren't in Firestore yet
+  apps.forEach(a => {
+    if (!allCadets.find(m => m.callsign === a.callsign)) {
+      allCadets.push({ callsign: a.callsign, discord: a.discord, rsi: a.rsi, rank: 'Cadet', division: 'UNASSIGNED', sp: 0, checks: [], mods: [], approved: true, date: a.date, answers: a.answers });
+    }
+  });
+  // Fill in discord/rsi from local apps if missing in Firestore
+  allCadets.forEach(m => {
+    const app = apps.find(a => a.callsign === m.callsign);
+    if (app) { m.discord = m.discord || app.discord; m.rsi = m.rsi || app.rsi; m.answers = m.answers || app.answers; }
+  });
+
+  if (!allCadets.length) {
     el.innerHTML = '<div class="admin-empty">No approved cadets yet. Approve applications in the Applications tab first.</div>';
     return;
   }
 
-  // Stats bar
-  const total = apps.length;
-  const graduated = members.filter(m => m.rank !== 'Cadet' && apps.find(a => a.callsign === m.callsign)).length;
-  const signedOff = apps.filter(a => getAdminData('inst_signoff_' + a.callsign, false)).length;
+  const total = allCadets.length;
+  const graduated = allCadets.filter(m => m.rank && m.rank !== 'Cadet').length;
+  const signedOff = allCadets.filter(m => getAdminData('inst_signoff_' + m.callsign, false)).length;
 
   el.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:20px;">
@@ -1985,39 +2205,33 @@ function renderAdminAcademy() {
       <div class="admin-stat"><div class="admin-stat-label">Sign-Offs Given</div><div class="admin-stat-val" style="color:#1fc8a0;">${signedOff}</div></div>
       <div class="admin-stat"><div class="admin-stat-label">Graduated</div><div class="admin-stat-val" style="color:#00c8ff;">${graduated}</div></div>
     </div>
-    ${apps.map(a => {
-      const member = members.find(m => m.callsign === a.callsign);
-      const rank = member ? member.rank : 'Cadet';
-      const div = member ? (member.division || '—') : '—';
-      const sp = member ? (member.sp || 0) : 0;
-      const isGrad = member && member.rank !== 'Cadet';
-      const assignedTo = member ? (member.assignedInstructor || 'Unassigned') : 'Unassigned';
-      const signedOff = getAdminData('inst_signoff_' + a.callsign, false);
+    ${allCadets.map(a => {
+      const rank = a.rank || 'Cadet';
+      const div = a.division || '—';
+      const sp = a.sp || 0;
+      const isGrad = rank !== 'Cadet';
+      const assignedTo = a.assignedInstructor || 'Unassigned';
+      const sigOff = getAdminData('inst_signoff_' + a.callsign, false);
       const note = getAdminData('inst_notes_' + a.callsign, '');
-      // Progress from stored member data or defaults
-      const checks = member && member.checks ? member.checks : [];
-      const mods = member && member.mods ? member.mods : [];
+      const checks = a.checks || [];
+      const mods = a.mods || [];
       const pct = Math.round((checks.length / 9) * 100);
       const allDone = checks.length >= 9 && mods.length >= 6;
       const pc = allDone ? '#1fc8a0' : pct >= 50 ? '#00c8ff' : '#e84040';
-
       return `<div class="admin-row" style="border-color:${isGrad?'rgba(0,200,255,0.3)':allDone?'rgba(31,200,160,0.3)':'#1e3a5f'};flex-direction:column;gap:0;margin-bottom:4px;">
-
-        <!-- Header row -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;width:100%;margin-bottom:12px;">
           <div>
             <div class="admin-row-name">${a.callsign}
               <span style="font-size:10px;color:${isGrad?'#00c8ff':'#5a8aaa'};border:1px solid;padding:2px 8px;margin-left:8px;">${rank}</span>
               ${isGrad?'<span style="font-size:10px;color:#00c8ff;margin-left:6px;">✓ GRADUATED</span>':''}
-              ${signedOff?'<span style="font-size:10px;color:#1fc8a0;margin-left:6px;">✓ SIGN-OFF GIVEN</span>':''}
+              ${sigOff?'<span style="font-size:10px;color:#1fc8a0;margin-left:6px;">✓ SIGN-OFF GIVEN</span>':''}
             </div>
             <div class="admin-row-meta" style="margin-top:6px;line-height:2;">
-              <span style="color:#5a8aaa;">Discord:</span> <span style="color:#8ab8d8">${a.discord}</span>
-              &nbsp;·&nbsp; <span style="color:#5a8aaa;">RSI:</span> <span style="color:#8ab8d8">${a.rsi}</span>
+              <span style="color:#5a8aaa;">Discord:</span> <span style="color:#8ab8d8">${a.discord||'—'}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">RSI:</span> <span style="color:#8ab8d8">${a.rsi||'—'}</span>
               &nbsp;·&nbsp; <span style="color:#5a8aaa;">Division:</span> <span style="color:#00c8ff">${div}</span>
               &nbsp;·&nbsp; <span style="color:#5a8aaa;">SP:</span> <span style="color:#00c8ff">${sp}</span>
               &nbsp;·&nbsp; <span style="color:#5a8aaa;">Instructor:</span> <span style="color:#8ab8d8">${assignedTo}</span>
-              &nbsp;·&nbsp; <span style="color:#5a8aaa;">Applied:</span> <span style="color:#5a8aaa">${a.date}</span>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
@@ -2025,53 +2239,37 @@ function renderAdminAcademy() {
             ${!isGrad && !allDone ? `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a6080;text-align:right;">Not yet<br>eligible</div>` : ''}
           </div>
         </div>
-
-        <!-- Progress row -->
-        <div style="background:#091220;border:1px solid #1e3a5f;padding:14px 16px;width:100%;margin-bottom:6px;">
-          <div style="display:flex;gap:24px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:11px;">
+        <div style="background:#091220;border:1px solid #1e3a5f;padding:12px 16px;width:100%;margin-bottom:4px;">
+          <div style="display:flex;gap:20px;margin-bottom:6px;font-family:'Share Tech Mono',monospace;font-size:11px;">
             <span>Modules: <span style="color:${mods.length>=6?'#1fc8a0':'#8ab8d8'}">${mods.length}/6</span></span>
             <span>Checklist: <span style="color:${checks.length>=9?'#1fc8a0':'#8ab8d8'}">${checks.length}/9</span></span>
-            <span>Live Op Sign-Off: <span style="color:${signedOff?'#1fc8a0':'#e84040'}">${signedOff?'✓ Done':'Pending'}</span></span>
+            <span>Sign-Off: <span style="color:${sigOff?'#1fc8a0':'#e84040'}">${sigOff?'✓ Done':'Pending'}</span></span>
             <span>Overall: <span style="color:${pc}">${pct}%</span></span>
           </div>
-          <div style="height:4px;background:#1e3a5f;">
-            <div style="height:100%;width:${pct}%;background:${pc};box-shadow:0 0 6px ${pc}66;transition:width 0.5s;"></div>
-          </div>
+          <div style="height:3px;background:#1e3a5f;"><div style="height:100%;width:${pct}%;background:${pc};transition:width 0.5s;"></div></div>
         </div>
-
-        <!-- Exam answers -->
-        ${a.answers ? `<div style="background:#091220;border:1px solid #1e3a5f;padding:14px 16px;width:100%;margin-bottom:6px;">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;">Exam Answers</div>
-          ${a.answers.map((ans,qi)=>`<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid #1a2d50;align-items:flex-start;">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6080;min-width:26px;padding-top:2px;">Q${qi+1}</div>
+        ${a.answers ? `<div style="background:#091220;border:1px solid #1e3a5f;padding:12px 16px;width:100%;margin-bottom:4px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:8px;">Exam Answers</div>
+          ${a.answers.map((ans,qi)=>`<div style="display:flex;gap:10px;padding:4px 0;border-bottom:1px solid #1a2d50;">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6080;min-width:26px;">Q${qi+1}</div>
             <div><div style="font-size:11px;color:#5a8aaa;margin-bottom:2px;">${ans.q}</div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${['B','B','D','C','B'][qi]===ans.answer?'#1fc8a0':'#e84040'};">${ans.answer} — ${ans.text}</div></div>
           </div>`).join('')}
         </div>` : ''}
-
-        <!-- Instructor note -->
-        ${note ? `<div style="background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:12px 16px;width:100;font-size:13px;color:#8ab8d8;"><span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;display:block;margin-bottom:6px;">Instructor Note</span>${note}</div>` : ''}
-
+        ${note?`<div style="background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:10px 16px;width:100%;font-size:13px;color:#8ab8d8;"><span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;display:block;margin-bottom:4px;">Instructor Note</span>${note}</div>`:''}
       </div>`;
     }).join('')}`;
 }
 
-function graduateCadetByCallsign(callsign) {
+async function graduateCadetByCallsign(callsign) {
+  // Update Firestore
+  await fsSet('members', callsign, { rank: 'Private', graduated: true, sp: 5 });
+  // Update local admin
   const members = getAdminData('members', []);
   const idx = members.findIndex(m => m.callsign === callsign);
-  if (idx !== -1) {
-    members[idx].rank = 'Private';
-    setAdminData('members', members);
-  } else {
-    const apps = getAdminData('applications', []);
-    const app = apps.find(a => a.callsign === callsign);
-    members.push({ callsign, rank: 'Private', division: app ? app.div || 'UNASSIGNED' : 'UNASSIGNED', sp: 5 });
-    setAdminData('members', members);
-  }
-  // If this is the active session mark graduated
-  if (localStorage.getItem('ram_callsign') === callsign) {
-    localStorage.setItem('ram_graduated', 'true');
-  }
+  if (idx !== -1) { members[idx].rank = 'Private'; setAdminData('members', members); }
+  else { members.push({ callsign, rank: 'Private', division: 'UNASSIGNED', sp: 5 }); setAdminData('members', members); }
+  if (localStorage.getItem('ram_callsign') === callsign) localStorage.setItem('ram_graduated', 'true');
   renderAdminAcademy();
   renderAdminMembers();
   alert('✓ ' + callsign + ' graduated and promoted to Private. Post in #academy-graduation-log on Discord.');
@@ -2087,43 +2285,73 @@ function clearCadetSession() {
   alert('Session cleared.');
 }
 
-// ── ENROLLMENT STEP 1: Callsign + usernames ──
-function enrollStep1() {
+// ── ENROLLMENT STEP 1: Callsign + usernames → Firebase account ──
+async function enrollStep1() {
   const callsign = document.getElementById('callsign-input').value.trim().toUpperCase();
   const discord  = document.getElementById('discord-input').value.trim();
   const rsi      = document.getElementById('rsi-input').value.trim();
   const err      = document.getElementById('enroll-error');
 
-  if (!callsign || callsign.length < 2) {
-    err.textContent = '// ERROR: CALLSIGN REQUIRED — MINIMUM 2 CHARACTERS';
-    return;
-  }
+  if (!callsign || callsign.length < 2) { err.textContent = '// ERROR: CALLSIGN REQUIRED — MINIMUM 2 CHARACTERS'; return; }
   if (!discord) { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
   if (!rsi)     { err.textContent = '// ERROR: RSI USERNAME REQUIRED'; return; }
 
-  // Save to localStorage
-  localStorage.setItem('ram_callsign', callsign);
-  localStorage.setItem('ram_discord',  discord);
-  localStorage.setItem('ram_rsi',      rsi);
-  localStorage.setItem('ram_pending',  'true');
+  // Check if callsign is already taken in Firestore
+  const existing = await fsGet('members', callsign);
+  if (existing) { err.textContent = '// ERROR: CALLSIGN ALREADY IN USE — CHOOSE ANOTHER'; return; }
 
-  // Save enrollment application to admin data
-  const apps = getAdminData('applications', []);
-  // Remove any previous app from same callsign
-  const filtered = apps.filter(a => a.callsign !== callsign);
-  const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
-  filtered.unshift({ callsign, discord, rsi, date: now, status: 'Pending', examPassed: false });
-  setAdminData('applications', filtered);
+  // Create Firebase Auth account using callsign@ramsorg.app as email
+  const email = callsign.toLowerCase() + '@ramsorg.app';
+  const password = callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
 
-  // Move to exam
-  document.getElementById('enroll-step-1').style.display = 'none';
-  document.getElementById('enroll-step-2').style.display = 'block';
-  const gate = document.getElementById('enroll-gate');
-  if (gate) gate.scrollTop = 0;
+  try {
+    const cred = await createUserFn(email, password);
+    currentUser = cred.user;
+
+    // Store member doc in Firestore
+    const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+    const memberData = {
+      callsign, discord, rsi,
+      rank: 'Cadet', division: 'UNASSIGNED', sp: 0,
+      status: 'Pending', examPassed: false,
+      checks: [], mods: [],
+      graduated: false, approved: false,
+      isInstructor: false, assignedInstructor: '',
+      date: now, uid: cred.user.uid
+    };
+    await fsSet('members', callsign, memberData);
+    currentMember = memberData;
+
+    // Also save to admin applications
+    const apps = getAdminData('applications', []);
+    const filtered = apps.filter(a => a.callsign !== callsign);
+    filtered.unshift({ callsign, discord, rsi, date: now, status: 'Pending', examPassed: false });
+    setAdminData('applications', filtered);
+
+    // Cache locally for this session
+    localStorage.setItem('ram_callsign', callsign);
+    localStorage.setItem('ram_discord',  discord);
+    localStorage.setItem('ram_rsi',      rsi);
+    localStorage.setItem('ram_pending',  'true');
+    localStorage.setItem('ram_password', password); // store so returning user can auto-login
+
+    // Move to exam
+    document.getElementById('enroll-step-1').style.display = 'none';
+    document.getElementById('enroll-step-2').style.display = 'block';
+    const gate = document.getElementById('enroll-gate');
+    if (gate) gate.scrollTop = 0;
+
+  } catch(e) {
+    if (e.code === 'auth/email-already-in-use') {
+      err.textContent = '// ERROR: CALLSIGN ALREADY REGISTERED — TRY LOGGING IN';
+    } else {
+      err.textContent = '// ERROR: ' + e.message;
+    }
+  }
 }
 
 // ── ENROLLMENT STEP 2: Entry exam ──
-function submitExam() {
+async function submitExam() {
   const answers = { q1:'B', q2:'B', q3:'D', q4:'C', q5:'B' };
   const err = document.getElementById('exam-error');
   let wrong = [];
@@ -2180,31 +2408,59 @@ function submitExam() {
   if (idx !== -1) { apps[idx].examPassed = true; apps[idx].answers = savedAnswers; }
   setAdminData('applications', apps);
 
+  // Also update Firestore member doc
+  const cs = localStorage.getItem('ram_callsign');
+  if (cs) {
+    await fsSet('members', cs, { examPassed: true, answers: savedAnswers });
+  }
+
   // Move to pending screen
   document.getElementById('enroll-step-2').style.display = 'none';
   document.getElementById('enroll-step-3').style.display = 'block';
   // Scroll gate back to top
   const gate = document.getElementById('enroll-gate');
   if (gate) gate.scrollTop = 0;
-  const cs = localStorage.getItem('ram_callsign');
   const pd = document.getElementById('pending-callsign');
   if (pd) pd.textContent = '// CALLSIGN: ' + cs + ' — EXAM PASSED — AWAITING APPROVAL';
 }
 
 // ── CHECK APPROVAL STATUS ──
-function checkApproval() {
+async function checkApproval() {
   const callsign = localStorage.getItem('ram_callsign');
-  const approved = localStorage.getItem('ram_approved') === 'true';
-  if (approved) {
-    document.getElementById('enroll-gate').style.display = 'none';
-    updateCallsignDisplay(callsign);
-    if (!academyInited) { initAcademy(); academyInited = true; }
+  if (!callsign) return;
+  const data = await fsGet('members', callsign);
+  if (data && data.approved) {
+    localStorage.setItem('ram_approved', 'true');
+    await loadMemberAndEnter(callsign);
   } else {
     const pd = document.getElementById('pending-callsign');
     if (pd) {
       pd.textContent = '// CALLSIGN: ' + callsign + ' — STILL PENDING ADMIRAL APPROVAL';
       pd.style.color = '#e87820';
     }
+  }
+}
+
+// ── RETURNING MEMBER LOGIN ──
+async function loginReturningMember() {
+  const callsign = document.getElementById('login-callsign').value.trim().toUpperCase();
+  const discord  = document.getElementById('login-discord').value.trim();
+  const err = document.getElementById('login-error');
+  if (!callsign) { err.textContent = '// ERROR: CALLSIGN REQUIRED'; return; }
+  if (!discord)  { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
+
+  const email    = callsign.toLowerCase() + '@ramsorg.app';
+  const password = callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
+
+  try {
+    const cred = await signInFn(email, password);
+    currentUser = cred.user;
+    localStorage.setItem('ram_callsign', callsign);
+    localStorage.setItem('ram_discord',  discord);
+    localStorage.setItem('ram_password', password);
+    await loadMemberAndEnter(callsign);
+  } catch(e) {
+    err.textContent = '// ERROR: INVALID CALLSIGN OR DISCORD USERNAME';
   }
 }
 
@@ -2215,26 +2471,66 @@ function updateCallsignDisplay(callsign) {
   if (h1) h1.innerHTML = 'Welcome,<br><em style="font-style:normal;color:#00c8ff;text-shadow:0 0 30px rgba(0,200,255,0.6);">' + callsign + '.</em>';
   const disp = document.getElementById('acad-callsign-display');
   if (disp) disp.textContent = '// ' + callsign;
+  // Update RSI dropdown button label
+  const label = document.getElementById('rsi-btn-label');
+  if (label) label.textContent = callsign;
+  updateRsiDropdown();
+  checkAdminButton();
 }
 
 // ════════════════════════════════════════
-// ── SECRET KEY COMBO: type A D M to reveal admin button ──
-(function() {
-  const seq = ['a','d','m'];
-  let pos = 0;
-  document.addEventListener('keydown', function(e) {
-    if (e.key.toLowerCase() === seq[pos]) {
-      pos++;
-      if (pos === seq.length) {
-        const btn = document.getElementById('admin-nav-btn');
-        if (btn) btn.style.display = 'inline-block';
-        pos = 0;
-      }
+// ── ADMIN BUTTON — only shown for CaptainRam ──
+function checkAdminButton() {
+  const callsign = localStorage.getItem('ram_callsign');
+  const wrap = document.getElementById('admin-nav-btn-wrap');
+  if (wrap) wrap.style.display = callsign === ADMIN_CALLSIGN ? 'list-item' : 'none';
+}
+
+// ── ONE-TIME ADMIN ACCOUNT SETUP ──
+// Open browser console and run: setupAdminAccount()
+// This creates the CaptainRam account in Firebase — do this once
+window.setupAdminAccount = async function() {
+  const email = 'captainram@ramsorg.app';
+  const password = 'CaptainRam_admin2024';
+  try {
+    const cred = await createUserFn(email, password);
+    await fsSet('members', ADMIN_CALLSIGN, {
+      callsign: ADMIN_CALLSIGN,
+      discord: 'Admiral',
+      rsi: 'CaptainRam',
+      rank: 'Admiral',
+      division: 'COMMAND',
+      sp: 9999,
+      status: 'Approved',
+      approved: true,
+      examPassed: true,
+      isInstructor: false,
+      assignedInstructor: '',
+      checks: ['ci-1','ci-2','ci-3','ci-4','ci-5','ci-6','ci-7','ci-8','ci-9'],
+      mods: [1,2,3,4,5,6],
+      graduated: true,
+      isAdmin: true,
+      date: new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+      uid: cred.user.uid
+    });
+    localStorage.setItem('ram_callsign', ADMIN_CALLSIGN);
+    localStorage.setItem('ram_password', password);
+    localStorage.setItem('ram_approved', 'true');
+    console.log('✓ CaptainRam admin account created. Reload the page to sign in.');
+    alert('✓ Admin account created! Reload the page — you will be signed in as CaptainRam.');
+  } catch(e) {
+    if (e.code === 'auth/email-already-in-use') {
+      console.log('Account already exists — just log in.');
+      alert('Account already exists. Open the RSI dropdown and use Academy / Sign In with callsign CaptainRam and discord "Admiral".');
     } else {
-      pos = e.key.toLowerCase() === seq[0] ? 1 : 0;
+      console.error(e);
+      alert('Error: ' + e.message);
     }
-  });
-})();
+  }
+};
+
+// Check admin button visibility on load
+checkAdminButton();
 
 // MAIN SITE — scroll reveal + connector
 // ════════════════════════════════════════
@@ -2318,6 +2614,9 @@ function toggleCheck(id) {
   const cf = document.getElementById('check-fill');
   if (cc) cc.textContent = c + '/9';
   if (cf) cf.style.width = (c / 9 * 100) + '%';
+  // Sync to Firestore
+  const cs = localStorage.getItem('ram_callsign');
+  if (cs) fsSet('members', cs, { checks: acadS.checks });
 }
 
 // Division select
@@ -2335,6 +2634,9 @@ function confirmDiv() {
   acadS.div = pendingDiv; acadS.divOk = true;
   localStorage.setItem('ram_div', pendingDiv);
   localStorage.setItem('ram_divOk', 'true');
+  // Sync to Firestore
+  const cs = localStorage.getItem('ram_callsign');
+  if (cs) fsSet('members', cs, { division: pendingDiv });
   document.getElementById('div-ui').style.display = 'none';
   document.getElementById('div-locked').classList.add('visible');
   document.getElementById('locked-title').textContent = pendingDiv + ' Division — Confirmed';
@@ -2431,6 +2733,8 @@ function initAcademy() {
     if (btn) btn.style.display = 'inline-block';
   }
 }
+
+
 </script>
 
 <!-- ════════════════════════════════════════
@@ -2441,6 +2745,29 @@ function initAcademy() {
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
 <div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+
+  <!-- RETURNING USER LOGIN -->
+  <div id="enroll-step-login" style="display:none;position:relative;max-width:480px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;">Second Fleet Academy — Login</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:24px;">Welcome<br><span style="color:#00c8ff;">Back</span></h2>
+    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;">CALLSIGN //</div>
+        <input id="login-callsign" type="text" placeholder="Your callsign" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;">DISCORD //</div>
+        <input id="login-discord" type="text" placeholder="Your Discord username" autocomplete="off"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;">
+      </div>
+    </div>
+    <div id="login-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="loginReturningMember()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Login →</button>
+    <button onclick="showEnrollGate('step1')" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← New Enrollment</button>
+    <button onclick="goToMain()" style="display:block;width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;" onmouseover="this.style.color='#5a8aaa'" onmouseout="this.style.color='#3a6080'">← Main Site</button>
+  </div>
 
   <!-- STEP 1: CALLSIGN + USERNAMES -->
   <div id="enroll-step-1" style="position:relative;max-width:560px;width:90%;text-align:center;padding:40px 20px;">
@@ -2472,9 +2799,8 @@ function initAcademy() {
     <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
     <button onclick="enrollStep1()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue to Entry Exam →</button>
     <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
+    <button onclick="showEnrollGate('login')" style="display:block;width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:none;padding:8px;cursor:pointer;" onmouseover="this.style.color='#5a8aaa'" onmouseout="this.style.color='#3a6080'">Already enrolled? Login →</button>
   </div>
-
-  <!-- STEP 2: ENTRY EXAM -->
   <div id="enroll-step-2" style="display:none;position:relative;max-width:600px;width:90%;padding:40px 20px;max-height:90vh;overflow-y:auto;">
     <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-align:center;">Second Fleet Academy — Step 2 of 3</div>
     <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-align:center;text-shadow:0 0 30px rgba(0,200,255,0.3);">Entry <span style="color:#00c8ff;">Exam</span></h2>
@@ -3153,9 +3479,10 @@ function initAcademy() {
   <p class="admin-panel-sub">View enrolled cadets and track their progress through the orientation pipeline in real time.</p>
   <div id="admin-academy-list"></div>
   <div class="admin-form" style="margin-top:16px;">
-    <div class="admin-form-title">// Clear Cadet Session</div>
-    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Remove an enrolled cadet's local session data — use this to clear test profiles.</p>
-    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Clear Current Cadet Session</button>
+    <div class="admin-form-title">// Remove Cadet from Firestore</div>
+    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Permanently removes a cadet account from Firestore and all local data. Use this to clear test profiles or remove a member completely.</p>
+    <input class="admin-input" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
+    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Remove Cadet</button>
   </div>
 </div>
 
