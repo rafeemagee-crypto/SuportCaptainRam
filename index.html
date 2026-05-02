@@ -1497,52 +1497,75 @@ footer {
 </div><!-- /page-main -->
 <script>
 // ════════════════════════════════════════
-// FIREBASE INIT
+// ADMIN DATA (localStorage)
 // ════════════════════════════════════════
-firebase.initializeApp({
-  apiKey: "AIzaSyABmROm7I5uBkWr7XFvsfHi0GHU12V-Jkk",
-  authDomain: "ramsorg-e0c22.firebaseapp.com",
-  projectId: "ramsorg-e0c22",
-  storageBucket: "ramsorg-e0c22.firebasestorage.app",
-  messagingSenderId: "218723692883",
-  appId: "1:218723692883:web:ce706bf6a7e886633d31a6"
-});
-const db   = firebase.firestore();
-const auth = firebase.auth();
+function getAdminData(key, def) {
+  try { return JSON.parse(localStorage.getItem('ram_admin_' + key) || 'null') || def; }
+  catch(e) { return def; }
+}
+function setAdminData(key, val) {
+  localStorage.setItem('ram_admin_' + key, JSON.stringify(val));
+}
 
+// ════════════════════════════════════════
+// FIREBASE — initialised after DOM ready so compat scripts are loaded
+// ════════════════════════════════════════
+let db = null, auth = null;
+
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyABmROm7I5uBkWr7XFvsfHi0GHU12V-Jkk",
+        authDomain: "ramsorg-e0c22.firebaseapp.com",
+        projectId: "ramsorg-e0c22",
+        storageBucket: "ramsorg-e0c22.firebasestorage.app",
+        messagingSenderId: "218723692883",
+        appId: "1:218723692883:web:ce706bf6a7e886633d31a6"
+      });
+    }
+    db   = firebase.firestore();
+    auth = firebase.auth();
+    console.log('✓ Firebase ready');
+    checkAdminButton();
+  } catch(e) {
+    console.warn('Firebase init error:', e.message);
+  }
+}
+
+// Firestore helpers
 async function fsGet(col, id) {
+  if (!db) return null;
   try { const s = await db.collection(col).doc(id).get(); return s.exists ? s.data() : null; }
-  catch(e) { return null; }
+  catch(e) { console.error('fsGet', e); return null; }
 }
 async function fsSet(col, id, data) {
+  if (!db) return false;
   try { await db.collection(col).doc(id).set(data, { merge: true }); return true; }
-  catch(e) { return false; }
+  catch(e) { console.error('fsSet', e); return false; }
 }
 async function fsGetAll(col) {
+  if (!db) return [];
   try { const s = await db.collection(col).get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); }
-  catch(e) { return []; }
+  catch(e) { console.error('fsGetAll', e); return []; }
 }
 async function fsDelete(col, id) {
+  if (!db) return false;
   try { await db.collection(col).doc(id).delete(); return true; }
-  catch(e) { return false; }
+  catch(e) { console.error('fsDelete', e); return false; }
 }
 async function createUserFn(email, pw) { return auth.createUserWithEmailAndPassword(email, pw); }
 async function signInFn(email, pw)     { return auth.signInWithEmailAndPassword(email, pw); }
 async function signOutFn()             { return auth.signOut(); }
 
-console.log('\u2713 Firebase ready');
-
-// ── ADMIN CONFIG ──
+// ════════════════════════════════════════
+// ADMIN CONFIG
+// ════════════════════════════════════════
 const ADMIN_CALLSIGN = 'CAPTAINRAM';
 
 // Current user state
 let currentUser = null;
 let currentMember = null;
-
-async function fsGet(col, id)    { return fsGetFn    ? fsGetFn(col, id)       : null; }
-async function fsSet(col, id, d) { return fsSetFn    ? fsSetFn(col, id, d)    : false; }
-async function fsGetAll(col)     { return fsGetAllFn ? fsGetAllFn(col)         : []; }
-async function fsDelete(col, id) { return fsDeleteFn ? fsDeleteFn(col, id)    : false; }
 
 // ════════════════════════════════════════
 // PAGE SWITCHING
@@ -2630,8 +2653,7 @@ window.setupAdminAccount = async function() {
 
 // Check admin button visibility once DOM is ready
 document.addEventListener("DOMContentLoaded", function() {
-  checkAdminButton();
-  // Also expose openAdminPanel directly for console debugging
+  initFirebase();
   window.openAdmin = openAdminPanel;
 });
 
