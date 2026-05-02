@@ -1427,13 +1427,13 @@ function goToAcademy() {
 
   if (!callsign) {
     // Never enrolled — show step 1
-    document.getElementById('enroll-gate').style.display = 'flex';
+    document.getElementById('enroll-gate').style.display = 'flex'; document.getElementById('enroll-gate').style.flexDirection = 'column'; document.getElementById('enroll-gate').style.alignItems = 'center';
     document.getElementById('enroll-step-1').style.display = 'block';
     document.getElementById('enroll-step-2').style.display = 'none';
     document.getElementById('enroll-step-3').style.display = 'none';
   } else if (pending && !approved) {
     // Enrolled but not yet approved — show pending screen
-    document.getElementById('enroll-gate').style.display = 'flex';
+    document.getElementById('enroll-gate').style.display = 'flex'; document.getElementById('enroll-gate').style.flexDirection = 'column'; document.getElementById('enroll-gate').style.alignItems = 'center';
     document.getElementById('enroll-step-1').style.display = 'none';
     document.getElementById('enroll-step-2').style.display = 'none';
     document.getElementById('enroll-step-3').style.display = 'block';
@@ -1627,9 +1627,20 @@ function demoteRank(i) {
 function removeMember(i) {
   if (!confirm('Remove this member?')) return;
   const members = getAdminData('members', []);
+  const removed = members[i];
   members.splice(i, 1);
   setAdminData('members', members);
+  // Remove from applications too
+  const apps = getAdminData('applications', []);
+  const newApps = apps.filter(a => a.callsign !== removed.callsign);
+  setAdminData('applications', newApps);
+  // If this is the currently active browser session, clear their academy data
+  if (localStorage.getItem('ram_callsign') === removed.callsign) {
+    ['ram_callsign','ram_checks','ram_mods','ram_div','ram_divOk','ram_graduated','ram_discord','ram_rsi','ram_pending','ram_approved'].forEach(k => localStorage.removeItem(k));
+  }
   renderAdminMembers();
+  renderAdminApplications();
+  renderAdminAcademy();
 }
 
 // ── EVENTS ──
@@ -1878,6 +1889,8 @@ function enrollStep1() {
   // Move to exam
   document.getElementById('enroll-step-1').style.display = 'none';
   document.getElementById('enroll-step-2').style.display = 'block';
+  const gate = document.getElementById('enroll-gate');
+  if (gate) gate.scrollTop = 0;
 }
 
 // ── ENROLLMENT STEP 2: Entry exam ──
@@ -1917,6 +1930,9 @@ function submitExam() {
   // Move to pending screen
   document.getElementById('enroll-step-2').style.display = 'none';
   document.getElementById('enroll-step-3').style.display = 'block';
+  // Scroll gate back to top
+  const gate = document.getElementById('enroll-gate');
+  if (gate) gate.scrollTop = 0;
   const cs = localStorage.getItem('ram_callsign');
   const pd = document.getElementById('pending-callsign');
   if (pd) pd.textContent = '// CALLSIGN: ' + cs + ' — EXAM PASSED — AWAITING APPROVAL';
@@ -2165,7 +2181,7 @@ function initAcademy() {
 <div id="page-academy" style="display:none;">
 
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
-<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);align-items:center;justify-content:center;backdrop-filter:blur(12px);overflow-y:auto;">
+<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
 
   <!-- STEP 1: CALLSIGN + USERNAMES -->
@@ -2201,7 +2217,7 @@ function initAcademy() {
   </div>
 
   <!-- STEP 2: ENTRY EXAM -->
-  <div id="enroll-step-2" style="display:none;position:relative;max-width:600px;width:90%;padding:40px 20px;">
+  <div id="enroll-step-2" style="display:none;position:relative;max-width:600px;width:90%;padding:40px 20px;max-height:90vh;overflow-y:auto;">
     <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-align:center;">Second Fleet Academy — Step 2 of 3</div>
     <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-align:center;text-shadow:0 0 30px rgba(0,200,255,0.3);">Entry <span style="color:#00c8ff;">Exam</span></h2>
     <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin-bottom:28px;text-align:center;">Answer all 5 questions correctly to proceed. You can retry if you don't pass.</p>
