@@ -1025,7 +1025,7 @@ footer {
         </div>
         <!-- Not signed in state -->
         <div id="rsi-dropdown-guest" style="padding:10px 6px;">
-          <button onclick="goToAcademy();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Academy / Enroll</button>
+          <button onclick="openSignupSignin();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Signup / Sign In</button>
         </div>
         <!-- Signed in state -->
         <div id="rsi-dropdown-member" style="display:none;padding:10px 6px;">
@@ -1512,41 +1512,49 @@ async function goToAcademy() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   if (!academyInited) { initAcademy(); academyInited = true; }
 
-  // Check if already signed in via Firebase
-  const user = auth ? auth.currentUser : null;
   const cachedCallsign = localStorage.getItem('ram_callsign');
   const cachedPassword = localStorage.getItem('ram_password');
 
-  if (user && cachedCallsign) {
-    // Already authenticated this session
-    await loadMemberAndEnter(cachedCallsign);
+  // Not signed in at all — show signup/sign in overlay
+  if (!cachedCallsign) {
+    document.getElementById('page-academy').style.display = 'none';
+    document.getElementById('page-main').style.display = 'block';
+    openSignupSignin();
     return;
   }
 
-  if (cachedCallsign && cachedPassword) {
-    // Try auto-login with cached credentials
+  // Try auto-login if not already authenticated
+  if (!auth.currentUser && cachedPassword) {
     try {
       const email = cachedCallsign.toLowerCase() + '@ramsorg.app';
       const cred = await signInFn(email, cachedPassword);
       currentUser = cred.user;
-      await loadMemberAndEnter(cachedCallsign);
-      return;
     } catch(e) {
-      // Credentials stale — clear and show login
       localStorage.removeItem('ram_password');
+      document.getElementById('page-academy').style.display = 'none';
+      document.getElementById('page-main').style.display = 'block';
+      openSignupSignin();
+      return;
     }
   }
 
-  // No account — show enrollment/login choice
-  showEnrollGate('choice');
+  await loadMemberAndEnter(cachedCallsign);
 }
 
 async function loadMemberAndEnter(callsign) {
-  // Load member from Firestore
   const data = await fsGet('members', callsign);
-  if (!data) { showEnrollGate('step1'); return; }
-  currentMember = data;
+  currentMember = data || {};
 
+  // Not yet enrolled in academy — show enrollment gate (Discord/RSI + exam)
+  if (!data || !data.enrolled) {
+    showEnrollGate('step1');
+    // Show their callsign in the enrollment form
+    const cd = document.getElementById('enroll-callsign-display');
+    if (cd) cd.textContent = '// SIGNED IN AS: ' + callsign;
+    return;
+  }
+
+  // Enrolled but pending approval
   if (!data.approved) {
     showEnrollGate('pending');
     const pd = document.getElementById('pending-callsign');
@@ -1554,15 +1562,15 @@ async function loadMemberAndEnter(callsign) {
     return;
   }
 
-  // Approved — enter academy
+  // Approved — enter academy portal
   document.getElementById('enroll-gate').style.display = 'none';
   localStorage.setItem('ram_callsign', callsign);
+  localStorage.setItem('ram_approved', 'true');
   updateCallsignDisplay(callsign);
   if (data.isInstructor) {
     const btn = document.getElementById('inst-panel-btn');
     if (btn) btn.style.display = 'inline-block';
   }
-  // Restore academy state from Firestore data
   acadS.checks = data.checks || [];
   acadS.mods   = data.mods   || [];
   acadS.div    = data.division || null;
@@ -1575,11 +1583,12 @@ function showEnrollGate(step) {
   gate.style.display = 'flex';
   gate.style.flexDirection = 'column';
   gate.style.alignItems = 'center';
-  document.getElementById('enroll-step-1').style.display = step === 'step1' || step === 'choice' ? 'block' : 'none';
-  document.getElementById('enroll-step-2').style.display = 'none';
-  document.getElementById('enroll-step-3').style.display = step === 'pending' ? 'block' : 'none';
-  const loginStep = document.getElementById('enroll-step-login');
-  if (loginStep) loginStep.style.display = step === 'login' ? 'block' : 'none';
+  const s1 = document.getElementById('enroll-step-1');
+  const s2 = document.getElementById('enroll-step-2');
+  const s3 = document.getElementById('enroll-step-3');
+  if (s1) s1.style.display = step === 'step1' ? 'block' : 'none';
+  if (s2) s2.style.display = 'none';
+  if (s3) s3.style.display = step === 'pending' ? 'block' : 'none';
 }
 function goToMain() {
   document.getElementById('page-academy').style.display = 'none';
@@ -1643,9 +1652,7 @@ function updateRsiDropdown() {
 async function signOutMember() {
   try { await signOutFn(); } catch(e) {}
   currentUser = null; currentMember = null;
-  localStorage.removeItem('ram_callsign');
-  localStorage.removeItem('ram_password');
-  localStorage.removeItem('ram_approved');
+  ['ram_callsign','ram_password','ram_approved','ram_discord','ram_rsi','ram_pending','ram_enrolled'].forEach(k=>localStorage.removeItem(k));
   const label = document.getElementById('rsi-btn-label');
   if (label) label.textContent = 'RSI';
   updateRsiDropdown();
@@ -2285,69 +2292,117 @@ function clearCadetSession() {
   alert('Session cleared.');
 }
 
-// ── ENROLLMENT STEP 1: Callsign + usernames → Firebase account ──
+// ── SIGNUP / SIGN IN OVERLAY ──
+let ssMode = 'new'; // 'new' or 'return'
+
+function openSignupSignin() {
+  document.getElementById('signup-gate').style.display = 'flex';
+  setSsMode('new');
+  document.getElementById('ss-callsign').value = '';
+  document.getElementById('ss-newpassword').value = '';
+  document.getElementById('ss-password').value = '';
+  document.getElementById('ss-error').textContent = '';
+}
+
+function setSsMode(mode) {
+  ssMode = mode;
+  const isNew = mode === 'new';
+  document.getElementById('ss-tab-new').style.background = isNew ? 'rgba(0,200,255,0.1)' : 'transparent';
+  document.getElementById('ss-tab-new').style.borderColor = isNew ? 'rgba(0,200,255,0.4)' : '#1e3a5f';
+  document.getElementById('ss-tab-new').style.color = isNew ? '#00c8ff' : '#5a8aaa';
+  document.getElementById('ss-tab-ret').style.background = !isNew ? 'rgba(0,200,255,0.1)' : 'transparent';
+  document.getElementById('ss-tab-ret').style.borderColor = !isNew ? 'rgba(0,200,255,0.4)' : '#1e3a5f';
+  document.getElementById('ss-tab-ret').style.color = !isNew ? '#00c8ff' : '#5a8aaa';
+  document.getElementById('ss-newpass-wrap').style.display = isNew ? 'block' : 'none';
+  document.getElementById('ss-password-wrap').style.display = !isNew ? 'block' : 'none';
+  document.getElementById('ss-submit-btn').textContent = isNew ? 'Create Account →' : 'Sign In →';
+}
+
+async function doSignupSignin() {
+  const callsign = document.getElementById('ss-callsign').value.trim().toUpperCase();
+  const err = document.getElementById('ss-error');
+  err.textContent = '';
+  if (!callsign || callsign.length < 2) { err.textContent = '// ERROR: CALLSIGN REQUIRED'; return; }
+
+  const email = callsign.toLowerCase() + '@ramsorg.app';
+
+  if (ssMode === 'new') {
+    const password = document.getElementById('ss-newpassword').value;
+    if (!password || password.length < 6) { err.textContent = '// ERROR: PASSWORD MUST BE AT LEAST 6 CHARACTERS'; return; }
+    try {
+      const cred = await createUserFn(email, password);
+      currentUser = cred.user;
+      const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+      const memberData = {
+        callsign, rank: 'Cadet', division: 'UNASSIGNED', sp: 0,
+        status: 'Pending', examPassed: false, checks: [], mods: [],
+        graduated: false, approved: false, enrolled: false,
+        isInstructor: false, assignedInstructor: '',
+        date: now, uid: cred.user.uid
+      };
+      await fsSet('members', callsign, memberData);
+      currentMember = memberData;
+      localStorage.setItem('ram_callsign', callsign);
+      localStorage.setItem('ram_password', password);
+      localStorage.setItem('ram_approved', 'false');
+      document.getElementById('signup-gate').style.display = 'none';
+      updateCallsignDisplay(callsign);
+    } catch(e) {
+      if (e.code === 'auth/email-already-in-use') {
+        err.textContent = '// CALLSIGN TAKEN — USE RETURNING TAB TO SIGN IN';
+      } else {
+        err.textContent = '// ERROR: ' + e.message;
+      }
+    }
+
+  } else {
+    const password = document.getElementById('ss-password').value;
+    if (!password) { err.textContent = '// ERROR: PASSWORD REQUIRED'; return; }
+    try {
+      const cred = await signInFn(email, password);
+      currentUser = cred.user;
+      const data = await fsGet('members', callsign);
+      currentMember = data;
+      localStorage.setItem('ram_callsign', callsign);
+      localStorage.setItem('ram_password', password);
+      localStorage.setItem('ram_approved', data && data.approved ? 'true' : 'false');
+      document.getElementById('signup-gate').style.display = 'none';
+      updateCallsignDisplay(callsign);
+      checkAdminButton();
+    } catch(e) {
+      err.textContent = '// ERROR: INVALID CALLSIGN OR PASSWORD';
+    }
+  }
+}
+
+// ── ACADEMY ENROLLMENT STEP 1: Discord + RSI (callsign already known) ──
 async function enrollStep1() {
-  const callsign = document.getElementById('callsign-input').value.trim().toUpperCase();
+  const callsign = localStorage.getItem('ram_callsign');
   const discord  = document.getElementById('discord-input').value.trim();
   const rsi      = document.getElementById('rsi-input').value.trim();
   const err      = document.getElementById('enroll-error');
 
-  if (!callsign || callsign.length < 2) { err.textContent = '// ERROR: CALLSIGN REQUIRED — MINIMUM 2 CHARACTERS'; return; }
   if (!discord) { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
-  if (!rsi)     { err.textContent = '// ERROR: RSI USERNAME REQUIRED'; return; }
+  if (!rsi)     { err.textContent = '// ERROR: RSI DISPLAY NAME REQUIRED'; return; }
 
-  // Check if callsign is already taken in Firestore
-  const existing = await fsGet('members', callsign);
-  if (existing) { err.textContent = '// ERROR: CALLSIGN ALREADY IN USE — CHOOSE ANOTHER'; return; }
+  // Update Firestore member doc with discord/rsi and mark as pending enrollment
+  const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  await fsSet('members', callsign, { discord, rsi, status: 'Pending', enrolled: true, date: now });
+  localStorage.setItem('ram_discord', discord);
+  localStorage.setItem('ram_rsi', rsi);
+  localStorage.setItem('ram_pending', 'true');
 
-  // Create Firebase Auth account using callsign@ramsorg.app as email
-  const email = callsign.toLowerCase() + '@ramsorg.app';
-  const password = callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
+  // Add to admin applications
+  const apps = getAdminData('applications', []);
+  const filtered = apps.filter(a => a.callsign !== callsign);
+  filtered.unshift({ callsign, discord, rsi, date: now, status: 'Pending', examPassed: false });
+  setAdminData('applications', filtered);
 
-  try {
-    const cred = await createUserFn(email, password);
-    currentUser = cred.user;
-
-    // Store member doc in Firestore
-    const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
-    const memberData = {
-      callsign, discord, rsi,
-      rank: 'Cadet', division: 'UNASSIGNED', sp: 0,
-      status: 'Pending', examPassed: false,
-      checks: [], mods: [],
-      graduated: false, approved: false,
-      isInstructor: false, assignedInstructor: '',
-      date: now, uid: cred.user.uid
-    };
-    await fsSet('members', callsign, memberData);
-    currentMember = memberData;
-
-    // Also save to admin applications
-    const apps = getAdminData('applications', []);
-    const filtered = apps.filter(a => a.callsign !== callsign);
-    filtered.unshift({ callsign, discord, rsi, date: now, status: 'Pending', examPassed: false });
-    setAdminData('applications', filtered);
-
-    // Cache locally for this session
-    localStorage.setItem('ram_callsign', callsign);
-    localStorage.setItem('ram_discord',  discord);
-    localStorage.setItem('ram_rsi',      rsi);
-    localStorage.setItem('ram_pending',  'true');
-    localStorage.setItem('ram_password', password); // store so returning user can auto-login
-
-    // Move to exam
-    document.getElementById('enroll-step-1').style.display = 'none';
-    document.getElementById('enroll-step-2').style.display = 'block';
-    const gate = document.getElementById('enroll-gate');
-    if (gate) gate.scrollTop = 0;
-
-  } catch(e) {
-    if (e.code === 'auth/email-already-in-use') {
-      err.textContent = '// ERROR: CALLSIGN ALREADY REGISTERED — TRY LOGGING IN';
-    } else {
-      err.textContent = '// ERROR: ' + e.message;
-    }
-  }
+  // Move to exam
+  document.getElementById('enroll-step-1').style.display = 'none';
+  document.getElementById('enroll-step-2').style.display = 'block';
+  const gate = document.getElementById('enroll-gate');
+  if (gate) gate.scrollTop = 0;
 }
 
 // ── ENROLLMENT STEP 2: Entry exam ──
@@ -2442,37 +2497,7 @@ async function checkApproval() {
 }
 
 // ── RETURNING MEMBER LOGIN ──
-async function loginReturningMember() {
-  const callsign = document.getElementById('login-callsign').value.trim().toUpperCase();
-  const discord  = document.getElementById('login-discord').value.trim();
-  const err = document.getElementById('login-error');
-  if (!callsign) { err.textContent = '// ERROR: CALLSIGN REQUIRED'; return; }
-
-  const email = callsign.toLowerCase() + '@ramsorg.app';
-  // Admin account uses fixed password — everyone else uses callsign+discord
-  const password = callsign === ADMIN_CALLSIGN
-    ? 'CaptainRam_admin2024'
-    : callsign + '_' + discord.replace(/[^a-zA-Z0-9]/g,'').substring(0,8);
-
-  // Non-admin must provide discord
-  if (callsign !== ADMIN_CALLSIGN && !discord) {
-    err.textContent = '// ERROR: DISCORD USERNAME REQUIRED';
-    return;
-  }
-
-  try {
-    const cred = await signInFn(email, password);
-    currentUser = cred.user;
-    localStorage.setItem('ram_callsign', callsign);
-    localStorage.setItem('ram_discord',  discord || 'Admiral');
-    localStorage.setItem('ram_password', password);
-    localStorage.setItem('ram_approved', 'true');
-    await loadMemberAndEnter(callsign);
-  } catch(e) {
-    err.textContent = '// ERROR: INVALID CALLSIGN OR DISCORD USERNAME';
-    console.error(e);
-  }
-}
+// loginReturningMember replaced by doSignupSignin
 
 function enrollCadet() { enrollStep1(); }
 
@@ -2519,6 +2544,7 @@ window.setupAdminAccount = async function() {
       checks: ['ci-1','ci-2','ci-3','ci-4','ci-5','ci-6','ci-7','ci-8','ci-9'],
       mods: [1,2,3,4,5,6],
       graduated: true,
+      enrolled: true,
       isAdmin: true,
       date: new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
       uid: cred.user.uid
@@ -2762,48 +2788,67 @@ function initAcademy() {
 <div id="page-academy" style="display:none;">
 
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
+<!-- ══ SIGNUP / SIGN IN OVERLAY — from RSI dropdown ══ -->
+<div id="signup-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(14px);">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:440px;width:90%;text-align:center;padding:40px 20px;">
+    <div style="width:72px;height:72px;margin:0 auto 22px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">RAM Space Industries</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:6px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Signup /<br><span style="color:#00c8ff;">Sign In</span></h2>
+    <p style="font-size:13px;color:#5a8aaa;line-height:1.7;margin:14px 0 24px;">Enter your callsign. New members will create an account — returning members will sign in.</p>
+
+    <!-- Mode tabs -->
+    <div style="display:flex;gap:2px;margin-bottom:20px;">
+      <button id="ss-tab-new" onclick="setSsMode('new')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid rgba(0,200,255,0.4);background:rgba(0,200,255,0.1);color:#00c8ff;cursor:pointer;">New Member</button>
+      <button id="ss-tab-ret" onclick="setSsMode('return')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid #1e3a5f;background:transparent;color:#5a8aaa;cursor:pointer;">Returning</button>
+    </div>
+
+    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
+        <input id="ss-callsign" type="text" maxlength="24" placeholder="Your callsign" autocomplete="off" spellcheck="false"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+      <!-- Password field — only for returning members -->
+      <div id="ss-password-wrap" style="display:none;position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
+        <input id="ss-password" type="password" placeholder="Your password" autocomplete="current-password"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
+          onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+      <!-- Password set — only for new members -->
+      <div id="ss-newpass-wrap" style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
+        <input id="ss-newpassword" type="password" placeholder="Choose a password (min 6 chars)" autocomplete="new-password"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
+          onkeydown="if(event.key==='Enter')doSignupSignin()">
+      </div>
+    </div>
+
+    <div id="ss-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;min-height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="doSignupSignin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'" id="ss-submit-btn">Create Account →</button>
+    <button onclick="document.getElementById('signup-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;">← Cancel</button>
+  </div>
+</div>
+
+<!-- ══ ACADEMY ENROLLMENT GATE — only shown first time going to academy after signing in ══ -->
 <div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
 
-  <!-- RETURNING USER LOGIN -->
-  <div id="enroll-step-login" style="display:none;position:relative;max-width:480px;width:90%;text-align:center;padding:40px 20px;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;">Second Fleet Academy — Login</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:24px;">Welcome<br><span style="color:#00c8ff;">Back</span></h2>
-    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;">CALLSIGN //</div>
-        <input id="login-callsign" type="text" placeholder="Your callsign" autocomplete="off"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
-          oninput="this.value=this.value.toUpperCase()">
-      </div>
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;">DISCORD //</div>
-        <input id="login-discord" type="text" placeholder="Your Discord username" autocomplete="off"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;letter-spacing:0.05em;">
-      </div>
-    </div>
-    <div id="login-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
-    <button onclick="loginReturningMember()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Login →</button>
-    <button onclick="showEnrollGate('step1')" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← New Enrollment</button>
-    <button onclick="goToMain()" style="display:block;width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;" onmouseover="this.style.color='#5a8aaa'" onmouseout="this.style.color='#3a6080'">← Main Site</button>
-  </div>
-
-  <!-- STEP 1: CALLSIGN + USERNAMES -->
+  <!-- STEP 1: ACADEMY ENROLLMENT — Discord + RSI (no callsign, already signed in) -->
   <div id="enroll-step-1" style="position:relative;max-width:560px;width:90%;text-align:center;padding:40px 20px;">
     <div style="width:80px;height:80px;margin:0 auto 24px;">
       <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Second Fleet Academy — Step 1 of 3</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Create Your<br><span style="color:#00c8ff;">Member Account</span></h2>
-    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:16px 0 28px;">Your callsign is your permanent identity in RAM Space Industries. Your Discord and RSI usernames are required so the Admiral can verify your membership before approving your enrollment.</p>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Second Fleet Academy — Enrollment Step 1 of 2</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Academy<br><span style="color:#00c8ff;">Enrollment</span></h2>
+    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:16px 0 6px;">Provide your Discord and RSI usernames so the Admiral can verify your membership before approving your Academy access.</p>
+    <div id="enroll-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:22px;"></div>
 
     <div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-      <div style="position:relative;">
-        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
-        <input id="callsign-input" type="text" maxlength="24" placeholder="e.g. GHOST-7" autocomplete="off" spellcheck="false"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;transition:border-color 0.2s;"
-          oninput="this.value=this.value.toUpperCase()">
-      </div>
       <div style="position:relative;">
         <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">DISCORD //</div>
         <input id="discord-input" type="text" maxlength="48" placeholder="Your Discord username" autocomplete="off"
@@ -2818,101 +2863,7 @@ function initAcademy() {
     <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:12px;text-align:left;"></div>
     <button onclick="enrollStep1()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue to Entry Exam →</button>
     <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
-    <button onclick="showEnrollGate('login')" style="display:block;width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:none;padding:8px;cursor:pointer;" onmouseover="this.style.color='#5a8aaa'" onmouseout="this.style.color='#3a6080'">Already enrolled? Login →</button>
   </div>
-  <div id="enroll-step-2" style="display:none;position:relative;max-width:600px;width:90%;padding:40px 20px;max-height:90vh;overflow-y:auto;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-align:center;">Second Fleet Academy — Step 2 of 3</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-align:center;text-shadow:0 0 30px rgba(0,200,255,0.3);">Entry <span style="color:#00c8ff;">Exam</span></h2>
-    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin-bottom:28px;text-align:center;">Answer all 5 questions correctly to proceed. You can retry if you don't pass.</p>
-
-    <div id="exam-questions" style="display:flex;flex-direction:column;gap:20px;">
-
-      <!-- Q1 -->
-      <div class="exam-q" data-correct="B">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 01 / 05</div>
-        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What is Star Citizen?</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="exam-opt"><input type="radio" name="q1" value="A"> A fantasy RPG</label>
-          <label class="exam-opt"><input type="radio" name="q1" value="B"> A space simulation MMO by Cloud Imperium Games</label>
-          <label class="exam-opt"><input type="radio" name="q1" value="C"> A first person shooter</label>
-          <label class="exam-opt"><input type="radio" name="q1" value="D"> A strategy game</label>
-        </div>
-      </div>
-
-      <!-- Q2 -->
-      <div class="exam-q" data-correct="B">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 02 / 05</div>
-        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What do you plan to contribute to RAM Space Industries?</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="exam-opt"><input type="radio" name="q2" value="A"> Nothing, just joining for fun</label>
-          <label class="exam-opt"><input type="radio" name="q2" value="B"> Active participation in ops, events, and org activities</label>
-          <label class="exam-opt"><input type="radio" name="q2" value="C"> I haven't decided yet</label>
-          <label class="exam-opt"><input type="radio" name="q2" value="D"> Just to see what it's like</label>
-        </div>
-      </div>
-
-      <!-- Q3 -->
-      <div class="exam-q" data-correct="D">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 03 / 05</div>
-        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">Which division handles healing, rescue, and medical gameplay?</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="exam-opt"><input type="radio" name="q3" value="A"> CORE</label>
-          <label class="exam-opt"><input type="radio" name="q3" value="B"> HAUL</label>
-          <label class="exam-opt"><input type="radio" name="q3" value="C"> HORIZON</label>
-          <label class="exam-opt"><input type="radio" name="q3" value="D"> PULSE</label>
-        </div>
-      </div>
-
-      <!-- Q4 -->
-      <div class="exam-q" data-correct="C">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 04 / 05</div>
-        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">If you have a dispute with another member, what should you do?</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="exam-opt"><input type="radio" name="q4" value="A"> Handle it yourself in game</label>
-          <label class="exam-opt"><input type="radio" name="q4" value="B"> Leave the org</label>
-          <label class="exam-opt"><input type="radio" name="q4" value="C"> Bring it to a Lieutenant or above</label>
-          <label class="exam-opt"><input type="radio" name="q4" value="D"> Post about it publicly</label>
-        </div>
-      </div>
-
-      <!-- Q5 -->
-      <div class="exam-q" data-correct="B">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#00c8ff;letter-spacing:0.15em;margin-bottom:8px;">QUESTION 05 / 05</div>
-        <div style="font-size:14px;color:#e8f4ff;margin-bottom:12px;line-height:1.6;">What is most important to remember when on a live fleet op?</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="exam-opt"><input type="radio" name="q5" value="A"> Do whatever you want</label>
-          <label class="exam-opt"><input type="radio" name="q5" value="B"> Follow your Captain's orders and keep voice comms clear</label>
-          <label class="exam-opt"><input type="radio" name="q5" value="C"> Talk as much as possible</label>
-          <label class="exam-opt"><input type="radio" name="q5" value="D"> Only listen to people you know</label>
-        </div>
-      </div>
-
-    </div>
-
-    <div id="exam-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;margin:16px 0 8px;min-height:18px;"></div>
-    <button onclick="submitExam()" style="width:100%;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Submit Exam →</button>
-  </div>
-
-  <!-- STEP 3: PENDING APPROVAL -->
-  <div id="enroll-step-3" style="display:none;position:relative;max-width:520px;width:90%;text-align:center;padding:40px 20px;">
-    <div style="width:80px;height:80px;margin:0 auto 24px;">
-      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(31,200,160,0.5)" stroke-width="1.5" fill="none"/><polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(31,200,160,0.2)" stroke-width="1" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(31,200,160,0.15)" stroke="#1fc8a0" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#1fc8a0"/></svg>
-    </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#1fc8a0;text-transform:uppercase;margin-bottom:12px;">Enrollment Submitted</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:16px;">Pending<br><span style="color:#1fc8a0;">Admiral Approval</span></h2>
-    <p style="font-size:14px;color:#8ab8d8;line-height:1.8;margin-bottom:24px;">Your enrollment application has been submitted. The Admiral will verify your Discord and RSI membership before approving your access to the Academy. You will be notified on Discord.</p>
-    <div id="pending-callsign" style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#00c8ff;letter-spacing:0.15em;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);padding:14px;margin-bottom:24px;"></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:24px;">Check back here after the Admiral approves your application.</div>
-    <button onclick="checkApproval()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.2s;margin-bottom:10px;" onmouseover="this.style.background='#40e8c0'" onmouseout="this.style.background='#1fc8a0'">Check Approval Status</button>
-    <button onclick="goToMain()" style="display:block;width:100%;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
-  </div>
-</div>
-
-<style>
-.exam-opt { display:flex; align-items:center; gap:10px; font-size:13px; color:#8ab8d8; padding:10px 14px; border:1px solid #1e3a5f; cursor:pointer; transition:all 0.15s; font-family:'Barlow',sans-serif; }
-.exam-opt:hover { border-color:rgba(0,200,255,0.3); color:#e8f4ff; background:rgba(0,200,255,0.04); }
-.exam-opt input[type="radio"] { accent-color:#00c8ff; flex-shrink:0; }
-</style>
 
 <!-- ══ ACADEMY NAV ══ -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
