@@ -1,403 +1,2634 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Captain Ram – Support the Channel</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Fleet Academy — RAM Space Industries</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0a0a0f; color: #e0e0e8; font-family: 'Rajdhani', sans-serif; min-height: 100vh; overflow-x: hidden; }
-  .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px); pointer-events: none; z-index: 0; }
-  .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-  .container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
-  .header { text-align: center; margin-bottom: 56px; }
-  .logo-ring { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #00c8ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 24px rgba(0,200,255,0.25), inset 0 0 24px rgba(0,200,255,0.08); animation: pulse 3s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { box-shadow: 0 0 24px rgba(0,200,255,0.25), inset 0 0 24px rgba(0,200,255,0.08); } 50% { box-shadow: 0 0 40px rgba(0,200,255,0.45), inset 0 0 32px rgba(0,200,255,0.15); } }
-  .logo-text { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900; color: #00c8ff; letter-spacing: 2px; }
-  .site-title { font-family: 'Orbitron', monospace; font-size: clamp(26px, 5vw, 46px); font-weight: 900; color: #ffffff; letter-spacing: 4px; text-transform: uppercase; line-height: 1.1; margin-bottom: 8px; }
-  .site-title span { color: #00c8ff; }
-  .tagline { font-size: 15px; font-weight: 500; color: #7a8a9a; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
-  .divider { width: 120px; height: 1px; background: linear-gradient(90deg, transparent, #00c8ff, transparent); margin: 0 auto; }
-  .channels { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px; }
-  .channel-badge { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; background: rgba(255,255,255,0.03); text-decoration: none; transition: all 0.2s; cursor: pointer; }
-  .channel-badge:hover { border-color: rgba(0,200,255,0.5); background: rgba(0,200,255,0.06); transform: translateY(-2px); }
-  .ch-icon { width: 20px; height: 20px; flex-shrink: 0; }
-  .ch-label { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: #aab8c8; }
-  .ch-name { font-size: 15px; font-weight: 600; color: #e0e8f0; }
-  .goal-section { max-width: 620px; margin: 0 auto 52px; border: 1px solid rgba(0,200,255,0.2); border-radius: 6px; background: rgba(0,200,255,0.04); padding: 24px 28px; }
-  .goal-section.hidden { display: none; }
-  .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-  .goal-ship { display: flex; align-items: center; gap: 10px; }
-  .goal-ship-icon { font-size: 22px; }
-  .goal-title { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; }
-  .goal-subtitle { font-size: 12px; color: #4a7a9a; letter-spacing: 1px; margin-top: 2px; }
-  .goal-amounts { text-align: right; }
-  .goal-current { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #00e5ff; text-shadow: 0 0 10px rgba(0,229,255,0.5); }
-  .goal-target { font-size: 12px; color: #4a7a9a; letter-spacing: 1px; }
-  .goal-bar-track { width: 100%; height: 14px; background: rgba(0,200,255,0.08); border-radius: 7px; border: 1px solid rgba(0,200,255,0.15); margin: 14px 0 10px; overflow: hidden; }
-  .goal-bar-fill { height: 100%; border-radius: 7px; background: linear-gradient(90deg, #0077aa, #00c8ff, #00f0ff); box-shadow: 0 0 12px rgba(0,200,255,0.5); transition: width 1s ease; position: relative; }
-  .goal-bar-fill::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25)); border-radius: 0 7px 7px 0; animation: shimmer-bar 2s ease-in-out infinite; }
-  @keyframes shimmer-bar { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-  .goal-footer { display: flex; justify-content: space-between; align-items: center; }
-  .goal-percent { font-family: 'Orbitron', monospace; font-size: 11px; color: #00c8ff; letter-spacing: 2px; }
-  .goal-label { font-size: 11px; color: #3a5a6a; letter-spacing: 1px; text-transform: uppercase; }
-  .goal-complete { display: none; text-align: center; margin-top: 10px; }
-  .goal-complete.show { display: block; }
-  .goal-complete-text { font-family: 'Orbitron', monospace; font-size: 12px; color: #00ff88; letter-spacing: 3px; animation: blink 1s ease-in-out infinite; }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-  .admin-panel { display: none; max-width: 620px; margin: -36px auto 48px; background: rgba(255,100,0,0.05); border: 1px solid rgba(255,100,0,0.2); border-radius: 6px; padding: 20px 24px; }
-  .admin-panel.visible { display: block; }
-  .admin-label { font-size: 11px; color: #ff6400; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
-  .admin-section { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,100,0,0.15); }
-  .admin-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-  .admin-section-label { font-size: 10px; color: #ff9060; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
-  .admin-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .admin-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,100,0,0.3); border-radius: 3px; color: #e0e8f0; font-family: 'Orbitron', monospace; font-size: 12px; padding: 8px 12px; outline: none; }
-  .admin-input-name { width: 200px; }
-  .admin-input-sub { width: 200px; }
-  .admin-input-price { width: 100px; }
-  .admin-input-amount { width: 120px; }
-  .admin-btn { padding: 8px 16px; background: rgba(255,100,0,0.15); border: 1px solid rgba(255,100,0,0.4); border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; color: #ff8040; cursor: pointer; letter-spacing: 1px; transition: all 0.15s; white-space: nowrap; }
-  .admin-btn:hover { background: rgba(255,100,0,0.28); }
-  .admin-btn.toggle-off { background: rgba(255,50,50,0.15); border-color: rgba(255,50,50,0.4); color: #ff5050; }
-  .admin-btn.toggle-off:hover { background: rgba(255,50,50,0.28); }
-  .admin-btn.toggle-on { background: rgba(0,200,100,0.15); border-color: rgba(0,200,100,0.4); color: #00cc66; }
-  .admin-btn.toggle-on:hover { background: rgba(0,200,100,0.28); }
-  .admin-btn.save-btn { background: rgba(0,200,255,0.15); border-color: rgba(0,200,255,0.4); color: #00c8ff; }
-  .admin-btn.save-btn:hover { background: rgba(0,200,255,0.28); }
-  .section-head { text-align: center; margin-bottom: 32px; }
-  .section-head h2 { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; margin-bottom: 6px; }
-  .section-head p { font-size: 15px; color: #6a7a8a; letter-spacing: 1px; }
-  .amounts { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
-  .amount-btn { padding: 12px 24px; border: 2px solid #00e5ff; border-radius: 3px; background: rgba(0,220,255,0.18); color: #ffffff; font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 900; cursor: pointer; transition: all 0.15s; letter-spacing: 2px; box-shadow: 0 0 16px rgba(0,220,255,0.35), inset 0 0 12px rgba(0,220,255,0.15); text-shadow: 0 0 10px rgba(0,240,255,1), 0 0 20px rgba(0,200,255,0.7); }
-  .amount-btn:hover, .amount-btn.active { background: rgba(0,220,255,0.32); border-color: #00f0ff; box-shadow: 0 0 28px rgba(0,220,255,0.65), inset 0 0 18px rgba(0,220,255,0.25); color: #ffffff; text-shadow: 0 0 14px rgba(0,255,255,1), 0 0 28px rgba(0,220,255,1); transform: translateY(-2px); }
-  .custom-row { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
-  .custom-prefix { display: flex; align-items: center; justify-content: center; height: 42px; padding: 0 12px; background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.35); border-right: none; border-radius: 3px 0 0 3px; color: #00e5ff; font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 700; text-shadow: 0 0 8px rgba(0,220,255,0.8); flex-shrink: 0; }
-  .custom-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,200,255,0.2); border-radius: 0 3px 3px 0; color: #e0e8f0; font-family: 'Orbitron', monospace; font-size: 14px; padding: 11px 14px; width: 140px; height: 42px; outline: none; transition: border-color 0.2s; }
-  .custom-input:focus { border-color: #00c8ff; }
-  .custom-input::placeholder { color: #3a4a5a; }
-  .donate-main { display: block; width: 100%; max-width: 400px; margin: 0 auto 56px; padding: 18px; background: rgba(0,220,255,0.18); border: 2px solid #00e5ff; border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; box-shadow: 0 0 18px rgba(0,220,255,0.38), inset 0 0 14px rgba(0,220,255,0.15); text-shadow: 0 0 10px rgba(0,240,255,1), 0 0 22px rgba(0,200,255,0.8); }
-  .donate-main::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,220,255,0.3), transparent); transition: left 0.4s; }
-  .donate-main:hover::before { left: 100%; }
-  .donate-main:hover { background: #00c8ff; color: #0a0a0f; text-shadow: none; box-shadow: 0 0 36px rgba(0,200,255,0.65); border-color: #00f0ff; transform: translateY(-1px); }
-  .donate-main:active { transform: translateY(0); }
-  .msg-section { text-align: center; margin-bottom: 40px; }
-  .msg-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #4a5a6a; margin-bottom: 8px; display: block; }
-  .msg-input { width: 100%; max-width: 480px; display: block; margin: 0 auto; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 3px; color: #c0c8d0; font-family: 'Rajdhani', sans-serif; font-size: 15px; padding: 12px 14px; resize: none; outline: none; transition: border-color 0.2s; }
-  .msg-input:focus { border-color: rgba(0,200,255,0.3); }
-  .msg-input::placeholder { color: #2a3a4a; }
-  .venmo-card { max-width: 480px; margin: 0 auto 56px; border: 1px solid rgba(0,200,255,0.15); border-radius: 4px; background: rgba(0,200,255,0.04); padding: 28px; text-align: center; }
-  .venmo-logo { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-  .venmo-icon { width: 32px; height: 32px; }
-  .venmo-wordmark { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: #008cff; letter-spacing: 2px; }
-  .venmo-handle { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900; color: #ffffff; margin-bottom: 6px; }
-  .venmo-sub { font-size: 13px; color: #4a6a8a; letter-spacing: 1px; margin-bottom: 20px; }
-  .venmo-btn { display: inline-block; padding: 12px 32px; background: #008cff; border-radius: 3px; color: #ffffff; font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-decoration: none; cursor: pointer; border: none; transition: all 0.15s; }
-  .venmo-btn:hover { background: #0070cc; box-shadow: 0 0 20px rgba(0,140,255,0.3); transform: translateY(-1px); }
-  .support-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 56px; }
-  .support-card { border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; background: rgba(255,255,255,0.02); padding: 20px; transition: border-color 0.2s; }
-  .support-card:hover { border-color: rgba(0,200,255,0.25); }
-  .support-icon { font-size: 22px; margin-bottom: 10px; display: block; }
-  .support-card h3 { font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #00c8ff; margin-bottom: 6px; }
-  .support-card p { font-size: 14px; color: #6a7a8a; line-height: 1.5; font-weight: 400; }
-  .footer { text-align: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px; }
-  .footer p { font-size: 13px; color: #3a4a5a; letter-spacing: 1px; }
-  .footer span { color: #00c8ff; }
-  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; }
-  .confirm-overlay.show { display: flex; }
-  .confirm-box { border: 1px solid #00c8ff; border-radius: 4px; background: #0d0d18; padding: 40px 32px; text-align: center; max-width: 360px; box-shadow: 0 0 60px rgba(0,200,255,0.15); }
-  .confirm-box h2 { font-family: 'Orbitron', monospace; font-size: 20px; color: #00c8ff; margin-bottom: 12px; letter-spacing: 2px; }
-  .confirm-box p { font-size: 15px; color: #8898a8; margin-bottom: 20px; line-height: 1.6; }
-  .confirm-countdown { font-family: 'Orbitron', monospace; font-size: 13px; color: #00c8ff; letter-spacing: 2px; margin-bottom: 20px; }
-  .confirm-close { padding: 10px 28px; background: #00c8ff; border: none; border-radius: 3px; font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; color: #0a0a0f; cursor: pointer; letter-spacing: 2px; }
-  .confirm-close:hover { background: #22d8ff; }
+:root {
+  --bg:       #04070f;
+  --bg2:      #060c18;
+  --bg3:      #091220;
+  --panel:    #0c1828;
+  --border:   #1e3a5f;
+  --amber:    #00c8ff;
+  --amber2:   #40dfff;
+  --amber-d:  #004a72;
+  --teal:     #1fc8a0;
+  --red:      #e84040;
+  --text:     #c8e0f4;
+  --text2:    #8ab8d8;
+  --text3:    #5a8aaa;
+  --white:    #e8f4ff;
+  --mono:     'Share Tech Mono', monospace;
+  --display:  'Barlow Condensed', sans-serif;
+  --body:     'Barlow', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* SCANLINE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,180,255,0.015) 2px,
+    rgba(0,180,255,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* HOLOGRAM VIGNETTE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,80,180,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 100% 100%, rgba(0,40,100,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 0% 100%, rgba(0,60,140,0.10) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ─── NAVIGATION ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(4,7,15,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,180,255,0.2);
+  box-shadow: 0 1px 30px rgba(0,100,200,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 58px;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-emblem {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.nav-emblem svg { width: 100%; height: 100%; }
+
+.nav-wordmark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.15em;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.nav-wordmark span {
+  color: var(--amber);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text2);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--amber); }
+
+.nav-cta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--amber) !important;
+  border: 1px solid var(--amber-d);
+  padding: 6px 16px;
+  text-transform: uppercase;
+  transition: all 0.2s !important;
+}
+.nav-cta:hover {
+  background: var(--amber) !important;
+  color: var(--bg) !important;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 80px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,180,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,180,255,0.07) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 20%, transparent 100%);
+  animation: gridPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes gridPulse {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+/* Vertical hologram beam */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 140px;
+  width: 1px;
+  height: 55%;
+  background: linear-gradient(to bottom, transparent, #00c8ff, transparent);
+  opacity: 0.5;
+  filter: blur(0.5px);
+  box-shadow: 0 0 8px rgba(0,200,255,0.6);
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeUp 0.8s ease both;
+}
+
+.hero-tag::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--amber);
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(52px, 8vw, 100px);
+  line-height: 0.95;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  max-width: 800px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 40px rgba(0,200,255,0.35), 0 0 100px rgba(0,100,200,0.15);
+  animation: fadeUp 0.8s ease 0.1s both;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--amber);
+  text-shadow: 0 0 30px rgba(0,200,255,0.6), 0 0 70px rgba(0,160,255,0.3);
+}
+
+.hero-sub {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(18px, 3vw, 28px);
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 40px;
+  animation: fadeUp 0.8s ease 0.2s both;
+}
+
+.hero-desc {
+  max-width: 520px;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 48px;
+  animation: fadeUp 0.8s ease 0.3s both;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  animation: fadeUp 0.8s ease 0.4s both;
+}
+
+.btn-primary {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #04070f;
+  background: var(--amber);
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  box-shadow: 0 0 20px rgba(0,200,255,0.3);
+}
+.btn-primary:hover {
+  background: var(--amber2);
+  transform: translateY(-1px);
+  box-shadow: 0 0 32px rgba(0,200,255,0.5);
+}
+
+.btn-secondary {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.btn-secondary:hover { color: var(--white); }
+.btn-secondary::after { content: '→'; }
+
+/* Stat bar */
+.hero-stats {
+  position: absolute;
+  bottom: 60px; right: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeUp 0.8s ease 0.5s both;
+}
+
+.stat-item {
+  text-align: right;
+  border-right: 2px solid rgba(0,200,255,0.3);
+  padding-right: 20px;
+}
+
+.stat-num {
+  font-family: var(--mono);
+  font-size: 28px;
+  color: var(--amber);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+/* Scrolling ticker */
+.ticker {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 36px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.ticker-inner {
+  display: flex;
+  gap: 0;
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  padding: 0 40px;
+  letter-spacing: 0.1em;
+}
+
+.ticker-item span {
+  color: var(--amber);
+  margin-right: 8px;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ─── SECTIONS ─── */
+section {
+  padding: 100px 80px;
+}
+
+.section-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-tag::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--amber);
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 60px;
+}
+
+/* ─── MISSION / ABOUT ─── */
+.about {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.about-quote {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1.4;
+  border-left: 3px solid var(--amber);
+  box-shadow: -4px 0 20px rgba(0,200,255,0.2);
+  padding-left: 24px;
+  margin-bottom: 32px;
+}
+
+.about-body {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.values-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.value-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+.value-item:hover { border-color: var(--amber); box-shadow: 0 0 16px rgba(0,200,255,0.08); }
+
+.value-letter {
+  font-family: var(--display);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--amber-d);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 40px;
+}
+
+.value-body h4 {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.value-body p {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ─── PIPELINE ─── */
+.pipeline {
+  background: var(--bg);
+  position: relative;
+}
+
+.pipeline-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+/* Connector line */
+.pipeline-connector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 60px;
+}
+
+.connector-seg {
+  height: 2px;
+  background: var(--border);
+  position: relative;
+}
+.connector-seg::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  background: var(--amber);
+  transition: width 1s ease;
+  width: 0;
+}
+.connector-seg.lit::after { width: 100%; box-shadow: 0 0 8px rgba(0,200,255,0.5); }
+
+.pipeline-step {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  position: relative;
+  transition: border-color 0.3s, transform 0.3s;
+  cursor: default;
+}
+
+.pipeline-step:hover {
+  border-color: var(--amber);
+  transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(0,200,255,0.12), 0 4px 24px rgba(0,50,120,0.3);
+}
+
+.step-number {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+}
+
+.step-number span {
+  color: var(--amber);
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+
+.step-title {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.step-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.step-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  color: var(--text3);
+}
+
+.step-tag.required { border-color: var(--amber-d); color: var(--amber); }
+.step-tag.milestone { border-color: var(--teal); color: var(--teal); }
+
+/* Corner cut */
+.pipeline-step::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  border-style: solid;
+  border-width: 0 14px 14px 0;
+  border-color: transparent var(--bg) transparent transparent;
+}
+
+/* ─── DIVISIONS ─── */
+.divisions {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+}
+
+.div-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.div-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.div-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--div-color, var(--amber));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.div-card:hover::before { transform: scaleX(1); }
+
+.div-card:hover {
+  background: var(--panel);
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(0,200,255,0.1);
+}
+
+.div-code {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--div-color, var(--amber));
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.div-name {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+}
+
+.div-role-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.div-role-list li {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.div-role-list li::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--div-color, var(--amber));
+  flex-shrink: 0;
+}
+
+/* ─── CERTIFICATIONS ─── */
+.certs {
+  background: var(--bg);
+}
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+}
+
+.cert-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 28px;
+  display: flex;
+  gap: 24px;
+  transition: border-color 0.2s;
+}
+.cert-card:hover { border-color: var(--amber); box-shadow: 0 0 20px rgba(0,200,255,0.1); }
+
+.cert-badge {
+  width: 56px;
+  height: 56px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.cert-title {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.cert-div {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.15em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.cert-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.cert-reqs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.req-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  text-transform: uppercase;
+}
+
+/* ─── RANKS ─── */
+.ranks {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rank-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.rank-table th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text3);
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.rank-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.rank-table tbody tr:hover { background: rgba(0,100,200,0.08); }
+
+.rank-table td {
+  padding: 16px 16px;
+  font-size: 13px;
+  color: var(--text2);
+  vertical-align: middle;
+}
+
+.rank-name-cell {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pips {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.pip.gold    { background: #00c8ff; box-shadow: 0 0 6px rgba(0,200,255,0.6); }
+.pip.silver  { background: #8A8A8A; }
+.pip.teal    { background: #1D9E75; }
+.pip.dim     { background: var(--border); }
+.pip.diamond { border-radius: 2px; transform: rotate(45deg); background: #00c8ff; box-shadow: 0 0 6px rgba(0,200,255,0.7); width:9px; height:9px; }
+
+.tier-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 1px solid;
+}
+
+.tier-command { border-color: #C8960A; color: #C8960A; }
+.tier-officer { border-color: #185FA5; color: #185FA5; }
+.tier-nco     { border-color: #1D9E75; color: #1D9E75; }
+.tier-enlisted{ border-color: #5a8aaa; color: #5a8aaa; }
+
+/* ─── CTA ─── */
+.cta {
+  background: var(--bg);
+  text-align: center;
+  padding: 120px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(232,165,32,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,165,32,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.cta-headline {
+  font-family: var(--display);
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.cta-headline em {
+  font-style: normal;
+  color: var(--amber);
+}
+
+.cta-sub {
+  font-size: 15px;
+  color: var(--text2);
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.cta-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 40px 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-org {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+}
+
+.footer-org span { color: var(--amber); }
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.2s;
+  text-transform: uppercase;
+}
+.footer-links a:hover { color: var(--amber); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  section { padding: 60px 24px; }
+  .hero { padding: 100px 24px 80px; }
+  .hero-stats { display: none; }
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .pipeline-track, .pipeline-connector { grid-template-columns: 1fr 1fr; }
+  .div-grid { grid-template-columns: 1fr 1fr; }
+  .cert-grid { grid-template-columns: 1fr; }
+  .cta { padding: 80px 24px; }
+  footer { flex-direction: column; gap: 16px; text-align: center; }
+}
+
+@media (max-width: 540px) {
+  .pipeline-track, .pipeline-connector { grid-template-columns: 1fr; }
+  .div-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
-<div class="scanlines"></div>
-<div class="grid-bg"></div>
-<div class="container">
-  <header class="header">
-    <div class="logo-ring"><span class="logo-text">CR</span></div>
-    <h1 class="site-title">Captain <span>Ram</span></h1>
-    <p class="tagline">Support the Creator</p>
-    <div class="divider"></div>
-  </header>
-  <div class="channels">
-    <a class="channel-badge" href="https://www.youtube.com/channel/UCJC6Zz794_UNz4SaDop-Hpg" target="_blank">
-      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#ff4444"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
-      <div><div class="ch-label">YouTube Gaming</div><div class="ch-name">RamPlayz</div></div>
-    </a>
-    <a class="channel-badge" href="https://www.twitch.tv/cptram2_0" target="_blank">
-      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#9146ff"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
-      <div><div class="ch-label">Twitch Live</div><div class="ch-name">Cptram2_0</div></div>
-    </a>
-    <a class="channel-badge" href="https://www.youtube.com/channel/UCaHL7qk2e8TX_2iRwkwFuAQ" target="_blank">
-      <svg class="ch-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#00c8ff"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
-      <div><div class="ch-label">Projects & DIY</div><div class="ch-name">RamCreates</div></div>
-    </a>
+<div id="page-main">
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-emblem">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e8a520" stroke-width="1.5" fill="none"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e8a520" stroke-width="0.8" fill="rgba(232,165,32,0.06)"/>
+        <line x1="16" y1="2" x2="16" y2="30" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
+        <line x1="2" y1="10" x2="30" y2="22" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
+        <line x1="30" y1="10" x2="2" y2="22" stroke="#e8a520" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="16" cy="16" r="2.5" fill="#e8a520"/>
+      </svg>
+    </div>
+    <div class="nav-wordmark">RAM<span> SPACE INDUSTRIES</span></div>
   </div>
-  <div class="goal-section" id="goalSection">
-    <div class="goal-header">
-      <div class="goal-ship">
-        <span class="goal-ship-icon">🚀</span>
-        <div>
-          <div class="goal-title" id="goalName">Aurora Mk II</div>
-          <div class="goal-subtitle" id="goalSub">Current Mission · Star Citizen</div>
+  <ul class="nav-links">
+    <li><a href="#about">Mission</a></li>
+    <li><a href="#pipeline">Training</a></li>
+    <li><a href="#divisions">Divisions</a></li>
+    <li><a href="#branches">Branches</a></li>
+    <li><a href="#certs">Certifications</a></li>
+    <li><a href="#ranks">Ranks</a></li>
+    <li><a onclick="goToAcademy()" class="nav-cta" style="cursor:pointer;">Academy</a></li>
+    <li><a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="nav-cta">Join Discord</a></li>
+    <li><a id="admin-nav-btn" onclick="goToAdmin()" class="nav-cta" style="display:none;cursor:pointer;border-color:rgba(232,64,64,0.4);color:#e84040;" onmouseover="this.style.background='#e84040';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#e84040'">⬡ Admin</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <div class="hero-tag">RAMSORG — Est. 2950s UEE</div>
+  <h1>RAM<br><em>Space</em><br>Industries</h1>
+  <div class="hero-sub">RAM Space Industries — Training Division</div>
+  <p class="hero-desc">
+    The First Fleet learned everything the hard way. The Second Fleet Academy exists so you don't have to. Structured training, ranked progression, and a crew worth flying with.
+  </p>
+  <div class="hero-actions">
+    <button onclick="goToAcademy()" class="btn-primary">Academy</button>
+    <a href="#pipeline" class="btn-secondary">View Training Pipeline</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Divisions</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">9</div>
+      <div class="stat-label">Ranks</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Ceiling</div>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <div class="ticker-item"><span>●</span> FLEET STATUS: ACTIVE</div>
+      <div class="ticker-item"><span>●</span> ACADEMY ENROLLMENT: OPEN</div>
+      <div class="ticker-item"><span>●</span> NEXT FLEET OP: SATURDAY</div>
+      <div class="ticker-item"><span>●</span> DISCORD: LIVE</div>
+      <div class="ticker-item"><span>●</span> ORG TAG: [RAMSORG]</div>
+      <div class="ticker-item"><span>●</span> DIVISIONS: SHIELD / HAUL / SCOUT / FORGE</div>
+      <div class="ticker-item"><span>●</span> FLEET STATUS: ACTIVE</div>
+      <div class="ticker-item"><span>●</span> ACADEMY ENROLLMENT: OPEN</div>
+      <div class="ticker-item"><span>●</span> NEXT FLEET OP: SATURDAY</div>
+      <div class="ticker-item"><span>●</span> DISCORD: LIVE</div>
+      <div class="ticker-item"><span>●</span> ORG TAG: [RAMSORG]</div>
+      <div class="ticker-item"><span>●</span> DIVISIONS: SHIELD / HAUL / SCOUT / FORGE</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="">
+      <div class="section-tag">Mission Brief</div>
+      <div class="section-title">Why The Academy Exists</div>
+      <blockquote class="about-quote">"The First Fleet learned everything the hard way. The Second Fleet Academy exists so you don't have to."</blockquote>
+      <p class="about-body">Founded in the deep lanes between systems, RAM Space Industries grew from a small crew of contractors bound by one conviction: that the right team, given the right mission, has no ceiling.</p>
+      <p class="about-body">Every hard lesson from those early years — every ambush, every failed cargo run, every callout that came too late — is now a training module in the Academy. What once cost ships and credits now costs a few hours in orientation.</p>
+      <p class="about-body">When you graduate, you don't just join an org. You join a second fleet built on everything the first one learned.</p>
+    </div>
+    <div class="">
+      <div class="section-tag">Core Values</div>
+      <div class="values-list">
+        <div class="value-item">
+          <div class="value-letter">R</div>
+          <div class="value-body">
+            <h4>Reliability</h4>
+            <p>If you sign up for an op, you show up. Your crew depends on you. The verse doesn't pause for no-shows.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-letter">A</div>
+          <div class="value-body">
+            <h4>Adaptability</h4>
+            <p>New patches, new metas, new threats. RAM members learn fast and flex faster. Rigidity is a liability in space.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <div class="value-letter">M</div>
+          <div class="value-body">
+            <h4>Mastery</h4>
+            <p>Know your role. Whatever position you hold on a ship, be the best at it you can be. Expertise saves lives — and cargo.</p>
+          </div>
         </div>
       </div>
-      <div class="goal-amounts">
-        <div class="goal-current" id="goalCurrent">$0</div>
-        <div class="goal-target" id="goalTargetLabel">of $56 goal</div>
-      </div>
-    </div>
-    <div class="goal-bar-track">
-      <div class="goal-bar-fill" id="goalBar" style="width:0%"></div>
-    </div>
-    <div class="goal-footer">
-      <div class="goal-percent" id="goalPercent">0% FUNDED</div>
-      <div class="goal-label">Help Ram fly ✦</div>
-    </div>
-    <div class="goal-complete" id="goalComplete">
-      <span class="goal-complete-text" id="goalCompleteText">🚀 MISSION FUNDED — AURORA MK II COMPLETE! 🚀</span>
     </div>
   </div>
-  <div class="admin-panel" id="adminPanel">
-    <div class="admin-label">⚙ Goal Admin Controls</div>
-    <div class="admin-section">
-      <div class="admin-section-label">✦ Change Goal Name & Target</div>
-      <div class="admin-row">
-        <input class="admin-input admin-input-name" type="text" id="adminName" placeholder="Goal name (e.g. New GPU)"/>
-        <input class="admin-input admin-input-sub" type="text" id="adminSub" placeholder="Subtitle (e.g. Hardware Upgrade)"/>
-        <input class="admin-input admin-input-price" type="number" id="adminPrice" placeholder="$ goal" min="1"/>
-        <button class="admin-btn save-btn" onclick="saveGoalInfo()">Save Goal</button>
-      </div>
+</section>
+
+<!-- ─── TRAINING PIPELINE ─── -->
+<section class="pipeline" id="pipeline">
+  <div class="section-tag">Training Pipeline</div>
+  <div class="section-title">From Recruit to Crew</div>
+  <p class="section-sub">Four stages stand between you and your division assignment. Each stage unlocks the next. No shortcuts — but no unnecessary obstacles either.</p>
+  <div style="margin-bottom:48px;background:var(--bg2);border:1px solid rgba(0,200,255,0.25);padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;box-shadow:0 0 40px rgba(0,100,200,0.15);">
+    <div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--amber);text-transform:uppercase;margin-bottom:8px;">⬡ Second Fleet Academy</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">Ready to Begin Your Training?</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.6;max-width:480px;">Read all six orientation modules, pick your division, track your stages, and unlock graduation — all inside the Academy Portal.</div>
     </div>
-    <div class="admin-section">
-      <div class="admin-section-label">✦ Update Current Amount Raised</div>
-      <div class="admin-row">
-        <span style="color:#ff8040;font-family:'Orbitron',monospace;font-size:14px;">$</span>
-        <input class="admin-input admin-input-amount" type="number" id="adminAmount" placeholder="0.00" min="0" step="0.01"/>
-        <button class="admin-btn" onclick="updateGoal()">Update</button>
-        <button class="admin-btn" onclick="resetGoal()">Reset to $0</button>
-      </div>
-    </div>
-    <div class="admin-section">
-      <div class="admin-section-label">✦ Goal Visibility</div>
-      <div class="admin-row">
-        <button class="admin-btn toggle-off" id="toggleBtn" onclick="toggleGoal()">Hide Goal</button>
-      </div>
-    </div>
+    <button onclick="goToAcademy()" class="btn-primary" style="white-space:nowrap;flex-shrink:0;font-size:13px;padding:16px 36px;">Enter Academy Portal →</button>
   </div>
-  <section>
-    <div class="section-head">
-      <h2>Choose an Amount</h2>
-      <p>Every contribution powers the next build</p>
-    </div>
-    <div class="amounts">
-      <button class="amount-btn" onclick="selectAmount(this, 3)">$3</button>
-      <button class="amount-btn" onclick="selectAmount(this, 5)">$5</button>
-      <button class="amount-btn" onclick="selectAmount(this, 10)">$10</button>
-      <button class="amount-btn" onclick="selectAmount(this, 25)">$25</button>
-      <button class="amount-btn" onclick="selectAmount(this, 50)">$50</button>
-    </div>
-    <div class="custom-row">
-      <div class="custom-prefix">$</div>
-      <input class="custom-input" type="number" id="customAmt" placeholder="Custom" min="1" oninput="clearPresets()" />
-    </div>
-    <div class="msg-section">
-      <label class="msg-label">Leave a message (optional)</label>
-      <textarea class="msg-input" id="msgBox" rows="3" placeholder="Say hi, share a suggestion, or just send good vibes..."></textarea>
-    </div>
-    <button class="donate-main" onclick="handleDonate()">Send Support via Venmo</button>
-  </section>
-  <div class="venmo-card">
-    <div class="venmo-logo">
-      <svg class="venmo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#008cff" d="M19.05 1.75c.525 1.05.75 2.1.75 3.45 0 4.275-3.675 9.825-6.675 13.8H6.525L3.75 2.5l5.7-.525 1.425 11.4c1.35-2.175 3-5.625 3-7.5 0-1.2-.225-2.025-.6-2.7L19.05 1.75z"/>
+
+  <div class="pipeline-connector">
+    <div class="connector-seg" id="seg0"></div>
+    <div class="connector-seg" id="seg1"></div>
+    <div class="connector-seg" id="seg2"></div>
+    <div class="connector-seg" id="seg3"></div>
+  </div>
+
+  <div class="pipeline-track">
+    <div class="pipeline-step">
+      <div class="step-number">STAGE <span>01</span></div>
+      <svg class="step-icon" viewBox="0 0 40 40" fill="none">
+        <rect x="6" y="8" width="28" height="24" rx="2" stroke="#e8a520" stroke-width="1.2"/>
+        <line x1="12" y1="16" x2="28" y2="16" stroke="#e8a520" stroke-width="1"/>
+        <line x1="12" y1="20" x2="24" y2="20" stroke="#e8a520" stroke-width="1"/>
+        <line x1="12" y1="24" x2="20" y2="24" stroke="#e8a520" stroke-width="1"/>
+        <circle cx="32" cy="10" r="5" fill="var(--bg3)" stroke="#e8a520" stroke-width="1"/>
+        <text x="32" y="13" text-anchor="middle" font-size="7" fill="#e8a520" font-family="'Share Tech Mono'">i</text>
       </svg>
-      <span class="venmo-wordmark">Venmo</span>
+      <div class="step-title">Orientation Module</div>
+      <p class="step-body">Covers org structure, rank system, division overview, rules of conduct, Standing Points, event protocol, and Discord navigation. Delivered via pinned posts or a live session with a Lieutenant.</p>
+      <span class="step-tag required">Required for all</span>
     </div>
-    <div class="venmo-handle">@CptRam</div>
-    <div class="venmo-sub">Tap to open Venmo directly on your device</div>
-    <button class="venmo-btn" onclick="handleDonate()">Open in Venmo</button>
+
+    <div class="pipeline-step">
+      <div class="step-number">STAGE <span>02</span></div>
+      <svg class="step-icon" viewBox="0 0 40 40" fill="none">
+        <polygon points="20,4 36,14 36,26 20,36 4,26 4,14" stroke="#e8a520" stroke-width="1.2"/>
+        <polygon points="20,10 30,16 30,24 20,30 10,24 10,16" stroke="#e8a520" stroke-width="0.6" opacity="0.5"/>
+        <circle cx="20" cy="20" r="3" fill="#e8a520"/>
+      </svg>
+      <div class="step-title">Division Foundations</div>
+      <p class="step-body">Division-specific training after you pick your lane. SHIELD covers combat callouts and flight basics. HAUL covers convoy protocol. SCOUT covers recon reporting. FORGE covers mining and repair priority.</p>
+      <span class="step-tag">Division-specific</span>
+    </div>
+
+    <div class="pipeline-step">
+      <div class="step-number">STAGE <span>03</span></div>
+      <svg class="step-icon" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="14" stroke="#e8a520" stroke-width="1.2"/>
+        <path d="M14 20 L18 24 L26 16" stroke="#e8a520" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="step-title">Live Ops Qualification</div>
+      <p class="step-body">Join one live event as observer/support. A Specialist or Senior Crew member mentors you through the op. After debrief, your mentor logs your qualification in #academy-graduation-log.</p>
+      <span class="step-tag">Live session required</span>
+    </div>
+
+    <div class="pipeline-step">
+      <div class="step-number">STAGE <span>04</span></div>
+      <svg class="step-icon" viewBox="0 0 40 40" fill="none">
+        <polygon points="20,3 24,13 35,13 26,20 29,31 20,24 11,31 14,20 5,13 16,13" stroke="#e8a520" stroke-width="1.2" fill="rgba(232,165,32,0.08)"/>
+      </svg>
+      <div class="step-title">Graduation</div>
+      <p class="step-body">Your Division Head officially promotes you to Crew Member in Discord. Standing Points from orientation are applied. Your name is posted in #academy-graduation-log. You're now RAM.</p>
+      <span class="step-tag milestone">Milestone</span>
+    </div>
   </div>
-  <div class="support-grid">
-    <div class="support-card"><span class="support-icon">🎮</span><h3>Gaming Content</h3><p>Helps fund new games, gear, and stream upgrades for RamPlayz &amp; Cptram2_0.</p></div>
-    <div class="support-card"><span class="support-icon">🔧</span><h3>DIY Builds</h3><p>Covers materials and tools for the next wild project on the build channel.</p></div>
-    <div class="support-card"><span class="support-icon">⚡</span><h3>Keep the Lights On</h3><p>Equipment, software, and hosting keep the content flowing every week.</p></div>
+</section>
+
+<!-- ─── DIVISIONS ─── -->
+<section class="divisions" id="divisions">
+  <div class="section-tag">Pick Your Lane</div>
+  <div class="section-title">The Four Divisions</div>
+  <p class="section-sub">Every Academy graduate joins a division. Your division is your crew, your specialty, and your career track inside RAMSORG.</p>
+
+  <div class="div-grid">
+    <div class="div-card" style="--div-color:#e84040;">
+      <div class="div-code">SHIELD</div>
+      <div class="div-name">Security & Combat</div>
+      <ul class="div-role-list">
+        <li>Fighter Pilot</li>
+        <li>Gunner</li>
+        <li>Marine</li>
+        <li>Medic</li>
+        <li>Combat Lead</li>
+      </ul>
+    </div>
+
+    <div class="div-card" style="--div-color:#1fc8a0;">
+      <div class="div-code">HAUL</div>
+      <div class="div-name">Logistics & Cargo</div>
+      <ul class="div-role-list">
+        <li>Cargo Pilot</li>
+        <li>Refueler</li>
+        <li>Trade Analyst</li>
+        <li>Convoy Lead</li>
+        <li>Supply Chain Op</li>
+      </ul>
+    </div>
+
+    <div class="div-card" style="--div-color:#4a9eff;">
+      <div class="div-code">SCOUT</div>
+      <div class="div-name">Exploration & Recon</div>
+      <ul class="div-role-list">
+        <li>Pathfinder</li>
+        <li>Salvager</li>
+        <li>Data Runner</li>
+        <li>Jump Point Cartographer</li>
+        <li>Recon Lead</li>
+      </ul>
+    </div>
+
+    <div class="div-card" style="--div-color:#c08b20;">
+      <div class="div-code">FORGE</div>
+      <div class="div-name">Engineering & Industry</div>
+      <ul class="div-role-list">
+        <li>Miner</li>
+        <li>Ship Engineer</li>
+        <li>Base Builder</li>
+        <li>Repair Specialist</li>
+        <li>MOLE Crew</li>
+      </ul>
+    </div>
   </div>
-  <footer class="footer">
-    <p>Made with love for the <span>Captain Ram</span> community &bull; YouTube: <span>RamPlayz</span> &amp; <span>RamCreates</span> &bull; Twitch: <span>Cptram2_0</span></p>
-  </footer>
-</div>
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <h2>Thanks!</h2>
-    <p>Opening Venmo now. Every bit of support means the world — see you in the stream!</p>
-    <div class="confirm-countdown" id="countdown">Redirecting in 3...</div>
-    <button class="confirm-close" onclick="goNow()">Open Venmo Now</button>
+</section>
+
+<!-- ─── BRANCHES ─── -->
+<section id="branches" style="background:var(--bg3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:100px 80px;">
+  <div class="section-tag">Org Structure</div>
+  <div class="section-title">Branches</div>
+  <p class="section-sub">Specialised branches sit above the division system — each one a focused arm of RAMSORG with its own command, culture, and purpose.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:8px;">
+
+    <!-- Branch card placeholder -->
+    <div style="grid-column:1/-1;background:var(--panel);border:1px solid var(--border);padding:60px 40px;text-align:center;position:relative;overflow:hidden;">
+      <!-- Hologram grid bg -->
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+      <!-- Animated pulse ring -->
+      <div style="position:relative;width:80px;height:80px;margin:0 auto 28px;">
+        <svg viewBox="0 0 80 80" fill="none" style="width:80px;height:80px;">
+          <polygon points="40,4 76,22 76,58 40,76 4,58 4,22" stroke="rgba(0,200,255,0.3)" stroke-width="1" fill="none"/>
+          <polygon points="40,14 66,28 66,52 40,66 14,52 14,28" stroke="rgba(0,200,255,0.15)" stroke-width="1" fill="none"/>
+          <circle cx="40" cy="40" r="6" fill="rgba(0,200,255,0.2)" stroke="#00c8ff" stroke-width="1.5">
+            <animate attributeName="r" values="6;10;6" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="40" cy="40" r="3" fill="#00c8ff"/>
+        </svg>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--amber);text-transform:uppercase;margin-bottom:14px;">Classification: Pending</div>
+      <div style="font-family:var(--display);font-size:36px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Coming Soon</div>
+      <div style="font-size:14px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.8;">The Branch system is currently under development by RAMSORG Command. Branches will define specialised arms of the org — each with unique structure, focus, and entry requirements. Details will be declassified in a future briefing.</div>
+      <div style="margin-top:32px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00c8ff;box-shadow:0 0 8px rgba(0,200,255,0.8);animation:blink 1.4s ease-in-out infinite;"></span>
+        Work In Progress
+      </div>
+    </div>
+
   </div>
-</div>
+</section>
+
+<style>
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+</style>
+
+<!-- ─── CERTIFICATIONS ─── -->
+<section class="certs" id="certs">
+  <div class="section-tag">Advanced Tracks</div>
+  <div class="section-title">Certifications</div>
+  <p class="section-sub">After graduating, Senior Crew members can pursue advanced certifications. Each unlocks a leadership role in fleet ops and counts toward the Officer tier.</p>
+
+  <div class="cert-grid">
+    <div class="cert-card">
+      <div class="cert-badge">ACE<br>CERT</div>
+      <div>
+        <div class="cert-title">Ace Certification</div>
+        <div class="cert-div">SHIELD Division</div>
+        <p class="cert-body">Proven combat excellence. Ace-certified pilots lead fighter wings in fleet ops and mentor new SHIELD recruits through combat drills.</p>
+        <div class="cert-reqs">
+          <span class="req-pill">3 Combat Drills Won</span>
+          <span class="req-pill">Senior Crew Rank</span>
+          <span class="req-pill">Mentor Sign-Off</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge">TM<br>CERT</div>
+      <div>
+        <div class="cert-title">Trade Master</div>
+        <div class="cert-div">HAUL Division</div>
+        <p class="cert-body">Demonstrated convoy coordination under pressure. Trade Masters become convoy leads and help plan HAUL-side logistics for major fleet ops.</p>
+        <div class="cert-reqs">
+          <span class="req-pill">3 Convoys Led</span>
+          <span class="req-pill">Senior Crew Rank</span>
+          <span class="req-pill">No Cargo Loss Record</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge">PF<br>CERT</div>
+      <div>
+        <div class="cert-title">Pathfinder</div>
+        <div class="cert-div">SCOUT Division</div>
+        <p class="cert-body">Solo deep-space survey completions on record. Pathfinders lead recon operations, chart routes for fleet ops, and file system reports in #scout-reports.</p>
+        <div class="cert-reqs">
+          <span class="req-pill">3 Solo Surveys Filed</span>
+          <span class="req-pill">Senior Crew Rank</span>
+          <span class="req-pill">Report Quality Check</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-badge">ME<br>CERT</div>
+      <div>
+        <div class="cert-title">Master Engineer</div>
+        <div class="cert-div">FORGE Division</div>
+        <p class="cert-body">Proven in both extraction and field repair. Master Engineers lead MOLE crews and serve as the ship's engineer on capital vessels during fleet ops.</p>
+        <div class="cert-reqs">
+          <span class="req-pill">3 Mining Ops Completed</span>
+          <span class="req-pill">1 Live Ship Repair</span>
+          <span class="req-pill">Senior Crew Rank</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RANKS ─── -->
+<section class="ranks" id="ranks">
+  <div class="section-tag">Command Structure</div>
+  <div class="section-title">Rank Table</div>
+  <p class="section-sub">Nine ranks across three tiers. Promotion is earned through participation, contribution, and Standing Points — never just time served.</p>
+
+  <table class="rank-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Tier</th>
+        <th>Pips</th>
+        <th>Summary</th>
+        <th>SP Threshold</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="rank-name-cell">Admiral</td>
+        <td><span class="tier-badge tier-command">Command</span></td>
+        <td><div class="pips"><div class="pip diamond"></div><div class="pip diamond"></div><div class="pip diamond"></div></div></td>
+        <td>Org founder. Final authority. Sets strategy.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--text3);">Founder</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Fleet Commander</td>
+        <td><span class="tier-badge tier-command">Command</span></td>
+        <td><div class="pips"><div class="pip gold"></div><div class="pip gold"></div><div class="pip gold"></div></div></td>
+        <td>Leads multi-ship operations. Manages division heads.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">Appointed</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Captain</td>
+        <td><span class="tier-badge tier-command">Command</span></td>
+        <td><div class="pips"><div class="pip gold"></div><div class="pip gold"></div><div class="pip dim"></div></div></td>
+        <td>Commands a vessel or squadron. Runs org events.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">Appointed</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Division Head</td>
+        <td><span class="tier-badge tier-officer">Officer</span></td>
+        <td><div class="pips"><div class="pip silver"></div><div class="pip silver"></div><div class="pip silver"></div></div></td>
+        <td>Leads a division. Recruits, trains, assigns.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">60 SP</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Lieutenant</td>
+        <td><span class="tier-badge tier-officer">Officer</span></td>
+        <td><div class="pips"><div class="pip silver"></div><div class="pip silver"></div><div class="pip dim"></div></div></td>
+        <td>Deputy to Division Head. Coordination & mentoring.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">60 SP</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Specialist</td>
+        <td><span class="tier-badge tier-officer">Officer</span></td>
+        <td><div class="pips"><div class="pip silver"></div><div class="pip dim"></div><div class="pip dim"></div></div></td>
+        <td>Expert in their role. Mentors crew members.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--amber);">40 SP</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Senior Crew</td>
+        <td><span class="tier-badge tier-crew">Crew</span></td>
+        <td><div class="pips"><div class="pip teal"></div><div class="pip teal"></div><div class="pip teal"></div></div></td>
+        <td>Veteran. 10+ events. Trusted crew lead on ships.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">20 SP</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Crew Member</td>
+        <td><span class="tier-badge tier-crew">Crew</span></td>
+        <td><div class="pips"><div class="pip teal"></div><div class="pip teal"></div><div class="pip dim"></div></div></td>
+        <td>Active member. Division-assigned. Academy graduate.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">5 SP</span></td>
+      </tr>
+      <tr>
+        <td class="rank-name-cell">Recruit</td>
+        <td><span class="tier-badge tier-crew">Crew</span></td>
+        <td><div class="pips"><div class="pip teal"></div><div class="pip dim"></div><div class="pip dim"></div></div></td>
+        <td>New joiner. In Academy orientation.</td>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--teal);">0 SP</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta" id="enroll">
+  <div class="cta-headline">Ready to Join<br><em>The Second Fleet?</em></div>
+  <p class="cta-sub">Enroll through the RSI org page or jump straight into Discord. Your orientation briefing is waiting.</p>
+  <div class="cta-btns">
+    <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="btn-primary">Join Discord</a>
+    <button onclick="goToAcademy()" class="btn-primary">Academy</button>
+    <a href="https://robertsspaceindustries.com/en/orgs/RAMSORG" target="_blank" class="btn-secondary">Apply on RSI</a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-org">
+    <span>RAM SPACE INDUSTRIES</span> — [RAMSORG] — Second Fleet Academy<br>
+    Star Citizen Org · Lawful · Role-Play Friendly
+  </div>
+  <div class="footer-links">
+    <a href="https://robertsspaceindustries.com/en/orgs/RAMSORG" target="_blank">RSI Page</a>
+    <a href="https://discord.gg/Xhaj3nRAEp" target="_blank">Discord</a>
+    <a href="https://robertsspaceindustries.com/spectrum/community/SC/forum/50177/thread/ram-space-industries-1" target="_blank">Spectrum</a>
+  </div>
+</footer>
+
+</div><!-- /page-main -->
+
 <script>
-  const DEFAULT_NAME  = 'Aurora Mk II';
-  const DEFAULT_SUB   = 'Current Mission · Star Citizen';
-  const DEFAULT_PRICE = 56;
+// ════════════════════════════════════════
+// PAGE SWITCHING
+// ════════════════════════════════════════
+let academyInited = false;
 
-  let goalName    = localStorage.getItem('goalName')  || DEFAULT_NAME;
-  let goalSub     = localStorage.getItem('goalSub')   || DEFAULT_SUB;
-  let goalPrice   = parseFloat(localStorage.getItem('goalPrice') || DEFAULT_PRICE);
-  let currentAmount = parseFloat(localStorage.getItem('goalAmount') || '0');
-  let goalVisible = localStorage.getItem('goalVisible') !== 'false';
-  let selectedAmount = null;
-  let countdownTimer = null;
-  let venmoUrl = '';
+function goToAcademy() {
+  document.getElementById('page-main').style.display = 'none';
+  document.getElementById('page-academy').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!academyInited) { initAcademy(); academyInited = true; }
+  // Show enrollment gate if first time
+  const callsign = localStorage.getItem('ram_callsign');
+  if (!callsign) {
+    document.getElementById('enroll-gate').style.display = 'flex';
+  } else {
+    document.getElementById('enroll-gate').style.display = 'none';
+    updateCallsignDisplay(callsign);
+  }
+}
+function goToMain() {
+  document.getElementById('page-academy').style.display = 'none';
+  document.getElementById('page-admin').style.display = 'none';
+  document.getElementById('page-main').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
 
-  function applyGoalInfo() {
-    document.getElementById('goalName').textContent = goalName;
-    document.getElementById('goalSub').textContent = goalSub;
-    document.getElementById('goalTargetLabel').textContent = 'of $' + goalPrice + ' goal';
-    document.getElementById('goalCompleteText').textContent =
-      '🚀 MISSION FUNDED — ' + goalName.toUpperCase() + ' COMPLETE! 🚀';
-    document.getElementById('adminName').value = goalName;
-    document.getElementById('adminSub').value = goalSub;
-    document.getElementById('adminPrice').value = goalPrice;
+function goToAdmin() {
+  const pw = localStorage.getItem('ram_admin_auth');
+  if (pw === 'ramsorg') {
+    openAdminPanel();
+  } else {
+    document.getElementById('admin-pw-gate').style.display = 'flex';
+  }
+}
+
+function adminLogin() {
+  const input = document.getElementById('admin-pw-input');
+  const err = document.getElementById('admin-pw-error');
+  if (input.value === 'ramsorg') {
+    localStorage.setItem('ram_admin_auth', 'ramsorg');
+    document.getElementById('admin-pw-gate').style.display = 'none';
+    openAdminPanel();
+  } else {
+    err.textContent = '// ACCESS DENIED — INVALID CREDENTIALS';
+    input.value = '';
+    input.style.borderColor = 'rgba(232,64,64,0.6)';
+    setTimeout(() => { err.textContent = ''; input.style.borderColor = ''; }, 3000);
+  }
+}
+
+function openAdminPanel() {
+  document.getElementById('page-main').style.display = 'none';
+  document.getElementById('page-academy').style.display = 'none';
+  document.getElementById('page-admin').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  renderAdminMembers();
+  renderAdminEvents();
+  renderAdminInstructors();
+  renderAdminAnnouncements();
+  renderAdminAcademy();
+}
+
+function adminLogout() {
+  localStorage.removeItem('ram_admin_auth');
+  document.getElementById('page-admin').style.display = 'none';
+  document.getElementById('page-main').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function showAdminTab(id) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('admin-panel-' + id).classList.add('active');
+  document.querySelectorAll('.admin-tab').forEach(b => {
+    if (b.getAttribute('onclick') === "showAdminTab('" + id + "')") b.classList.add('active');
+  });
+}
+
+// ── ADMIN DATA (localStorage) ──
+function getAdminData(key, def) {
+  try { return JSON.parse(localStorage.getItem('ram_admin_' + key) || 'null') || def; } catch(e) { return def; }
+}
+function setAdminData(key, val) { localStorage.setItem('ram_admin_' + key, JSON.stringify(val)); }
+
+// ── MEMBERS ──
+function renderAdminMembers() {
+  const members = getAdminData('members', []);
+  const el = document.getElementById('admin-member-list');
+  if (!el) return;
+  if (!members.length) { el.innerHTML = '<div class="admin-empty">No members added yet. Add your first member below.</div>'; return; }
+  el.innerHTML = members.map((m, i) => `
+    <div class="admin-row">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${m.callsign}</div>
+        <div class="admin-row-meta">${m.rank} · ${m.division} · <span style="color:#00c8ff">${m.sp} SP</span></div>
+      </div>
+      <div class="admin-row-actions">
+        <button class="admin-btn-sm" onclick="awardSP(${i})">+SP</button>
+        <button class="admin-btn-sm" onclick="promoteRank(${i})">Promote</button>
+        <button class="admin-btn-sm admin-btn-danger" onclick="removeMember(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+const RANKS = ['Cadet','Private','Corporal','Sergeant','Lieutenant','Commander','Captain','Strike Leader','Fleet Commander','Admiral'];
+function addMember() {
+  const cs = document.getElementById('new-callsign').value.trim().toUpperCase();
+  const div = document.getElementById('new-division').value;
+  if (!cs) return;
+  const members = getAdminData('members', []);
+  members.push({ callsign: cs, rank: 'Cadet', division: div, sp: 0 });
+  setAdminData('members', members);
+  document.getElementById('new-callsign').value = '';
+  renderAdminMembers();
+  renderAdminAcademy();
+}
+function awardSP(i) {
+  const amt = parseInt(prompt('Award how many SP?', '1')) || 0;
+  if (!amt) return;
+  const members = getAdminData('members', []);
+  members[i].sp = (members[i].sp || 0) + amt;
+  setAdminData('members', members);
+  renderAdminMembers();
+}
+function promoteRank(i) {
+  const members = getAdminData('members', []);
+  const cur = RANKS.indexOf(members[i].rank);
+  if (cur < RANKS.length - 1) members[i].rank = RANKS[cur + 1];
+  setAdminData('members', members);
+  renderAdminMembers();
+}
+function removeMember(i) {
+  if (!confirm('Remove this member?')) return;
+  const members = getAdminData('members', []);
+  members.splice(i, 1);
+  setAdminData('members', members);
+  renderAdminMembers();
+}
+
+// ── EVENTS ──
+function renderAdminEvents() {
+  const events = getAdminData('events', []);
+  const el = document.getElementById('admin-event-list');
+  if (!el) return;
+  if (!events.length) { el.innerHTML = '<div class="admin-empty">No events scheduled yet.</div>'; return; }
+  el.innerHTML = events.map((e, i) => `
+    <div class="admin-row">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${e.name}</div>
+        <div class="admin-row-meta">${e.type} · ${e.date} · <span style="color:${e.status==='Live'?'#e84040':e.status==='Complete'?'#1fc8a0':'#00c8ff'}">${e.status}</span></div>
+        ${e.notes ? `<div class="admin-row-notes">${e.notes}</div>` : ''}
+      </div>
+      <div class="admin-row-actions">
+        <button class="admin-btn-sm" onclick="cycleEventStatus(${i})">${e.status==='Scheduled'?'Go Live':e.status==='Live'?'Complete':'Archive'}</button>
+        <button class="admin-btn-sm admin-btn-danger" onclick="removeEvent(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+function addEvent() {
+  const name = document.getElementById('new-event-name').value.trim();
+  const type = document.getElementById('new-event-type').value;
+  const date = document.getElementById('new-event-date').value;
+  const notes = document.getElementById('new-event-notes').value.trim();
+  if (!name || !date) return;
+  const events = getAdminData('events', []);
+  events.unshift({ name, type, date, notes, status: 'Scheduled' });
+  setAdminData('events', events);
+  document.getElementById('new-event-name').value = '';
+  document.getElementById('new-event-notes').value = '';
+  renderAdminEvents();
+}
+function cycleEventStatus(i) {
+  const events = getAdminData('events', []);
+  const cycle = { 'Scheduled':'Live', 'Live':'Complete', 'Complete':'Archived' };
+  events[i].status = cycle[events[i].status] || 'Archived';
+  setAdminData('events', events);
+  renderAdminEvents();
+}
+function removeEvent(i) {
+  if (!confirm('Remove this event?')) return;
+  const events = getAdminData('events', []);
+  events.splice(i, 1);
+  setAdminData('events', events);
+  renderAdminEvents();
+}
+
+// ── INSTRUCTORS ──
+function renderAdminInstructors() {
+  const instructors = getAdminData('instructors', [{name:'Admiral',role:'Org Founder · Academy Commandant',div:'COMMAND',sessions:999,commend:true}]);
+  const el = document.getElementById('admin-instructor-list');
+  if (!el) return;
+  el.innerHTML = instructors.map((inst, i) => `
+    <div class="admin-row">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${inst.name}</div>
+        <div class="admin-row-meta">${inst.role} · ${inst.div} · <span style="color:#00c8ff">${inst.sessions === 999 ? '∞' : inst.sessions} sessions</span>${inst.commend ? ' · <span style="color:#1fc8a0">⬡ Commended</span>' : ''}</div>
+      </div>
+      <div class="admin-row-actions">
+        ${inst.sessions !== 999 ? `<button class="admin-btn-sm" onclick="logSession(${i})">+Session</button>` : ''}
+        ${inst.sessions !== 999 ? `<button class="admin-btn-sm admin-btn-danger" onclick="removeInstructor(${i})">Remove</button>` : ''}
+      </div>
+    </div>`).join('');
+  // Also update the academy roster
+  const acadRoster = document.querySelectorAll('.acad-inst-grid');
+}
+function addInstructor() {
+  const name = document.getElementById('new-instructor-name').value.trim().toUpperCase();
+  const role = document.getElementById('new-instructor-role').value.trim();
+  const div = document.getElementById('new-instructor-div').value;
+  if (!name) return;
+  const instructors = getAdminData('instructors', [{name:'Admiral',role:'Org Founder · Academy Commandant',div:'COMMAND',sessions:999,commend:true}]);
+  instructors.push({ name, role: role || 'Academy Instructor', div, sessions: 0, commend: false });
+  setAdminData('instructors', instructors);
+  document.getElementById('new-instructor-name').value = '';
+  document.getElementById('new-instructor-role').value = '';
+  renderAdminInstructors();
+}
+function logSession(i) {
+  const instructors = getAdminData('instructors', []);
+  instructors[i].sessions = (instructors[i].sessions || 0) + 1;
+  if (instructors[i].sessions >= 5) instructors[i].commend = true;
+  setAdminData('instructors', instructors);
+  renderAdminInstructors();
+}
+function removeInstructor(i) {
+  if (!confirm('Remove this instructor?')) return;
+  const instructors = getAdminData('instructors', []);
+  instructors.splice(i, 1);
+  setAdminData('instructors', instructors);
+  renderAdminInstructors();
+}
+
+// ── ANNOUNCEMENTS ──
+function renderAdminAnnouncements() {
+  const posts = getAdminData('announcements', []);
+  const el = document.getElementById('admin-announcement-list');
+  if (!el) return;
+  if (!posts.length) { el.innerHTML = '<div class="admin-empty">No announcements posted yet.</div>'; return; }
+  el.innerHTML = posts.map((p, i) => `
+    <div class="admin-row">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${p.title}</div>
+        <div class="admin-row-meta">${p.date} · <span style="color:${p.type==='URGENT'?'#e84040':p.type==='OP'?'#00c8ff':'#1fc8a0'}">${p.type}</span></div>
+        <div class="admin-row-notes">${p.body}</div>
+      </div>
+      <div class="admin-row-actions">
+        <button class="admin-btn-sm admin-btn-danger" onclick="removeAnnouncement(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+function addAnnouncement() {
+  const title = document.getElementById('new-ann-title').value.trim();
+  const body = document.getElementById('new-ann-body').value.trim();
+  const type = document.getElementById('new-ann-type').value;
+  if (!title || !body) return;
+  const posts = getAdminData('announcements', []);
+  const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+  posts.unshift({ title, body, type, date: now });
+  setAdminData('announcements', posts);
+  document.getElementById('new-ann-title').value = '';
+  document.getElementById('new-ann-body').value = '';
+  renderAdminAnnouncements();
+}
+function removeAnnouncement(i) {
+  if (!confirm('Remove this announcement?')) return;
+  const posts = getAdminData('announcements', []);
+  posts.splice(i, 1);
+  setAdminData('announcements', posts);
+  renderAdminAnnouncements();
+}
+
+// ── ACADEMY PROGRESS ──
+function renderAdminAcademy() {
+  const el = document.getElementById('admin-academy-list');
+  if (!el) return;
+  const enrolled = localStorage.getItem('ram_callsign');
+  const checks = JSON.parse(localStorage.getItem('ram_checks') || '[]');
+  const mods = JSON.parse(localStorage.getItem('ram_mods') || '[]');
+  const div = localStorage.getItem('ram_div') || '—';
+  const graduated = localStorage.getItem('ram_graduated') === 'true';
+
+  if (!enrolled) {
+    el.innerHTML = '<div class="admin-empty">No cadets have enrolled yet.</div>';
+    return;
   }
 
-  function saveGoalInfo() {
-    const name  = document.getElementById('adminName').value.trim();
-    const sub   = document.getElementById('adminSub').value.trim();
-    const price = parseFloat(document.getElementById('adminPrice').value);
-    if (name)  { goalName  = name;  localStorage.setItem('goalName', name); }
-    if (sub)   { goalSub   = sub;   localStorage.setItem('goalSub', sub); }
-    if (!isNaN(price) && price > 0) {
-      goalPrice = price;
-      localStorage.setItem('goalPrice', price);
-      currentAmount = 0;
-      localStorage.setItem('goalAmount', '0');
-      document.getElementById('adminAmount').value = '';
-    }
-    applyGoalInfo();
-    renderGoal();
+  const pct = Math.round((checks.length / 9) * 100);
+  const allDone = checks.length >= 9 && mods.length >= 6;
+  const progressColour = pct === 100 ? '#1fc8a0' : pct >= 50 ? '#00c8ff' : '#e84040';
+
+  el.innerHTML = `
+    <div class="admin-row" style="border-color:${allDone && !graduated ? 'rgba(31,200,160,0.4)' : graduated ? 'rgba(0,200,255,0.3)' : '#1e3a5f'};">
+      <div class="admin-row-main">
+        <div class="admin-row-name">${enrolled}
+          ${graduated ? '<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;border:1px solid rgba(31,200,160,0.4);padding:2px 8px;margin-left:10px;letter-spacing:0.1em;">✓ GRADUATED</span>' : '<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#5a8aaa;padding:2px 8px;margin-left:6px;">CADET</span>'}
+        </div>
+        <div class="admin-row-meta" style="margin-top:6px;">
+          Division: <span style="color:#00c8ff">${div}</span>
+          &nbsp;·&nbsp; Modules: <span style="color:${mods.length>=6?'#1fc8a0':'#8ab8d8'}">${mods.length}/6</span>
+          &nbsp;·&nbsp; Checklist: <span style="color:${checks.length>=9?'#1fc8a0':'#8ab8d8'}">${checks.length}/9</span>
+          &nbsp;·&nbsp; Progress: <span style="color:${progressColour}">${pct}%</span>
+        </div>
+        <div class="admin-progress-bar-wrap" style="margin-top:10px;">
+          <div class="admin-progress-bar-fill" style="width:${pct}%;background:${progressColour};box-shadow:0 0 8px ${progressColour}44;"></div>
+        </div>
+        ${allDone && !graduated ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:#1fc8a0;letter-spacing:0.1em;margin-top:10px;">⬡ ALL STAGES COMPLETE — READY FOR GRADUATION</div>' : ''}
+        ${graduated ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-top:10px;">Promoted to Crew Member. Graduation logged.</div>' : ''}
+      </div>
+      <div class="admin-row-actions" style="align-self:center;">
+        ${!graduated && allDone ? `<button class="admin-btn-sm" onclick="graduateCadet()" style="color:#1fc8a0;border-color:rgba(31,200,160,0.4);background:rgba(31,200,160,0.08);font-size:11px;padding:8px 16px;">⬡ Graduate</button>` : ''}
+        ${!graduated && !allDone ? `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a6080;letter-spacing:0.08em;text-align:right;">Not yet<br>eligible</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function graduateCadet() {
+  const callsign = localStorage.getItem('ram_callsign');
+  if (!callsign) return;
+  if (!confirm('Graduate ' + callsign + ' and promote to Crew Member?')) return;
+
+  // Mark graduated in localStorage
+  localStorage.setItem('ram_graduated', 'true');
+
+  // Also promote in the members roster if they exist there
+  const members = getAdminData('members', []);
+  const idx = members.findIndex(m => m.callsign === callsign);
+  if (idx !== -1) {
+    members[idx].rank = 'Crew Member';
+    setAdminData('members', members);
+  } else {
+    // Add them to the roster as Crew Member if not already there
+    const div = localStorage.getItem('ram_div') || 'UNASSIGNED';
+    members.push({ callsign, rank: 'Crew Member', division: div, sp: 5 });
+    setAdminData('members', members);
   }
 
-  function renderGoal() {
-    const pct = Math.min(100, (currentAmount / goalPrice) * 100);
-    document.getElementById('goalBar').style.width = pct + '%';
-    document.getElementById('goalCurrent').textContent = '$' + currentAmount.toFixed(0);
-    document.getElementById('goalPercent').textContent = Math.round(pct) + '% FUNDED';
-    if (currentAmount >= goalPrice) {
-      document.getElementById('goalComplete').classList.add('show');
-      document.getElementById('goalBar').style.background = 'linear-gradient(90deg, #00aa55, #00ff88)';
-      document.getElementById('goalBar').style.boxShadow = '0 0 14px rgba(0,255,136,0.6)';
-    } else {
-      document.getElementById('goalComplete').classList.remove('show');
-      document.getElementById('goalBar').style.background = 'linear-gradient(90deg, #0077aa, #00c8ff, #00f0ff)';
-      document.getElementById('goalBar').style.boxShadow = '0 0 12px rgba(0,200,255,0.5)';
-    }
-  }
+  // Re-render both panels
+  renderAdminAcademy();
+  renderAdminMembers();
 
-  function applyVisibility() {
-    const section = document.getElementById('goalSection');
-    const btn = document.getElementById('toggleBtn');
-    if (goalVisible) {
-      section.classList.remove('hidden');
-      btn.textContent = 'Hide Goal';
-      btn.classList.remove('toggle-on');
-      btn.classList.add('toggle-off');
-    } else {
-      section.classList.add('hidden');
-      btn.textContent = 'Show Goal';
-      btn.classList.remove('toggle-off');
-      btn.classList.add('toggle-on');
-    }
-  }
+  // Show confirmation
+  alert('✓ ' + callsign + ' has been graduated and promoted to Crew Member. Post their graduation in #academy-graduation-log on Discord.');
+}
 
-  function toggleGoal() {
-    goalVisible = !goalVisible;
-    localStorage.setItem('goalVisible', goalVisible);
-    applyVisibility();
-  }
 
-  function updateGoal() {
-    const val = parseFloat(document.getElementById('adminAmount').value);
-    if (!isNaN(val) && val >= 0) {
-      currentAmount = val;
-      localStorage.setItem('goalAmount', val);
-      renderGoal();
-    }
-  }
+function clearCadetSession() {
+  const callsign = localStorage.getItem('ram_callsign');
+  if (!callsign) { alert('No cadet session found.'); return; }
+  if (!confirm('Clear session for ' + callsign + '? This removes their enrollment, progress, and division data.')) return;
+  ['ram_callsign','ram_checks','ram_mods','ram_div','ram_divOk','ram_graduated'].forEach(k => localStorage.removeItem(k));
+  renderAdminAcademy();
+  alert('Session cleared.');
+}
 
-  function resetGoal() {
-    currentAmount = 0;
-    localStorage.setItem('goalAmount', '0');
-    document.getElementById('adminAmount').value = '';
-    renderGoal();
+function enrollCadet() {
+  const input = document.getElementById('callsign-input');
+  const err = document.getElementById('enroll-error');
+  const val = input.value.trim().toUpperCase();
+  if (!val || val.length < 2) {
+    err.textContent = '// ERROR: CALLSIGN REQUIRED — MINIMUM 2 CHARACTERS';
+    input.style.borderColor = 'rgba(232,64,64,0.6)';
+    return;
   }
+  localStorage.setItem('ram_callsign', val);
+  document.getElementById('enroll-gate').style.display = 'none';
+  updateCallsignDisplay(val);
+}
 
-  function selectAmount(btn, amt) {
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedAmount = amt;
-    document.getElementById('customAmt').value = '';
-  }
+function updateCallsignDisplay(callsign) {
+  const h1 = document.getElementById('acad-welcome-h1');
+  if (h1) h1.innerHTML = 'Welcome,<br><em style="font-style:normal;color:#00c8ff;text-shadow:0 0 30px rgba(0,200,255,0.6);">' + callsign + '.</em>';
+  const disp = document.getElementById('acad-callsign-display');
+  if (disp) disp.textContent = '// ' + callsign;
+}
 
-  function clearPresets() {
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    selectedAmount = null;
-  }
-
-  function buildVenmoUrl() {
-    const amt = selectedAmount || parseFloat(document.getElementById('customAmt').value) || null;
-    const note = encodeURIComponent(document.getElementById('msgBox').value || 'Supporting Captain Ram!');
-    let url = 'https://www.venmo.com/u/CptRam';
-    if (amt) url += '?txn=pay&amount=' + amt + '&note=' + note;
-    return url;
-  }
-
-  function handleDonate() {
-    venmoUrl = buildVenmoUrl();
-    document.getElementById('confirmOverlay').classList.add('show');
-    startCountdown();
-  }
-
-  function startCountdown() {
-    let secs = 3;
-    const el = document.getElementById('countdown');
-    el.textContent = 'Redirecting in ' + secs + '...';
-    if (countdownTimer) clearInterval(countdownTimer);
-    countdownTimer = setInterval(function() {
-      secs--;
-      if (secs <= 0) {
-        clearInterval(countdownTimer);
-        el.textContent = 'Opening Venmo...';
-        window.open(venmoUrl, '_blank');
-        setTimeout(closeConfirm, 1000);
-      } else {
-        el.textContent = 'Redirecting in ' + secs + '...';
+// ════════════════════════════════════════
+// ── SECRET KEY COMBO: type A D M to reveal admin button ──
+(function() {
+  const seq = ['a','d','m'];
+  let pos = 0;
+  document.addEventListener('keydown', function(e) {
+    if (e.key.toLowerCase() === seq[pos]) {
+      pos++;
+      if (pos === seq.length) {
+        const btn = document.getElementById('admin-nav-btn');
+        if (btn) btn.style.display = 'inline-block';
+        pos = 0;
       }
-    }, 1000);
+    } else {
+      pos = e.key.toLowerCase() === seq[0] ? 1 : 0;
+    }
+  });
+})();
+
+// MAIN SITE — scroll reveal + connector
+// ════════════════════════════════════════
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      document.querySelectorAll('.connector-seg').forEach((s, i) =>
+        setTimeout(() => s.classList.add('lit'), i * 200));
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(r => revealObs.observe(r));
+
+window.addEventListener('scroll', () => {
+  if (document.getElementById('page-academy').style.display === 'block') return;
+  let current = '';
+  document.querySelectorAll('section[id]').forEach(s => {
+    if (window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+});
+
+// ════════════════════════════════════════
+// ACADEMY — all functions
+// ════════════════════════════════════════
+
+// State — loaded from localStorage, used only after initAcademy()
+const acadS = {
+  mods:   JSON.parse(localStorage.getItem('ram_mods')   || '[]'),
+  checks: JSON.parse(localStorage.getItem('ram_checks') || '[]'),
+  div:    localStorage.getItem('ram_div')   || null,
+  divOk:  localStorage.getItem('ram_divOk') === 'true'
+};
+let pendingDiv = null;
+
+// Panel switching
+function showPanel(id) {
+  document.querySelectorAll('.acad-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.acad-tab, .acad-sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('[onclick="showPanel(\'' + id + '\')"]').forEach(el => el.classList.add('active'));
+  updateGrad();
+  // Restore callsign display
+  const cs = localStorage.getItem('ram_callsign');
+  if (cs) updateCallsignDisplay(cs);
+}
+
+// Modules
+function toggleMod(n) {
+  document.getElementById('mod-' + n).classList.toggle('open');
+}
+function markRead(n) {
+  if (!acadS.mods.includes(n)) {
+    acadS.mods.push(n);
+    localStorage.setItem('ram_mods', JSON.stringify(acadS.mods));
+  }
+  const btn = document.querySelector('#mod-' + n + ' .acad-mark-btn');
+  if (btn) { btn.textContent = '✓ Complete'; btn.classList.add('done'); }
+  const st = document.getElementById('ms-' + n);
+  if (st) { st.textContent = 'Complete'; st.className = 'acad-mod-status done'; }
+  const c = acadS.mods.length;
+  const mc = document.getElementById('mod-count');
+  if (mc) mc.textContent = c + '/6';
+  if (c >= 6) {
+    const os = document.getElementById('orient-status');
+    if (os) { os.textContent = 'Complete'; os.style.color = '#1fc8a0'; }
+  }
+}
+
+// Checklist
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const i = acadS.checks.indexOf(id);
+  if (i === -1) { acadS.checks.push(id); el.classList.add('checked'); }
+  else { acadS.checks.splice(i, 1); el.classList.remove('checked'); }
+  localStorage.setItem('ram_checks', JSON.stringify(acadS.checks));
+  const c = acadS.checks.length;
+  const cc = document.getElementById('check-count');
+  const cf = document.getElementById('check-fill');
+  if (cc) cc.textContent = c + '/9';
+  if (cf) cf.style.width = (c / 9 * 100) + '%';
+}
+
+// Division select
+function pickDiv(code) {
+  if (acadS.divOk) return;
+  document.querySelectorAll('.div-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('dv-' + code).classList.add('selected');
+  pendingDiv = code;
+  document.getElementById('div-confirm').classList.add('visible');
+  document.getElementById('confirm-title').textContent = 'Join ' + code + '?';
+  document.getElementById('confirm-name').textContent = code + ' Division';
+}
+function confirmDiv() {
+  if (!pendingDiv) return;
+  acadS.div = pendingDiv; acadS.divOk = true;
+  localStorage.setItem('ram_div', pendingDiv);
+  localStorage.setItem('ram_divOk', 'true');
+  document.getElementById('div-ui').style.display = 'none';
+  document.getElementById('div-locked').classList.add('visible');
+  document.getElementById('locked-title').textContent = pendingDiv + ' Division — Confirmed';
+  document.getElementById('locked-name').textContent = pendingDiv + ' Division';
+}
+function resetDiv() {
+  acadS.div = null; acadS.divOk = false; pendingDiv = null;
+  localStorage.removeItem('ram_div');
+  localStorage.removeItem('ram_divOk');
+  document.getElementById('div-ui').style.display = '';
+  document.getElementById('div-locked').classList.remove('visible');
+  document.getElementById('div-confirm').classList.remove('visible');
+  document.querySelectorAll('.div-card').forEach(c => c.classList.remove('selected'));
+}
+
+// Graduation tracker
+function updateGrad() {
+  const map = {
+    'gi-1':'ci-1','gi-2':'ci-2','gi-3':'ci-3','gi-4':'ci-4',
+    'gi-5':'ci-5','gi-6':'ci-6','gi-7':'ci-7','gi-8':'ci-8'
+  };
+  let all = true;
+  Object.entries(map).forEach(([gi, ci]) => {
+    const done = acadS.checks.includes(ci);
+    const el = document.getElementById(gi);
+    if (!el) return;
+    if (done) { el.classList.add('done'); el.querySelector('.acad-gcheck').textContent = '✓'; }
+    else { el.classList.remove('done'); el.querySelector('.acad-gcheck').textContent = ''; all = false; }
+  });
+  const gl = document.getElementById('grad-locked');
+  const gr = document.getElementById('grad-ready');
+  const graduated = localStorage.getItem('ram_graduated') === 'true';
+  if (graduated) {
+    // Show a special graduated state
+    if (gl) gl.style.display = 'none';
+    if (gr) {
+      gr.style.display = 'block';
+      const h3 = gr.querySelector('h3');
+      const p = gr.querySelector('p');
+      if (h3) h3.textContent = 'Congratulations, Crew Member.';
+      if (p) p.textContent = 'You have been officially graduated by the Admiral and promoted to Crew Member. Your name has been posted in #academy-graduation-log. Welcome to RAM Space Industries.';
+    }
+  } else {
+    if (gl) gl.style.display = all ? 'none' : 'block';
+    if (gr) gr.style.display = all ? 'block' : 'none';
+  }
+}
+
+// Init — only called once when academy page first opens
+function initAcademy() {
+  // Restore module states
+  acadS.mods.forEach(n => {
+    const btn = document.querySelector('#mod-' + n + ' .mark-btn');
+    if (btn) { btn.textContent = '✓ Complete'; btn.classList.add('done'); }
+    const st = document.getElementById('ms-' + n);
+    if (st) { st.textContent = 'Complete'; st.className = 'acad-mod-status done'; }
+  });
+  const mc = document.getElementById('mod-count');
+  if (mc) mc.textContent = acadS.mods.length + '/6';
+  if (acadS.mods.length >= 6) {
+    const os = document.getElementById('orient-status');
+    if (os) { os.textContent = 'Complete'; os.style.color = 'var(--teal)'; }
   }
 
-  function goNow() {
-    clearInterval(countdownTimer);
-    window.open(venmoUrl, '_blank');
-    closeConfirm();
+  // Restore checklist
+  acadS.checks.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('checked');
+  });
+  const cc = document.getElementById('check-count');
+  const cf = document.getElementById('check-fill');
+  if (cc) cc.textContent = acadS.checks.length + '/9';
+  if (cf) cf.style.width = (acadS.checks.length / 9 * 100) + '%';
+
+  // Restore division
+  if (acadS.divOk && acadS.div) {
+    const ui = document.getElementById('div-ui');
+    const lk = document.getElementById('div-locked');
+    const lt = document.getElementById('locked-title');
+    const ln = document.getElementById('locked-name');
+    if (ui) ui.style.display = 'none';
+    if (lk) lk.classList.add('visible');
+    if (lt) lt.textContent = acadS.div + ' Division — Confirmed';
+    if (ln) ln.textContent = acadS.div + ' Division';
   }
 
-  function closeConfirm() {
-    document.getElementById('confirmOverlay').classList.remove('show');
-    document.getElementById('countdown').textContent = 'Redirecting in 3...';
-  }
-
-  if (window.location.search.includes('admin=1')) {
-    document.getElementById('adminPanel').classList.add('visible');
-  }
-
-  applyGoalInfo();
-  applyVisibility();
-  setTimeout(renderGoal, 300);
+  updateGrad();
+  // Restore callsign display
+  const cs = localStorage.getItem('ram_callsign');
+  if (cs) updateCallsignDisplay(cs);
+}
 </script>
+
+<!-- ════════════════════════════════════════
+     ACADEMY PORTAL — hidden on load
+════════════════════════════════════════ -->
+<div id="page-academy" style="display:none;">
+
+<!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
+<div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);">
+  <!-- grid bg -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:540px;width:90%;text-align:center;padding:20px;">
+    <!-- Hex emblem -->
+    <div style="width:90px;height:90px;margin:0 auto 28px;">
+      <svg viewBox="0 0 90 90" fill="none">
+        <polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/>
+        <polygon points="45,16 74,32 74,58 45,74 16,58 16,32" stroke="rgba(0,200,255,0.2)" stroke-width="1" fill="none"/>
+        <circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5">
+          <animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="45" cy="45" r="4" fill="#00c8ff"/>
+      </svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;">Second Fleet Academy — Enrollment</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,6vw,56px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 40px rgba(0,200,255,0.3);">Cadet<br><span style="color:#00c8ff;">Enrollment</span></h2>
+    <p style="font-size:14px;color:#8ab8d8;line-height:1.8;margin:20px 0 8px;">Enter your callsign to enroll in the Second Fleet Academy. This is how the org will identify you on the roster, in ops, and on graduation day.</p>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:32px;">YOUR CALLSIGN IS YOUR IDENTITY IN RAM SPACE INDUSTRIES</p>
+    <!-- Input -->
+    <div style="position:relative;margin-bottom:16px;">
+      <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;">CALLSIGN //</div>
+      <input id="callsign-input" type="text" maxlength="24" placeholder="e.g. GHOST-7" autocomplete="off" spellcheck="false"
+        style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.25);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:16px;padding:16px 16px 16px 120px;outline:none;letter-spacing:0.1em;text-transform:uppercase;transition:border-color 0.2s;"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')enrollCadet()">
+    </div>
+    <div id="enroll-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:16px;"></div>
+    <button onclick="enrollCadet()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:16px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));box-shadow:0 0 30px rgba(0,200,255,0.35);transition:all 0.2s;"
+      onmouseover="this.style.background='#40dfff';this.style.boxShadow='0 0 50px rgba(0,200,255,0.6)'"
+      onmouseout="this.style.background='#00c8ff';this.style.boxShadow='0 0 30px rgba(0,200,255,0.35)'">
+      Enroll in the Academy
+    </button>
+    <button onclick="goToMain()" style="display:block;width:100%;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:12px;cursor:pointer;transition:all 0.2s;"
+      onmouseover="this.style.color='#8ab8d8';this.style.borderColor='#3a6aaa'"
+      onmouseout="this.style.color='#5a8aaa';this.style.borderColor='#1e3a5f'">
+      ← Return to Main Site
+    </button>
+  </div>
+</div>
+
+<!-- ══ ACADEMY NAV ══ -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/>
+      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/>
+      <circle cx="16" cy="16" r="2.5" fill="#00c8ff"/>
+    </svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div id="acad-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#5a8aaa;text-transform:uppercase;"></div>
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;transition:color 0.2s;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:4px 12px;text-transform:uppercase;">Cadet Portal</div>
+    <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:6px 14px;text-decoration:none;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#00c8ff';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#00c8ff'">Discord</a>
+  </div>
+</nav>
+
+<!-- ══ PAGE HEADER ══ -->
+<div style="padding:120px 80px 60px;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;background:#060c18;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;position:relative;">
+    <span style="display:block;width:32px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.6);"></span>Second Fleet Academy — Cadet Portal
+  </div>
+  <h1 id="acad-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,7vw,80px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;letter-spacing:0.01em;margin-bottom:16px;position:relative;text-shadow:0 0 40px rgba(0,200,255,0.3);">Welcome,<br><em style="font-style:normal;color:#00c8ff;text-shadow:0 0 30px rgba(0,200,255,0.6);">Cadet.</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:600px;line-height:1.8;position:relative;">Complete orientation, pick your division, and earn your place in RAM. Return any time to study new modules or pursue advanced certifications.</p>
+</div>
+
+<!-- ══ TAB BAR ══ -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.15);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="acad-tab active" onclick="showPanel('orientation')"><span class="acad-dot"></span>Orientation</button>
+  <button class="acad-tab" onclick="showPanel('checklist')"><span class="acad-dot"></span>Checklist</button>
+  <button class="acad-tab" onclick="showPanel('division')"><span class="acad-dot"></span>Division Select</button>
+  <button class="acad-tab" onclick="showPanel('instructors')"><span class="acad-dot"></span>Instructors</button>
+  <button class="acad-tab" onclick="showPanel('graduation')"><span class="acad-dot"></span>Graduation</button>
+</div>
+
+<style>
+/* ── Academy scoped styles — no conflicts with main site ── */
+.acad-tab{display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,180,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;}
+.acad-tab:hover{color:#8ab8d8;background:rgba(0,100,200,0.08);}
+.acad-tab.active{color:#00c8ff;border-bottom-color:#00c8ff;}
+.acad-dot{width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0;}
+.acad-tab.active .acad-dot{background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7);}
+
+.acad-layout{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 110px);}
+.acad-sidebar{background:#060c18;border-right:1px solid rgba(0,180,255,0.1);padding:24px 0;position:sticky;top:110px;height:calc(100vh - 110px);overflow-y:auto;}
+.acad-sidebar::-webkit-scrollbar{width:3px;}
+.acad-sidebar::-webkit-scrollbar-thumb{background:#1e3a5f;}
+.acad-sidebar-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#3a6080;text-transform:uppercase;padding:0 20px;margin-bottom:6px;}
+.acad-sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8ab8d8;text-transform:uppercase;transition:all 0.15s;cursor:pointer;border-left:2px solid transparent;border-right:none;border-top:none;border-bottom:none;background:none;width:100%;text-align:left;}
+.acad-sidebar-btn:hover{color:#e8f4ff;background:rgba(0,100,200,0.08);}
+.acad-sidebar-btn.active{color:#00c8ff;border-left-color:#00c8ff;background:rgba(0,200,255,0.05);}
+.acad-sidebar-icon{font-size:11px;color:#3a6080;flex-shrink:0;}
+.acad-sidebar-section{margin-bottom:24px;}
+
+.acad-panel{display:none;padding:52px 68px;border-bottom:1px solid rgba(0,180,255,0.1);}
+.acad-panel.active{display:block;animation:acadIn 0.3s ease both;}
+@keyframes acadIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.acad-panel-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.acad-panel-tag::before{content:'';display:block;width:20px;height:1px;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.5);}
+.acad-panel-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:12px;}
+.acad-panel-sub{font-size:15px;color:#8ab8d8;max-width:580px;line-height:1.8;margin-bottom:40px;}
+
+/* Info cards */
+.acad-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:32px;}
+.acad-info-card{background:#0c1828;border:1px solid #1e3a5f;padding:18px 20px;}
+.acad-info-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:6px;}
+.acad-info-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:#00c8ff;line-height:1;}
+.acad-info-sub{font-size:12px;color:#5a8aaa;margin-top:4px;}
+
+/* Module blocks */
+.acad-mod{background:#0c1828;border:1px solid #1e3a5f;margin-bottom:2px;overflow:hidden;transition:border-color 0.2s;}
+.acad-mod:hover{border-color:rgba(0,200,255,0.3);}
+.acad-mod-header{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;transition:background 0.2s;}
+.acad-mod-header:hover{background:rgba(0,100,200,0.06);}
+.acad-mod-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:#3a6080;letter-spacing:0.1em;min-width:32px;}
+.acad-mod-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;flex:1;}
+.acad-mod-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;}
+.acad-mod-status.done{color:#1fc8a0;}
+.acad-mod-chevron{color:#3a6080;font-size:11px;transition:transform 0.2s;}
+.acad-mod.open .acad-mod-chevron{transform:rotate(180deg);}
+.acad-mod-body{display:none;padding:0 22px 26px;border-top:1px solid #1e3a5f;background:#091220;}
+.acad-mod.open .acad-mod-body{display:block;}
+.acad-mod-body p{font-size:14px;color:#c8e0f4;line-height:1.8;margin:14px 0;}
+.acad-mod-body h4{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 6px;}
+.acad-mod-body ul{list-style:none;margin:8px 0;}
+.acad-mod-body ul li{font-size:14px;color:#8ab8d8;line-height:1.7;padding:3px 0;display:flex;align-items:flex-start;gap:10px;}
+.acad-mod-body ul li::before{content:'▸';color:#00c8ff;flex-shrink:0;font-size:10px;margin-top:5px;}
+.acad-callout{background:rgba(0,200,255,0.05);border-left:2px solid #00c8ff;padding:14px 18px;margin:16px 0;font-size:13px;color:#8ab8d8;line-height:1.7;}
+.acad-callout strong{color:#00c8ff;}
+.acad-mark-btn{margin-top:18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:10px 24px;cursor:pointer;transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));box-shadow:0 0 16px rgba(0,200,255,0.25);}
+.acad-mark-btn:hover{background:#40dfff;box-shadow:0 0 24px rgba(0,200,255,0.4);}
+.acad-mark-btn.done{background:#091220;color:#1fc8a0;border:1px solid #1fc8a0;clip-path:none;cursor:default;box-shadow:none;}
+
+/* Checklist */
+.acad-prog-wrap{background:#091220;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
+.acad-prog-count{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#1fc8a0;white-space:nowrap;}
+.acad-prog-track{flex:1;height:3px;background:#1e3a5f;}
+.acad-prog-fill{height:100%;background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.5);transition:width 0.5s ease;}
+.acad-prog-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;white-space:nowrap;}
+.acad-check-list{display:flex;flex-direction:column;gap:2px;}
+.acad-check-item{display:flex;align-items:flex-start;gap:14px;background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;transition:all 0.2s;cursor:pointer;}
+.acad-check-item:hover{border-color:rgba(0,200,255,0.25);}
+.acad-check-item.checked{border-color:#1fc8a0;background:rgba(31,200,160,0.04);}
+.acad-check-box{width:20px;height:20px;border:1.5px solid #1e3a5f;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px;transition:all 0.2s;}
+.acad-check-item.checked .acad-check-box{border-color:#1fc8a0;background:rgba(31,200,160,0.15);}
+.acad-check-tick{color:#1fc8a0;font-size:12px;display:none;}
+.acad-check-item.checked .acad-check-tick{display:block;}
+.acad-check-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
+.acad-check-item.checked .acad-check-title{color:#1fc8a0;text-decoration:line-through;text-decoration-color:rgba(31,200,160,0.4);}
+.acad-check-desc{font-size:13px;color:#8ab8d8;line-height:1.6;}
+.acad-check-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#3a6080;border:1px solid #1e3a5f;padding:2px 8px;margin-top:8px;display:inline-block;}
+.acad-check-tag.req{border-color:rgba(0,200,255,0.3);color:#00c8ff;}
+
+/* Division cards */
+.acad-div-intro{background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:16px 20px;margin-bottom:26px;font-size:14px;color:#8ab8d8;line-height:1.7;}
+.acad-div-intro strong{color:#00c8ff;}
+.acad-div-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.acad-div-card{border:1px solid #1e3a5f;background:#0c1828;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+.acad-div-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,50,120,0.4);}
+.acad-div-card.selected{box-shadow:0 0 0 1px var(--dc);border-color:var(--dc);}
+.acad-div-card-top{padding:24px 24px 16px;border-bottom:1px solid #1e3a5f;}
+.acad-div-accent{height:2px;width:100%;margin-bottom:16px;}
+.acad-div-code{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;letter-spacing:0.05em;margin-bottom:4px;}
+.acad-div-name{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#5a8aaa;text-transform:uppercase;margin-bottom:12px;}
+.acad-div-desc{font-size:13px;color:#8ab8d8;line-height:1.7;}
+.acad-div-card-bottom{padding:16px 24px;}
+.acad-div-roles-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-roles{display:flex;flex-wrap:wrap;gap:5px;}
+.acad-div-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.05em;padding:3px 8px;border:1px solid #1e3a5f;color:#5a8aaa;text-transform:uppercase;}
+.acad-div-badge{position:absolute;top:12px;right:12px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;display:none;}
+.acad-div-card.selected .acad-div-badge{display:block;}
+.acad-div-confirm{display:none;margin-top:8px;}.acad-div-confirm.visible{display:block;}
+.acad-div-confirm-box{background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.25);padding:22px 26px;}
+.acad-div-confirm-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-confirm-note{font-size:14px;color:#8ab8d8;line-height:1.7;margin-bottom:18px;}
+.acad-div-confirm-note strong{color:#00c8ff;}
+.acad-div-confirm-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:12px 28px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background 0.2s;box-shadow:0 0 16px rgba(0,200,255,0.25);}
+.acad-div-confirm-btn:hover{background:#40dfff;}
+.acad-div-locked{display:none;}.acad-div-locked.visible{display:block;}
+.acad-div-locked-box{background:rgba(31,200,160,0.04);border:1px solid #1fc8a0;padding:22px 26px;}
+.acad-div-locked-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#1fc8a0;text-transform:uppercase;margin-bottom:8px;}
+.acad-div-locked-note{font-size:14px;color:#8ab8d8;line-height:1.7;}
+.acad-div-locked-note strong{color:#1fc8a0;}
+.acad-div-change-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:transparent;border:1px solid #1e3a5f;padding:7px 14px;cursor:pointer;margin-top:14px;transition:all 0.2s;}
+.acad-div-change-btn:hover{color:#8ab8d8;border-color:#3a6080;}
+
+/* Instructors */
+.acad-inst-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.acad-inst-card{background:#0c1828;border:1px solid #1e3a5f;padding:22px;transition:border-color 0.2s;}
+.acad-inst-card:hover{border-color:rgba(0,200,255,0.3);}
+.acad-inst-avatar{width:46px;height:46px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#00c8ff;margin-bottom:12px;clip-path:polygon(10% 0%,90% 0%,100% 10%,100% 90%,90% 100%,10% 100%,0% 90%,0% 10%);}
+.acad-inst-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;}
+.acad-inst-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;}
+.acad-inst-div{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 10px;border:1px solid rgba(0,200,255,0.3);color:#00c8ff;display:inline-block;margin-bottom:12px;}
+.acad-inst-sessions{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;}
+.acad-inst-sessions span{color:#00c8ff;}
+.acad-inst-commend{margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#1fc8a0;border:1px solid rgba(31,200,160,0.3);padding:3px 8px;display:inline-block;}
+.acad-inst-vacant{background:#091220;border:1px dashed #1e3a5f;padding:22px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:155px;cursor:pointer;transition:border-color 0.2s;}
+.acad-inst-vacant:hover{border-color:#3a6080;}
+.acad-inst-vacant-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;}
+.acad-hall-note{font-size:14px;color:#8ab8d8;line-height:1.7;background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:14px 18px;margin-top:24px;}
+.acad-hall-note strong{color:#00c8ff;}
+
+/* Graduation */
+.acad-grad-locked{text-align:center;padding:60px 40px;}
+.acad-grad-locked h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:12px;}
+.acad-grad-locked p{font-size:14px;color:#8ab8d8;max-width:440px;margin:0 auto 28px;line-height:1.7;}
+.acad-grad-list{list-style:none;text-align:left;max-width:340px;margin:0 auto 28px;display:flex;flex-direction:column;gap:8px;}
+.acad-grad-list li{display:flex;align-items:center;gap:12px;font-family:'Share Tech Mono',monospace;font-size:12px;color:#5a8aaa;letter-spacing:0.05em;}
+.acad-gcheck{width:16px;height:16px;border:1px solid #1e3a5f;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.acad-grad-list li.done .acad-gcheck{border-color:#1fc8a0;color:#1fc8a0;}
+.acad-grad-ready{text-align:center;padding:60px 40px;display:none;}
+.acad-grad-ready h3{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;text-shadow:0 0 30px rgba(0,200,255,0.4);}
+.acad-grad-ready p{font-size:14px;color:#8ab8d8;max-width:480px;margin:0 auto 28px;line-height:1.7;}
+.acad-grad-btn{font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px 36px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all 0.2s;text-decoration:none;display:inline-block;box-shadow:0 0 24px rgba(0,200,255,0.35);}
+.acad-grad-btn:hover{background:#40dfff;box-shadow:0 0 40px rgba(0,200,255,0.5);}
+
+@media(max-width:900px){
+  .acad-layout{grid-template-columns:1fr;}
+  .acad-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;flex-wrap:wrap;padding:8px 16px;gap:4px;}
+  .acad-sidebar-section{display:contents;}
+  .acad-sidebar-label{display:none;}
+  .acad-sidebar-btn{padding:7px 10px;border-left:none;border-bottom:2px solid transparent;font-size:10px;}
+  .acad-sidebar-btn.active{border-bottom-color:#00c8ff;border-left-color:transparent;}
+  .acad-panel{padding:32px 20px;}
+  .acad-div-grid{grid-template-columns:1fr;}
+  .acad-inst-grid{grid-template-columns:1fr 1fr;}
+  .acad-info-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:540px){.acad-inst-grid{grid-template-columns:1fr;}}
+</style>
+
+<!-- ══ PORTAL LAYOUT ══ -->
+<div class="acad-layout">
+  <aside class="acad-sidebar">
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Orientation</div>
+      <button class="acad-sidebar-btn active" onclick="showPanel('orientation')"><span class="acad-sidebar-icon">◈</span>Orientation</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Progress</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('checklist')"><span class="acad-sidebar-icon">◻</span>Checklist</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Division</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('division')"><span class="acad-sidebar-icon">◆</span>Division Select</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Faculty</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('instructors')"><span class="acad-sidebar-icon">★</span>Instructors</button>
+    </div>
+    <div class="acad-sidebar-section">
+      <div class="acad-sidebar-label">Graduate</div>
+      <button class="acad-sidebar-btn" onclick="showPanel('graduation')"><span class="acad-sidebar-icon">◇</span>Graduation</button>
+    </div>
+  </aside>
+
+  <main style="min-width:0;">
+
+    <!-- ORIENTATION -->
+    <div class="acad-panel active" id="panel-orientation">
+      <div class="acad-panel-tag">Module 01</div>
+      <div class="acad-panel-title">Orientation Briefing</div>
+      <p class="acad-panel-sub">Read each module and mark it complete. Progress saves in your browser.</p>
+      <div class="acad-info-grid">
+        <div class="acad-info-card"><div class="acad-info-label">Modules</div><div class="acad-info-val" id="mod-count">0/6</div><div class="acad-info-sub">Complete all to advance</div></div>
+        <div class="acad-info-card"><div class="acad-info-label">Est. Read Time</div><div class="acad-info-val">~15</div><div class="acad-info-sub">Minutes total</div></div>
+        <div class="acad-info-card"><div class="acad-info-label">Status</div><div class="acad-info-val" id="orient-status" style="font-size:18px;color:#3a6080;">In Progress</div><div class="acad-info-sub">Read all to complete</div></div>
+      </div>
+
+      <div class="acad-mod" id="mod-1"><div class="acad-mod-header" onclick="toggleMod(1)"><div class="acad-mod-num">01</div><div class="acad-mod-title">Welcome to RAM Space Industries</div><div class="acad-mod-status" id="ms-1">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Welcome, Cadet. You have taken the first step toward joining RAM Space Industries. Before you earn your division assignment and your crew rank, you need to understand who we are, how we operate, and what we expect of every person who flies under the RAMSORG tag.</p>
+        <h4>Who We Are</h4><p>RAM Space Industries was founded on a simple idea: that the right crew, given the right mission, has no ceiling. We are lawful, role-play friendly, and active across every major gameplay loop.</p>
+        <h4>The RAM Doctrine</h4><ul><li><strong style="color:#00c8ff">Reliability</strong> — If you sign up, you show up. Your crew plans around you.</li><li><strong style="color:#00c8ff">Adaptability</strong> — The verse changes with every patch. Stay flexible.</li><li><strong style="color:#00c8ff">Mastery</strong> — Know your role. Do it well.</li></ul>
+        <div class="acad-callout"><strong>Cadet note:</strong> Cadet is your rank while you complete the Academy. Once you graduate you become a Crew Member and receive your official division assignment.</div>
+        <button class="acad-mark-btn" onclick="markRead(1)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-2"><div class="acad-mod-header" onclick="toggleMod(2)"><div class="acad-mod-num">02</div><div class="acad-mod-title">Rank Structure &amp; Progression</div><div class="acad-mod-status" id="ms-2">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG uses a nine-rank system across three tiers. Understanding where you sit and how to move up is essential.</p>
+        <h4>The Three Tiers</h4><ul><li><strong style="color:#00aaff">Command Tier</strong> — Admiral, Fleet Commander, Captain. Set strategy, run fleet ops, final authority.</li><li><strong style="color:#8ab8d8">Officer Tier</strong> — Division Head, Lieutenant, Specialist. Leadership and mentorship within each division.</li><li><strong style="color:#1fc8a0">Crew Tier</strong> — Senior Crew, Crew Member, Cadet. Where you start. The backbone of every op.</li></ul>
+        <h4>How You Advance</h4><p>Rank is earned through Standing Points (SP) — awarded for attending events, completing ops, recruiting members, and teaching in the Academy.</p>
+        <div class="acad-callout"><strong>Your current rank:</strong> Cadet. Next milestone: Crew Member — earned by completing all Academy stages and attending your first live op.</div>
+        <button class="acad-mark-btn" onclick="markRead(2)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-3"><div class="acad-mod-header" onclick="toggleMod(3)"><div class="acad-mod-num">03</div><div class="acad-mod-title">The Four Divisions</div><div class="acad-mod-status" id="ms-3">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Every member of RAMSORG belongs to a division. Read this before picking in the Division Select tab.</p>
+        <h4>SHIELD — Security &amp; Combat</h4><ul><li>Fighter pilots, gunners, marines, medics protecting the org's assets.</li><li>Escort missions, bounty hunting, PvP response, base defense.</li><li>Best for: combat, dogfighting, FPS gameplay.</li></ul>
+        <h4>HAUL — Logistics &amp; Cargo</h4><ul><li>Cargo pilots, refuelers, trade analysts keeping the org funded.</li><li>Freight convoys, trade route optimization, supply missions.</li><li>Best for: trading, hauling, economic gameplay.</li></ul>
+        <h4>SCOUT — Exploration &amp; Recon</h4><ul><li>Pathfinders, salvagers, cartographers mapping the verse.</li><li>Deep space surveys, jump point scouting, salvage sweeps.</li><li>Best for: exploration, discovery, solo or small-team play.</li></ul>
+        <h4>FORGE — Engineering &amp; Industry</h4><ul><li>Miners, ship engineers, base builders, repair specialists.</li><li>Mining operations, ship repair during fleet ops, base construction.</li><li>Best for: industry, engineering, and support roles.</li></ul>
+        <div class="acad-callout"><strong>Important:</strong> Your primary division is your starting point — not your cage. After reaching Crew Member rank, return here to cross-train in secondary divisions.</div>
+        <button class="acad-mark-btn" onclick="markRead(3)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-4"><div class="acad-mod-header" onclick="toggleMod(4)"><div class="acad-mod-num">04</div><div class="acad-mod-title">Events, Ops &amp; How We Run Them</div><div class="acad-mod-status" id="ms-4">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG runs a structured weekly event schedule. Know these before your first live op.</p>
+        <h4>Weekly Rhythm</h4><ul><li><strong style="color:#00c8ff">Monday — Open Contracts Night:</strong> Informal. No assigned roles. Great for your first session.</li><li><strong style="color:#00c8ff">Wednesday — Division Ops:</strong> Structured. Each division runs its own focused activity.</li><li><strong style="color:#00c8ff">Saturday — Fleet Op:</strong> Main event. Multi-ship, all divisions. Earns the most SP.</li><li><strong style="color:#00c8ff">Monthly — Org Meeting:</strong> Voice meeting. Promotions, strategy, next month planned.</li></ul>
+        <h4>Fleet Op Flow</h4><ul><li>Announced 3+ days ahead in <strong style="color:#e8f4ff">#fleet-ops-announcements</strong>.</li><li>Sign up by reacting with your division emoji or posting your role.</li><li>Captain assigns positions 24 hours before.</li><li>Everyone joins voice for a muster brief — objective, callsigns, rules of engagement.</li><li>After the op: after-action report. This is how SP are awarded.</li></ul>
+        <div class="acad-callout"><strong>Comms rule:</strong> In a live op, keep voice clear. Call out threats, statuses, positions — nothing else until debrief.</div>
+        <button class="acad-mark-btn" onclick="markRead(4)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-5"><div class="acad-mod-header" onclick="toggleMod(5)"><div class="acad-mod-num">05</div><div class="acad-mod-title">Standing Points &amp; The Org Economy</div><div class="acad-mod-status" id="ms-5">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>Standing Points (SP) track your contribution and progress toward rank.</p>
+        <h4>How You Earn SP</h4><ul><li>Casual event attendance — <strong style="color:#00c8ff">+1 SP</strong></li><li>Division Op completion — <strong style="color:#00c8ff">+2 SP</strong></li><li>Fleet Op participation — <strong style="color:#00c8ff">+3 SP</strong></li><li>MVP / Commendation — <strong style="color:#00c8ff">+2 SP bonus</strong></li><li>Recruiting a new member — <strong style="color:#00c8ff">+3 SP</strong></li><li>Teaching an Academy module — <strong style="color:#00c8ff">+4 SP</strong></li><li>Org fund contributions — <strong style="color:#00c8ff">+1–5 SP</strong> at leadership discretion</li></ul>
+        <h4>Rank Thresholds</h4><ul><li>5 SP — eligible for Crew Member</li><li>20 SP — eligible for Senior Crew</li><li>40 SP — eligible for Specialist</li><li>60 SP — eligible for Lieutenant / Division Head</li></ul>
+        <button class="acad-mark-btn" onclick="markRead(5)">Mark as Read</button></div></div>
+
+      <div class="acad-mod" id="mod-6"><div class="acad-mod-header" onclick="toggleMod(6)"><div class="acad-mod-num">06</div><div class="acad-mod-title">Code of Conduct &amp; Discord</div><div class="acad-mod-status" id="ms-6">Unread</div><div class="acad-mod-chevron">▾</div></div>
+        <div class="acad-mod-body"><p>RAMSORG runs on trust, respect, and Discord. These rules apply to every member from Cadet to Admiral.</p>
+        <h4>Code of Conduct</h4><ul><li>Treat every member with respect. Zero tolerance for harassment.</li><li>No griefing org members or allies. Disputes go to a Division Head.</li><li>If you commit to an op, show up. Notify leadership in advance if you can't.</li><li>Follow your Captain's orders in an op. Save disagreements for debrief.</li><li>No unauthorized PvP — check rules of engagement before engaging.</li></ul>
+        <h4>Required: Join Discord</h4><p>Join at: <strong style="color:#00c8ff">discord.gg/Xhaj3nRAEp</strong> — required before your first op.</p>
+        <h4>Key Channels</h4><ul><li><strong style="color:#e8f4ff">#org-announcements</strong> — Official org news.</li><li><strong style="color:#e8f4ff">#fleet-ops-announcements</strong> — All ops posted here first.</li><li><strong style="color:#e8f4ff">#academy-orientation</strong> — Your home channel as a Cadet.</li><li><strong style="color:#e8f4ff">#academy-graduation-log</strong> — Graduates posted here.</li><li><strong style="color:#e8f4ff">#standing-points-log</strong> — SP tracking.</li></ul>
+        <div class="acad-callout"><strong>Final note:</strong> The Academy exists because the First Fleet learned everything the hard way. You have the advantage of everything they figured out. Use it.</div>
+        <button class="acad-mark-btn" onclick="markRead(6)">Mark as Read</button></div></div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="acad-panel" id="panel-checklist">
+      <div class="acad-panel-tag">Stage Tracker</div>
+      <div class="acad-panel-title">Cadet Checklist</div>
+      <p class="acad-panel-sub">Click each item to mark it complete. Progress saves in your browser.</p>
+      <div class="acad-prog-wrap"><div class="acad-prog-count" id="check-count">0/9</div><div class="acad-prog-track"><div class="acad-prog-fill" id="check-fill" style="width:0%"></div></div><div class="acad-prog-label">Tasks Complete</div></div>
+      <div class="acad-check-list">
+        <div class="acad-check-item" id="ci-1" onclick="toggleCheck('ci-1')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Join the Discord Server</div><div class="acad-check-desc">Join at discord.gg/Xhaj3nRAEp — required before anything else.</div><span class="acad-check-tag req">Required First</span></div></div>
+        <div class="acad-check-item" id="ci-2" onclick="toggleCheck('ci-2')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Read All 6 Orientation Modules</div><div class="acad-check-desc">Complete every module in the Orientation tab. Mark each one read.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-3" onclick="toggleCheck('ci-3')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Apply on the RSI Org Page</div><div class="acad-check-desc">Apply at robertsspaceindustries.com/orgs/RAMSORG and wait for approval.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-4" onclick="toggleCheck('ci-4')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Choose Your Primary Division</div><div class="acad-check-desc">Select SHIELD, HAUL, SCOUT, or FORGE in the Division Select tab.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-5" onclick="toggleCheck('ci-5')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Complete Division Foundations</div><div class="acad-check-desc">Read your division's foundations module in Discord or get briefed by your Division Head.</div><span class="acad-check-tag req">Required</span></div></div>
+        <div class="acad-check-item" id="ci-6" onclick="toggleCheck('ci-6')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Attend Your First Live Op</div><div class="acad-check-desc">Monday casual night is a great first one. Your mentor will be with you.</div><span class="acad-check-tag">Live Required</span></div></div>
+        <div class="acad-check-item" id="ci-7" onclick="toggleCheck('ci-7')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Receive Mentor Sign-Off</div><div class="acad-check-desc">After your Live Ops Qualification, your mentor logs completion in #academy-graduation-log.</div><span class="acad-check-tag">Mentor Required</span></div></div>
+        <div class="acad-check-item" id="ci-8" onclick="toggleCheck('ci-8')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Earn 5 Standing Points</div><div class="acad-check-desc">Attend ops, contribute, recruit a friend. 5 SP unlocks Crew Member eligibility.</div><span class="acad-check-tag">SP Track</span></div></div>
+        <div class="acad-check-item" id="ci-9" onclick="toggleCheck('ci-9')"><div class="acad-check-box"><span class="acad-check-tick">✓</span></div><div><div class="acad-check-title">Graduation — Promoted by Division Head</div><div class="acad-check-desc">Your Division Head promotes you to Crew Member in Discord. You're RAM.</div><span class="acad-check-tag">Milestone</span></div></div>
+      </div>
+    </div>
+
+    <!-- DIVISION SELECT -->
+    <div class="acad-panel" id="panel-division">
+      <div class="acad-panel-tag">Division Select</div>
+      <div class="acad-panel-title">Choose Your Lane</div>
+      <p class="acad-panel-sub">Pick your primary division. Return any time to study additional divisions after reaching Crew Member rank.</p>
+      <div class="acad-div-intro"><strong>Primary division only</strong> — not your only division. After reaching Crew Member rank, come back to study secondary modules. The best crew members in RAMSORG know more than one lane.</div>
+      <div id="div-ui">
+        <div class="acad-div-grid">
+          <div class="acad-div-card" id="dv-SHIELD" style="--dc:#e84040;" onclick="pickDiv('SHIELD')"><div class="acad-div-badge" style="border-color:#e84040;color:#e84040;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#e84040;box-shadow:0 0 8px rgba(232,64,64,0.4);"></div><div class="acad-div-code" style="color:#e84040;">SHIELD</div><div class="acad-div-name">Security &amp; Combat</div><div class="acad-div-desc">The org's fighting force. Escort, intercept, bounty hunt, and defend. If you want to be the tip of the spear in every fleet op, SHIELD is your home.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Fighter Pilot</span><span class="acad-div-role">Gunner</span><span class="acad-div-role">Marine</span><span class="acad-div-role">Medic</span><span class="acad-div-role">Combat Lead</span></div></div></div>
+          <div class="acad-div-card" id="dv-HAUL" style="--dc:#1fc8a0;" onclick="pickDiv('HAUL')"><div class="acad-div-badge" style="border-color:#1fc8a0;color:#1fc8a0;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#1fc8a0;box-shadow:0 0 8px rgba(31,200,160,0.4);"></div><div class="acad-div-code" style="color:#1fc8a0;">HAUL</div><div class="acad-div-name">Logistics &amp; Cargo</div><div class="acad-div-desc">The economic engine of RAMSORG. Run freight convoys, trade routes, and supply chains that fund every fleet op. No cargo, no war.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Cargo Pilot</span><span class="acad-div-role">Refueler</span><span class="acad-div-role">Trade Analyst</span><span class="acad-div-role">Convoy Lead</span></div></div></div>
+          <div class="acad-div-card" id="dv-SCOUT" style="--dc:#4a9eff;" onclick="pickDiv('SCOUT')"><div class="acad-div-badge" style="border-color:#4a9eff;color:#4a9eff;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#4a9eff;box-shadow:0 0 8px rgba(74,158,255,0.4);"></div><div class="acad-div-code" style="color:#4a9eff;">SCOUT</div><div class="acad-div-name">Exploration &amp; Recon</div><div class="acad-div-desc">The org's eyes in deep space. Chart jump points, run salvage sweeps, gather intel, and open routes no one else has found.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Pathfinder</span><span class="acad-div-role">Salvager</span><span class="acad-div-role">Data Runner</span><span class="acad-div-role">Cartographer</span></div></div></div>
+          <div class="acad-div-card" id="dv-FORGE" style="--dc:#c08b20;" onclick="pickDiv('FORGE')"><div class="acad-div-badge" style="border-color:#c08b20;color:#c08b20;">Selected ✓</div><div class="acad-div-card-top"><div class="acad-div-accent" style="background:#c08b20;box-shadow:0 0 8px rgba(192,139,32,0.4);"></div><div class="acad-div-code" style="color:#c08b20;">FORGE</div><div class="acad-div-name">Engineering &amp; Industry</div><div class="acad-div-desc">The builders and maintainers. Mine the ore, repair the ships, construct the base. FORGE makes everything else possible.</div></div><div class="acad-div-card-bottom"><div class="acad-div-roles-label">Roles available</div><div class="acad-div-roles"><span class="acad-div-role">Miner</span><span class="acad-div-role">Ship Engineer</span><span class="acad-div-role">Base Builder</span><span class="acad-div-role">Repair Specialist</span></div></div></div>
+        </div>
+        <div class="acad-div-confirm" id="div-confirm"><div class="acad-div-confirm-box"><div class="acad-div-confirm-title" id="confirm-title">Confirm Division</div><div class="acad-div-confirm-note">You're setting <strong id="confirm-name">—</strong> as your primary division. Tell your Division Head on Discord so they can assign your role. <strong>You can always return to study additional divisions after reaching Crew Member rank.</strong></div><button class="acad-div-confirm-btn" onclick="confirmDiv()">Confirm Selection</button></div></div>
+      </div>
+      <div class="acad-div-locked" id="div-locked"><div class="acad-div-locked-box"><div class="acad-div-locked-title" id="locked-title">Division Confirmed</div><div class="acad-div-locked-note">Your primary division is <strong id="locked-name">—</strong>. Report to your Division Head on Discord — they'll assign your role and point you to your division's foundations module. <strong>Return here any time to study a secondary division.</strong></div><button class="acad-div-change-btn" onclick="resetDiv()">Change Selection</button></div></div>
+    </div>
+
+    <!-- INSTRUCTORS -->
+    <div class="acad-panel" id="panel-instructors">
+      <div class="acad-panel-tag">Faculty</div>
+      <div class="acad-panel-title">Instructor Roster</div>
+      <p class="acad-panel-sub">Certified instructors earn +4 SP per session and a permanent place on this roster. Five sessions earns an Instructor Commendation.</p>
+      <div class="acad-inst-grid">
+        <div class="acad-inst-card"><div class="acad-inst-avatar">AD</div><div class="acad-inst-name">Admiral</div><div class="acad-inst-role">Org Founder · Academy Commandant</div><span class="acad-inst-div">COMMAND</span><div class="acad-inst-sessions">Sessions Taught: <span>∞</span></div><div class="acad-inst-commend">Founder Commendation</div></div>
+        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
+        <div class="acad-inst-vacant" onclick="alert('Volunteer by messaging a Division Head on Discord. Instructors earn +4 SP per session.')"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#1e3a5f" stroke-width="1.5"/><line x1="14" y1="8" x2="14" y2="20" stroke="#3a6080" stroke-width="1.5"/><line x1="8" y1="14" x2="20" y2="14" stroke="#3a6080" stroke-width="1.5"/></svg><div class="acad-inst-vacant-label">Slot Open</div><div class="acad-inst-vacant-label" style="color:#00c8ff;font-size:9px;">Volunteer → +4 SP / session</div></div>
+      </div>
+      <div class="acad-hall-note"><strong>Want to be on this roster?</strong> Any Senior Crew or above can volunteer as an Academy Instructor. Message your Division Head on Discord. Every session earns +4 SP and a permanent entry here. Five sessions earns the Instructor Commendation.</div>
+    </div>
+
+    <!-- GRADUATION -->
+    <div class="acad-panel" id="panel-graduation">
+      <div class="acad-panel-tag">Final Stage</div>
+      <div class="acad-panel-title">Graduation</div>
+      <p class="acad-panel-sub">Complete all checklist stages to unlock graduation. Your Division Head officially promotes you to Crew Member.</p>
+      <div class="acad-grad-locked" id="grad-locked">
+        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#1e3a5f" stroke-width="2" fill="none"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#1e3a5f" stroke-width="1" fill="none" opacity="0.5"/><text x="50" y="60" text-anchor="middle" font-size="28" fill="#3a6080">🔒</text></svg></div>
+        <h3>Not Yet, Cadet</h3>
+        <p>Complete all required stages before your Division Head can promote you. Track your progress in the Checklist tab.</p>
+        <ul class="acad-grad-list" id="grad-list">
+          <li id="gi-1"><div class="acad-gcheck"></div>Join Discord Server</li>
+          <li id="gi-2"><div class="acad-gcheck"></div>Complete Orientation Modules</li>
+          <li id="gi-3"><div class="acad-gcheck"></div>Apply on RSI Org Page</li>
+          <li id="gi-4"><div class="acad-gcheck"></div>Choose Primary Division</li>
+          <li id="gi-5"><div class="acad-gcheck"></div>Division Foundations</li>
+          <li id="gi-6"><div class="acad-gcheck"></div>Live Ops Qualification</li>
+          <li id="gi-7"><div class="acad-gcheck"></div>Mentor Sign-Off</li>
+          <li id="gi-8"><div class="acad-gcheck"></div>Earn 5 Standing Points</li>
+        </ul>
+      </div>
+      <div class="acad-grad-ready" id="grad-ready">
+        <div style="width:90px;height:90px;margin:0 auto 24px;"><svg viewBox="0 0 100 100" fill="none"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" stroke="#00c8ff" stroke-width="2" fill="rgba(0,200,255,0.05)"/><polygon points="50,20 80,37.5 80,62.5 50,80 20,62.5 20,37.5" stroke="#00c8ff" stroke-width="1" fill="none" opacity="0.4"/><path d="M35 50 L45 62 L65 40" stroke="#00c8ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Ready to Graduate</h3>
+        <p>All stages complete. Contact your Division Head on Discord — they'll promote you to Crew Member and post your graduation in #academy-graduation-log.</p>
+        <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" class="acad-grad-btn">Open Discord →</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</div><!-- /page-academy -->
+<!-- ══ ADMIN PASSWORD GATE ══ -->
+<div id="admin-pw-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(12px);">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:relative;max-width:420px;width:90%;text-align:center;padding:20px;">
+    <div style="width:70px;height:70px;margin:0 auto 24px;">
+      <svg viewBox="0 0 70 70" fill="none"><polygon points="35,3 67,20 67,50 35,67 3,50 3,20" stroke="rgba(232,64,64,0.5)" stroke-width="1.5" fill="none"/><polygon points="35,14 56,26 56,44 35,56 14,44 14,26" stroke="rgba(232,64,64,0.2)" stroke-width="1" fill="none"/><circle cx="35" cy="35" r="5" fill="rgba(232,64,64,0.2)" stroke="#e84040" stroke-width="1.5"><animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle><circle cx="35" cy="35" r="2.5" fill="#e84040"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Restricted Access</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:24px;">Admiral<br><span style="color:#e84040;">Command</span></h2>
+    <div style="position:relative;margin-bottom:12px;">
+      <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;">AUTH //</div>
+      <input id="admin-pw-input" type="password" placeholder="Enter access code"
+        style="width:100%;background:rgba(232,64,64,0.05);border:1px solid rgba(232,64,64,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 90px;outline:none;letter-spacing:0.15em;transition:border-color 0.2s;"
+        onkeydown="if(event.key==='Enter')adminLogin()">
+    </div>
+    <div id="admin-pw-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;height:18px;margin-bottom:14px;"></div>
+    <button onclick="adminLogin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#e84040;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(232,64,64,0.3);transition:all 0.2s;" onmouseover="this.style.background='#ff6060'" onmouseout="this.style.background='#e84040'">Authenticate</button>
+    <button onclick="document.getElementById('admin-pw-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Cancel</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN PAGE ══ -->
+<div id="page-admin" style="display:none;">
+
+<style>
+.admin-tab{display:flex;align-items:center;gap:9px;padding:0 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(232,64,64,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%;}
+.admin-tab:hover{color:#8ab8d8;background:rgba(232,64,64,0.05);}
+.admin-tab.active{color:#e84040;border-bottom-color:#e84040;}
+.admin-tab-dot{width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0;}
+.admin-tab.active .admin-tab-dot{background:#e84040;box-shadow:0 0 6px rgba(232,64,64,0.7);}
+.admin-panel{display:none;padding:48px 72px;}
+.admin-panel.active{display:block;animation:acadIn 0.3s ease both;}
+.admin-section-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.admin-section-label::before{content:'';display:block;width:20px;height:1px;background:#e84040;box-shadow:0 0 6px rgba(232,64,64,0.5);}
+.admin-panel-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,4vw,42px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:12px;}
+.admin-panel-sub{font-size:14px;color:#8ab8d8;max-width:560px;line-height:1.7;margin-bottom:36px;}
+.admin-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;background:#0c1828;border:1px solid #1e3a5f;padding:16px 20px;margin-bottom:2px;transition:border-color 0.2s;}
+.admin-row:hover{border-color:rgba(232,64,64,0.2);}
+.admin-row-main{flex:1;min-width:0;}
+.admin-row-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
+.admin-row-meta{font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;}
+.admin-row-notes{font-size:13px;color:#8ab8d8;line-height:1.6;margin-top:6px;}
+.admin-row-actions{display:flex;gap:6px;flex-shrink:0;align-items:center;}
+.admin-btn-sm{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:5px 12px;cursor:pointer;transition:all 0.2s;}
+.admin-btn-sm:hover{background:rgba(0,200,255,0.15);border-color:rgba(0,200,255,0.4);}
+.admin-btn-sm.admin-btn-danger{color:#e84040;background:rgba(232,64,64,0.06);border-color:rgba(232,64,64,0.2);}
+.admin-btn-sm.admin-btn-danger:hover{background:rgba(232,64,64,0.15);border-color:rgba(232,64,64,0.4);}
+.admin-empty{font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase;}
+.admin-form{background:#091220;border:1px solid rgba(232,64,64,0.15);padding:24px;margin-top:24px;}
+.admin-form-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:#e84040;text-transform:uppercase;margin-bottom:18px;}
+.admin-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px;}
+.admin-input{width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.2s;letter-spacing:0.05em;}
+.admin-input:focus{border-color:rgba(0,200,255,0.4);}
+.admin-select{width:100%;background:#091220;border:1px solid #1e3a5f;color:#8ab8d8;font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px 14px;outline:none;cursor:pointer;}
+.admin-textarea{width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 14px;outline:none;resize:vertical;min-height:80px;transition:border-color 0.2s;}
+.admin-textarea:focus{border-color:rgba(0,200,255,0.4);}
+.admin-submit{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#04070f;background:#e84040;border:none;padding:11px 28px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background 0.2s;box-shadow:0 0 16px rgba(232,64,64,0.2);}
+.admin-submit:hover{background:#ff6060;}
+.admin-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:32px;}
+.admin-stat{background:#0c1828;border:1px solid #1e3a5f;padding:18px 20px;}
+.admin-stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:6px;}
+.admin-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:#e84040;line-height:1;}
+.admin-stat-sub{font-size:12px;color:#5a8aaa;margin-top:3px;}
+.admin-progress-bar-wrap{margin-top:8px;height:3px;background:#1e3a5f;border-radius:0;}
+.admin-progress-bar-fill{height:100%;background:#e84040;box-shadow:0 0 8px rgba(232,64,64,0.4);transition:width 0.5s ease;}
+</style>
+
+<!-- Admin Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);box-shadow:0 1px 30px rgba(120,0,0,0.15);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/>
+      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e84040" stroke-width="0.8" fill="rgba(232,64,64,0.06)"/>
+      <circle cx="16" cy="16" r="2.5" fill="#e84040"/>
+    </svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Admiral Command</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#e84040'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
+    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,64,64,0.1)'" onmouseout="this.style.background='none'">Logout</button>
+  </div>
+</nav>
+
+<!-- Admin Header -->
+<div style="padding:100px 72px 48px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e84040,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;">
+    <span style="display:block;width:32px;height:1px;background:#e84040;"></span>Admiral Command Panel
+  </div>
+  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,72px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 40px rgba(232,64,64,0.2);">Command<br><em style="font-style:normal;color:#e84040;">Centre</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, events, instructors, announcements, and academy progress. All changes save locally to this browser.</p>
+</div>
+
+<!-- Admin Tab Bar -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="admin-tab active" onclick="showAdminTab('members')"><span class="admin-tab-dot"></span>Members</button>
+  <button class="admin-tab" onclick="showAdminTab('events')"><span class="admin-tab-dot"></span>Events</button>
+  <button class="admin-tab" onclick="showAdminTab('instructors')"><span class="admin-tab-dot"></span>Instructors</button>
+  <button class="admin-tab" onclick="showAdminTab('announcements')"><span class="admin-tab-dot"></span>Announcements</button>
+  <button class="admin-tab" onclick="showAdminTab('academy')"><span class="admin-tab-dot"></span>Academy Progress</button>
+</div>
+
+<!-- ── MEMBERS ── -->
+<div class="admin-panel active" id="admin-panel-members">
+  <div class="admin-section-label">Roster</div>
+  <div class="admin-panel-title">Member Management</div>
+  <p class="admin-panel-sub">View all members, promote ranks, and award Standing Points. All changes save locally.</p>
+  <div id="admin-member-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Add New Member</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-callsign" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
+      <select class="admin-select" id="new-division">
+        <option value="SHIELD">SHIELD — Security</option>
+        <option value="HAUL">HAUL — Logistics</option>
+        <option value="SCOUT">SCOUT — Exploration</option>
+        <option value="FORGE">FORGE — Engineering</option>
+        <option value="COMMAND">COMMAND</option>
+      </select>
+    </div>
+    <button class="admin-submit" onclick="addMember()">Add Member</button>
+  </div>
+</div>
+
+<!-- ── EVENTS ── -->
+<div class="admin-panel" id="admin-panel-events">
+  <div class="admin-section-label">Operations</div>
+  <div class="admin-panel-title">Event Management</div>
+  <p class="admin-panel-sub">Schedule fleet ops, division ops, and casual nights. Track status from Scheduled → Live → Complete.</p>
+  <div id="admin-event-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Schedule New Event</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-event-name" placeholder="Event name" style="grid-column:1/-1;">
+      <select class="admin-select" id="new-event-type">
+        <option value="Fleet Op">Fleet Op — Saturday</option>
+        <option value="Division Op">Division Op — Wednesday</option>
+        <option value="Casual Night">Casual Night — Monday</option>
+        <option value="Org Meeting">Org Meeting — Monthly</option>
+        <option value="Special Op">Special Op</option>
+      </select>
+      <input class="admin-input" id="new-event-date" type="date">
+    </div>
+    <textarea class="admin-textarea" id="new-event-notes" placeholder="Briefing notes (optional)..." style="margin-bottom:14px;"></textarea>
+    <button class="admin-submit" onclick="addEvent()">Schedule Event</button>
+  </div>
+</div>
+
+<!-- ── INSTRUCTORS ── -->
+<div class="admin-panel" id="admin-panel-instructors">
+  <div class="admin-section-label">Faculty</div>
+  <div class="admin-panel-title">Instructor Management</div>
+  <p class="admin-panel-sub">Add and manage Academy instructors. Logging a session awards their Standing Points automatically. 5 sessions unlocks a Commendation.</p>
+  <div id="admin-instructor-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Add New Instructor</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-instructor-name" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
+      <input class="admin-input" id="new-instructor-role" placeholder="Role / title">
+      <select class="admin-select" id="new-instructor-div">
+        <option value="SHIELD">SHIELD</option>
+        <option value="HAUL">HAUL</option>
+        <option value="SCOUT">SCOUT</option>
+        <option value="FORGE">FORGE</option>
+        <option value="COMMAND">COMMAND</option>
+      </select>
+    </div>
+    <button class="admin-submit" onclick="addInstructor()">Add Instructor</button>
+  </div>
+</div>
+
+<!-- ── ANNOUNCEMENTS ── -->
+<div class="admin-panel" id="admin-panel-announcements">
+  <div class="admin-section-label">Comms</div>
+  <div class="admin-panel-title">Announcements</div>
+  <p class="admin-panel-sub">Post org-wide announcements. These will display on the main site news feed when that feature goes live.</p>
+  <div id="admin-announcement-list"></div>
+  <div class="admin-form">
+    <div class="admin-form-title">// Post New Announcement</div>
+    <div class="admin-form-grid">
+      <input class="admin-input" id="new-ann-title" placeholder="Announcement title" style="grid-column:1/-1;">
+      <select class="admin-select" id="new-ann-type">
+        <option value="GENERAL">General</option>
+        <option value="OP">Fleet Op</option>
+        <option value="URGENT">Urgent</option>
+        <option value="ACADEMY">Academy</option>
+      </select>
+    </div>
+    <textarea class="admin-textarea" id="new-ann-body" placeholder="Announcement body..." style="margin-bottom:14px;"></textarea>
+    <button class="admin-submit" onclick="addAnnouncement()">Post Announcement</button>
+  </div>
+</div>
+
+<!-- ── ACADEMY PROGRESS ── -->
+<div class="admin-panel" id="admin-panel-academy">
+  <div class="admin-section-label">Intel</div>
+  <div class="admin-panel-title">Academy Progress</div>
+  <p class="admin-panel-sub">View enrolled cadets and track their progress through the orientation pipeline in real time.</p>
+  <div id="admin-academy-list"></div>
+  <div class="admin-form" style="margin-top:16px;">
+    <div class="admin-form-title">// Clear Cadet Session</div>
+    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Remove an enrolled cadet's local session data — use this to clear test profiles.</p>
+    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Clear Current Cadet Session</button>
+  </div>
+</div>
+
+</div><!-- /page-admin -->
+
 </body>
 </html>
