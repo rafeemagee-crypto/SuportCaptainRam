@@ -982,7 +982,7 @@ footer {
 .admin-tab.active{color:#e84040;border-bottom-color:#e84040;}
 .admin-tab-dot{width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0;}
 .admin-tab.active .admin-tab-dot{background:#e84040;box-shadow:0 0 6px rgba(232,64,64,0.7);}
-.admin-panel{display:none;padding:48px 72px;}
+.admin-panel{display:none;padding:48px 72px;}.admin-panel.active,.admin-panel[style*="display: block"]{display:block !important;padding:48px 72px;}
 .admin-panel.active{display:block;}
 .admin-section-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
 .admin-section-label::before{content:'';display:block;width:20px;height:1px;background:#e84040;box-shadow:0 0 6px rgba(232,64,64,0.5);}
@@ -1965,7 +1965,7 @@ footer {
 </div>
 
 <!-- ══ ADMIN PAGE ══ -->
-<div id="page-admin" style="display:none;">
+<div id="page-admin" style="display:none;min-height:100vh;background:#04070f;position:relative;z-index:1;">
 
 <!-- Admin Nav -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);box-shadow:0 1px 30px rgba(120,0,0,0.15);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
@@ -2006,7 +2006,7 @@ footer {
 </div>
 
 <!-- ── APPLICATIONS ── -->
-<div class="admin-panel" id="admin-panel-applications">
+<div class="admin-panel" id="admin-panel-applications" style="padding-top:110px;">
   <div class="admin-section-label">Enrollment</div>
   <div class="admin-panel-title">Applications</div>
   <p class="admin-panel-sub">Review enrollment applications from new cadets. Verify their Discord and RSI membership before approving. Approving adds them to the member roster and grants them Academy access.</p>
@@ -2014,7 +2014,7 @@ footer {
 </div>
 
 <!-- ── MEMBERS ── -->
-<div class="admin-panel active" id="admin-panel-members">
+<div class="admin-panel active" id="admin-panel-members" style="padding-top:110px;">
   <div class="admin-section-label">Roster</div>
   <div class="admin-panel-title">Member Management</div>
   <p class="admin-panel-sub">View all members, promote ranks, and award Standing Points. All changes save locally.</p>
@@ -2605,9 +2605,15 @@ function openAdminPanel() {
   document.getElementById('page-academy').style.display = 'none';
   const pi = document.getElementById('page-instructor');
   if (pi) pi.style.display = 'none';
-  document.getElementById('page-admin').style.display = 'block';
+  const pa = document.getElementById('page-admin');
+  pa.style.display = 'block';
+  pa.style.minHeight = '100vh';
+  pa.style.background = '#04070f';
   window.scrollTo({ top: 0, behavior: 'instant' });
+  console.log('openAdminPanel — page-admin display:', pa.style.display);
   showAdminTab('members');
+  const mp = document.getElementById('admin-panel-members');
+  console.log('members panel:', mp ? mp.style.display : 'NOT FOUND');
   renderAdminMembers();
   renderAdminApplications();
   renderAdminEvents();
