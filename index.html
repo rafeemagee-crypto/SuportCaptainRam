@@ -1575,8 +1575,8 @@ function approveApplication(i) {
 }
 
 function rejectApplication(i) {
-  if (!confirm('Reject this application?')) return;
   const apps = getAdminData('applications', []);
+  if (!apps[i]) return;
   apps[i].status = 'Rejected';
   setAdminData('applications', apps);
   renderAdminApplications();
@@ -1646,8 +1646,7 @@ function demoteRank(i) {
   renderAdminMembers();
 }
 function removeMember(i) {
-  if (!confirm('Remove this member?')) return;
-  const members = getAdminData('members', []);
+    const members = getAdminData('members', []);
   const removed = members[i];
   members.splice(i, 1);
   setAdminData('members', members);
@@ -1704,8 +1703,7 @@ function cycleEventStatus(i) {
   renderAdminEvents();
 }
 function removeEvent(i) {
-  if (!confirm('Remove this event?')) return;
-  const events = getAdminData('events', []);
+    const events = getAdminData('events', []);
   events.splice(i, 1);
   setAdminData('events', events);
   renderAdminEvents();
@@ -1750,8 +1748,7 @@ function logSession(i) {
   renderAdminInstructors();
 }
 function removeInstructor(i) {
-  if (!confirm('Remove this instructor?')) return;
-  const instructors = getAdminData('instructors', []);
+    const instructors = getAdminData('instructors', []);
   instructors.splice(i, 1);
   setAdminData('instructors', instructors);
   renderAdminInstructors();
@@ -1789,8 +1786,7 @@ function addAnnouncement() {
   renderAdminAnnouncements();
 }
 function removeAnnouncement(i) {
-  if (!confirm('Remove this announcement?')) return;
-  const posts = getAdminData('announcements', []);
+    const posts = getAdminData('announcements', []);
   posts.splice(i, 1);
   setAdminData('announcements', posts);
   renderAdminAnnouncements();
@@ -1843,8 +1839,7 @@ function renderAdminAcademy() {
 function graduateCadet() {
   const callsign = localStorage.getItem('ram_callsign');
   if (!callsign) return;
-  if (!confirm('Graduate ' + callsign + ' and promote to Crew Member?')) return;
-
+  
   // Mark graduated in localStorage
   localStorage.setItem('ram_graduated', 'true');
 
