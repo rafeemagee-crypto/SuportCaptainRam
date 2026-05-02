@@ -1448,9 +1448,141 @@ function goToAcademy() {
 function goToMain() {
   document.getElementById('page-academy').style.display = 'none';
   document.getElementById('page-admin').style.display = 'none';
+  document.getElementById('page-instructor').style.display = 'none';
   document.getElementById('page-main').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
+
+// ── INSTRUCTOR PANEL ──
+function goToInstructor() {
+  document.getElementById('page-main').style.display = 'none';
+  document.getElementById('page-academy').style.display = 'none';
+  document.getElementById('page-admin').style.display = 'none';
+  document.getElementById('page-instructor').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const callsign = localStorage.getItem('ram_callsign');
+  const h1 = document.getElementById('inst-welcome-h1');
+  const nav = document.getElementById('inst-callsign-nav');
+  if (callsign) {
+    if (h1) h1.innerHTML = 'Instructor<br><em style="font-style:normal;color:#00c8ff;">' + callsign + '</em>';
+    if (nav) nav.textContent = '// ' + callsign;
+  }
+  renderInstCadets();
+  renderInstRoster();
+}
+
+function showInstPanel(id) {
+  document.querySelectorAll('.inst-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.inst-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('inst-panel-' + id).classList.add('active');
+  document.querySelectorAll('[onclick="showInstPanel(\'' + id + '\')"]').forEach(el => el.classList.add('active'));
+}
+
+function isInstructor() {
+  const callsign = localStorage.getItem('ram_callsign');
+  if (!callsign) return false;
+  const members = getAdminData('members', []);
+  const m = members.find(m => m.callsign === callsign);
+  return m && m.isInstructor === true;
+}
+
+function renderInstCadets() {
+  const el = document.getElementById('inst-cadet-list');
+  if (!el) return;
+  const callsign = localStorage.getItem('ram_callsign');
+  const members = getAdminData('members', []);
+  const apps = getAdminData('applications', []);
+  // Get cadets assigned to this instructor
+  const myCadets = members.filter(m => m.assignedInstructor === callsign);
+  if (!myCadets.length) {
+    el.innerHTML = '<div class="inst-empty">No cadets assigned to you yet. The Admiral will assign cadets from the admin panel.</div>';
+    return;
+  }
+  el.innerHTML = myCadets.map(cadet => {
+    const app = apps.find(a => a.callsign === cadet.callsign);
+    const notes = getAdminData('inst_notes_' + cadet.callsign, '');
+    const signedOff = getAdminData('inst_signoff_' + cadet.callsign, false);
+    const checks = cadet.checks || [];
+    const mods = cadet.mods || [];
+    const div = cadet.division || '—';
+    const pct = Math.round(((checks.length || 0) / 9) * 100);
+    return `
+    <div class="inst-cadet-row">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;">
+          <div class="inst-cadet-name">${cadet.callsign}</div>
+          <div class="inst-cadet-meta">
+            Rank: <span style="color:#00c8ff">${cadet.rank}</span>
+            &nbsp;·&nbsp; Division: <span style="color:#00c8ff">${div}</span>
+            &nbsp;·&nbsp; SP: <span style="color:#00c8ff">${cadet.sp || 0}</span>
+            ${app ? ' &nbsp;·&nbsp; Discord: <span style="color:#8ab8d8">' + app.discord + '</span>' : ''}
+          </div>
+          <div style="display:flex;gap:20px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;">
+            <span>Modules: <span style="color:${mods.length>=6?'#1fc8a0':'#8ab8d8'}">${mods.length || 0}/6</span></span>
+            <span>Checklist: <span style="color:${checks.length>=9?'#1fc8a0':'#8ab8d8'}">${checks.length || 0}/9</span></span>
+            <span>Progress: <span style="color:#00c8ff">${pct}%</span></span>
+          </div>
+          <div class="inst-progress-bar"><div class="inst-progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+          ${signedOff
+            ? '<div class="inst-signoff-done">✓ Live Ops Sign-Off Given</div>'
+            : `<button class="inst-signoff-btn" onclick="giveSignOff('${cadet.callsign}')">⬡ Give Live Ops Sign-Off</button>`
+          }
+        </div>
+      </div>
+      <div style="margin-top:14px;border-top:1px solid #1e3a5f;padding-top:14px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:6px;">Instructor Notes</div>
+        <textarea class="inst-note-input" id="note-${cadet.callsign}" placeholder="Add notes about this cadet...">${notes}</textarea>
+        <button class="inst-note-save" onclick="saveNote('${cadet.callsign}')">Save Note</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInstRoster() {
+  const el = document.getElementById('inst-roster-list');
+  if (!el) return;
+  const apps = getAdminData('applications', []).filter(a => a.status === 'Approved');
+  const members = getAdminData('members', []).filter(m => m.rank === 'Cadet' || m.rank === 'Private');
+  if (!apps.length && !members.length) {
+    el.innerHTML = '<div class="inst-empty">No cadets enrolled yet.</div>';
+    return;
+  }
+  el.innerHTML = apps.map(a => {
+    const m = members.find(m => m.callsign === a.callsign);
+    const assignedTo = m ? (m.assignedInstructor || 'Unassigned') : 'Unassigned';
+    const signedOff = getAdminData('inst_signoff_' + a.callsign, false);
+    return `<div class="inst-cadet-row">
+      <div class="inst-cadet-name">${a.callsign}</div>
+      <div class="inst-cadet-meta">
+        Discord: <span style="color:#8ab8d8">${a.discord}</span>
+        &nbsp;·&nbsp; RSI: <span style="color:#8ab8d8">${a.rsi}</span>
+        &nbsp;·&nbsp; Instructor: <span style="color:#00c8ff">${assignedTo}</span>
+        &nbsp;·&nbsp; Sign-Off: <span style="color:${signedOff?'#1fc8a0':'#e84040'}">${signedOff?'✓ Given':'Pending'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function giveSignOff(callsign) {
+  setAdminData('inst_signoff_' + callsign, true);
+  // Also mark ci-7 (mentor sign-off) as complete on their checklist in admin data
+  const members = getAdminData('members', []);
+  const idx = members.findIndex(m => m.callsign === callsign);
+  if (idx !== -1) {
+    if (!members[idx].checks) members[idx].checks = [];
+    if (!members[idx].checks.includes('ci-7')) members[idx].checks.push('ci-7');
+    setAdminData('members', members);
+  }
+  renderInstCadets();
+}
+
+function saveNote(callsign) {
+  const val = document.getElementById('note-' + callsign);
+  if (val) setAdminData('inst_notes_' + callsign, val.value);
+}
+
 
 function goToAdmin() {
   const pw = localStorage.getItem('ram_admin_auth');
@@ -1487,6 +1619,7 @@ function openAdminPanel() {
   renderAdminInstructors();
   renderAdminAnnouncements();
   renderAdminAcademy();
+  renderAssignPanel();
 }
 
 function adminLogout() {
@@ -1599,6 +1732,7 @@ function renderAdminMembers() {
         <button class="admin-btn-sm admin-btn-danger" onclick="deductSP(${i})">−SP</button>
         <button class="admin-btn-sm" onclick="promoteRank(${i})">Promote</button>
         <button class="admin-btn-sm admin-btn-danger" onclick="demoteRank(${i})">Demote</button>
+        <button class="admin-btn-sm" onclick="toggleInstructor(${i})" style="${m.isInstructor?'color:#1fc8a0;border-color:rgba(31,200,160,0.3);':''}">${m.isInstructor?'★ Instructor':'Make Instructor'}</button>
         <button class="admin-btn-sm admin-btn-danger" onclick="removeMember(${i})">Remove</button>
       </div>
     </div>`).join('');
@@ -1644,6 +1778,41 @@ function demoteRank(i) {
   if (cur > 0) members[i].rank = RANKS[cur - 1];
   setAdminData('members', members);
   renderAdminMembers();
+}
+
+function toggleInstructor(i) {
+  const members = getAdminData('members', []);
+  const m = members[i];
+  // Cannot make Cadets or Privates instructors
+  if (m.rank === 'Cadet' || m.rank === 'Private') {
+    alert('Cannot assign Instructor role to Cadets or Privates.');
+    return;
+  }
+  m.isInstructor = !m.isInstructor;
+  setAdminData('members', members);
+  renderAdminMembers();
+  renderAdminInstructors();
+}
+
+function assignCadetToInstructor() {
+  const cadetSel = document.getElementById('assign-cadet-select').value;
+  const instSel  = document.getElementById('assign-instructor-select').value;
+  if (!cadetSel || !instSel) return;
+  const members = getAdminData('members', []);
+  const idx = members.findIndex(m => m.callsign === cadetSel);
+  if (idx !== -1) { members[idx].assignedInstructor = instSel; setAdminData('members', members); }
+  renderAdminMembers();
+  renderAssignPanel();
+}
+
+function renderAssignPanel() {
+  const members = getAdminData('members', []);
+  const cadets = members.filter(m => m.rank === 'Cadet' || m.rank === 'Private');
+  const instructors = members.filter(m => m.isInstructor);
+  const cadetSel = document.getElementById('assign-cadet-select');
+  const instSel  = document.getElementById('assign-instructor-select');
+  if (cadetSel) cadetSel.innerHTML = '<option value="">— Select Cadet —</option>' + cadets.map(c => `<option value="${c.callsign}">${c.callsign} (${c.assignedInstructor ? 'Assigned: ' + c.assignedInstructor : 'Unassigned'})</option>`).join('');
+  if (instSel)  instSel.innerHTML  = '<option value="">— Select Instructor —</option>' + instructors.map(inst => `<option value="${inst.callsign}">${inst.callsign} (${inst.rank})</option>`).join('');
 }
 function removeMember(i) {
     const members = getAdminData('members', []);
@@ -1796,72 +1965,116 @@ function removeAnnouncement(i) {
 function renderAdminAcademy() {
   const el = document.getElementById('admin-academy-list');
   if (!el) return;
-  const enrolled = localStorage.getItem('ram_callsign');
-  const checks = JSON.parse(localStorage.getItem('ram_checks') || '[]');
-  const mods = JSON.parse(localStorage.getItem('ram_mods') || '[]');
-  const div = localStorage.getItem('ram_div') || '—';
-  const graduated = localStorage.getItem('ram_graduated') === 'true';
 
-  if (!enrolled) {
-    el.innerHTML = '<div class="admin-empty">No cadets have enrolled yet.</div>';
+  const apps = getAdminData('applications', []).filter(a => a.status === 'Approved');
+  const members = getAdminData('members', []);
+
+  if (!apps.length) {
+    el.innerHTML = '<div class="admin-empty">No approved cadets yet. Approve applications in the Applications tab first.</div>';
     return;
   }
 
-  const pct = Math.round((checks.length / 9) * 100);
-  const allDone = checks.length >= 9 && mods.length >= 6;
-  const progressColour = pct === 100 ? '#1fc8a0' : pct >= 50 ? '#00c8ff' : '#e84040';
+  // Stats bar
+  const total = apps.length;
+  const graduated = members.filter(m => m.rank !== 'Cadet' && apps.find(a => a.callsign === m.callsign)).length;
+  const signedOff = apps.filter(a => getAdminData('inst_signoff_' + a.callsign, false)).length;
 
   el.innerHTML = `
-    <div class="admin-row" style="border-color:${allDone && !graduated ? 'rgba(31,200,160,0.4)' : graduated ? 'rgba(0,200,255,0.3)' : '#1e3a5f'};">
-      <div class="admin-row-main">
-        <div class="admin-row-name">${enrolled}
-          ${graduated ? '<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;border:1px solid rgba(31,200,160,0.4);padding:2px 8px;margin-left:10px;letter-spacing:0.1em;">✓ GRADUATED</span>' : '<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#5a8aaa;padding:2px 8px;margin-left:6px;">CADET</span>'}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:20px;">
+      <div class="admin-stat"><div class="admin-stat-label">Total Cadets</div><div class="admin-stat-val">${total}</div></div>
+      <div class="admin-stat"><div class="admin-stat-label">Sign-Offs Given</div><div class="admin-stat-val" style="color:#1fc8a0;">${signedOff}</div></div>
+      <div class="admin-stat"><div class="admin-stat-label">Graduated</div><div class="admin-stat-val" style="color:#00c8ff;">${graduated}</div></div>
+    </div>
+    ${apps.map(a => {
+      const member = members.find(m => m.callsign === a.callsign);
+      const rank = member ? member.rank : 'Cadet';
+      const div = member ? (member.division || '—') : '—';
+      const sp = member ? (member.sp || 0) : 0;
+      const isGrad = member && member.rank !== 'Cadet';
+      const assignedTo = member ? (member.assignedInstructor || 'Unassigned') : 'Unassigned';
+      const signedOff = getAdminData('inst_signoff_' + a.callsign, false);
+      const note = getAdminData('inst_notes_' + a.callsign, '');
+      // Progress from stored member data or defaults
+      const checks = member && member.checks ? member.checks : [];
+      const mods = member && member.mods ? member.mods : [];
+      const pct = Math.round((checks.length / 9) * 100);
+      const allDone = checks.length >= 9 && mods.length >= 6;
+      const pc = allDone ? '#1fc8a0' : pct >= 50 ? '#00c8ff' : '#e84040';
+
+      return `<div class="admin-row" style="border-color:${isGrad?'rgba(0,200,255,0.3)':allDone?'rgba(31,200,160,0.3)':'#1e3a5f'};flex-direction:column;gap:0;margin-bottom:4px;">
+
+        <!-- Header row -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;width:100%;margin-bottom:12px;">
+          <div>
+            <div class="admin-row-name">${a.callsign}
+              <span style="font-size:10px;color:${isGrad?'#00c8ff':'#5a8aaa'};border:1px solid;padding:2px 8px;margin-left:8px;">${rank}</span>
+              ${isGrad?'<span style="font-size:10px;color:#00c8ff;margin-left:6px;">✓ GRADUATED</span>':''}
+              ${signedOff?'<span style="font-size:10px;color:#1fc8a0;margin-left:6px;">✓ SIGN-OFF GIVEN</span>':''}
+            </div>
+            <div class="admin-row-meta" style="margin-top:6px;line-height:2;">
+              <span style="color:#5a8aaa;">Discord:</span> <span style="color:#8ab8d8">${a.discord}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">RSI:</span> <span style="color:#8ab8d8">${a.rsi}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">Division:</span> <span style="color:#00c8ff">${div}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">SP:</span> <span style="color:#00c8ff">${sp}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">Instructor:</span> <span style="color:#8ab8d8">${assignedTo}</span>
+              &nbsp;·&nbsp; <span style="color:#5a8aaa;">Applied:</span> <span style="color:#5a8aaa">${a.date}</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
+            ${!isGrad && allDone ? `<button class="admin-btn-sm" onclick="graduateCadetByCallsign('${a.callsign}')" style="color:#1fc8a0;border-color:rgba(31,200,160,0.4);background:rgba(31,200,160,0.06);">⬡ Graduate</button>` : ''}
+            ${!isGrad && !allDone ? `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a6080;text-align:right;">Not yet<br>eligible</div>` : ''}
+          </div>
         </div>
-        <div class="admin-row-meta" style="margin-top:6px;">
-          Division: <span style="color:#00c8ff">${div}</span>
-          &nbsp;·&nbsp; Modules: <span style="color:${mods.length>=6?'#1fc8a0':'#8ab8d8'}">${mods.length}/6</span>
-          &nbsp;·&nbsp; Checklist: <span style="color:${checks.length>=9?'#1fc8a0':'#8ab8d8'}">${checks.length}/9</span>
-          &nbsp;·&nbsp; Progress: <span style="color:${progressColour}">${pct}%</span>
+
+        <!-- Progress row -->
+        <div style="background:#091220;border:1px solid #1e3a5f;padding:14px 16px;width:100%;margin-bottom:6px;">
+          <div style="display:flex;gap:24px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:11px;">
+            <span>Modules: <span style="color:${mods.length>=6?'#1fc8a0':'#8ab8d8'}">${mods.length}/6</span></span>
+            <span>Checklist: <span style="color:${checks.length>=9?'#1fc8a0':'#8ab8d8'}">${checks.length}/9</span></span>
+            <span>Live Op Sign-Off: <span style="color:${signedOff?'#1fc8a0':'#e84040'}">${signedOff?'✓ Done':'Pending'}</span></span>
+            <span>Overall: <span style="color:${pc}">${pct}%</span></span>
+          </div>
+          <div style="height:4px;background:#1e3a5f;">
+            <div style="height:100%;width:${pct}%;background:${pc};box-shadow:0 0 6px ${pc}66;transition:width 0.5s;"></div>
+          </div>
         </div>
-        <div class="admin-progress-bar-wrap" style="margin-top:10px;">
-          <div class="admin-progress-bar-fill" style="width:${pct}%;background:${progressColour};box-shadow:0 0 8px ${progressColour}44;"></div>
-        </div>
-        ${allDone && !graduated ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:#1fc8a0;letter-spacing:0.1em;margin-top:10px;">⬡ ALL STAGES COMPLETE — READY FOR GRADUATION</div>' : ''}
-        ${graduated ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-top:10px;">Promoted to Crew Member. Graduation logged.</div>' : ''}
-      </div>
-      <div class="admin-row-actions" style="align-self:center;">
-        ${!graduated && allDone ? `<button class="admin-btn-sm" onclick="graduateCadet()" style="color:#1fc8a0;border-color:rgba(31,200,160,0.4);background:rgba(31,200,160,0.08);font-size:11px;padding:8px 16px;">⬡ Graduate</button>` : ''}
-        ${!graduated && !allDone ? `<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#3a6080;letter-spacing:0.08em;text-align:right;">Not yet<br>eligible</div>` : ''}
-      </div>
-    </div>`;
+
+        <!-- Exam answers -->
+        ${a.answers ? `<div style="background:#091220;border:1px solid #1e3a5f;padding:14px 16px;width:100%;margin-bottom:6px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;">Exam Answers</div>
+          ${a.answers.map((ans,qi)=>`<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid #1a2d50;align-items:flex-start;">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6080;min-width:26px;padding-top:2px;">Q${qi+1}</div>
+            <div><div style="font-size:11px;color:#5a8aaa;margin-bottom:2px;">${ans.q}</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${['B','B','D','C','B'][qi]===ans.answer?'#1fc8a0':'#e84040'};">${ans.answer} — ${ans.text}</div></div>
+          </div>`).join('')}
+        </div>` : ''}
+
+        <!-- Instructor note -->
+        ${note ? `<div style="background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:12px 16px;width:100;font-size:13px;color:#8ab8d8;"><span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.15em;color:#3a6080;text-transform:uppercase;display:block;margin-bottom:6px;">Instructor Note</span>${note}</div>` : ''}
+
+      </div>`;
+    }).join('')}`;
 }
 
-function graduateCadet() {
-  const callsign = localStorage.getItem('ram_callsign');
-  if (!callsign) return;
-  
-  // Mark graduated in localStorage
-  localStorage.setItem('ram_graduated', 'true');
-
-  // Also promote in the members roster if they exist there
+function graduateCadetByCallsign(callsign) {
   const members = getAdminData('members', []);
   const idx = members.findIndex(m => m.callsign === callsign);
   if (idx !== -1) {
-    members[idx].rank = 'Crew Member';
+    members[idx].rank = 'Private';
     setAdminData('members', members);
   } else {
-    // Add them to the roster as Crew Member if not already there
-    const div = localStorage.getItem('ram_div') || 'UNASSIGNED';
-    members.push({ callsign, rank: 'Crew Member', division: div, sp: 5 });
+    const apps = getAdminData('applications', []);
+    const app = apps.find(a => a.callsign === callsign);
+    members.push({ callsign, rank: 'Private', division: app ? app.div || 'UNASSIGNED' : 'UNASSIGNED', sp: 5 });
     setAdminData('members', members);
   }
-
-  // Re-render both panels
+  // If this is the active session mark graduated
+  if (localStorage.getItem('ram_callsign') === callsign) {
+    localStorage.setItem('ram_graduated', 'true');
+  }
   renderAdminAcademy();
   renderAdminMembers();
-
-  // Show confirmation
-  alert('✓ ' + callsign + ' has been graduated and promoted to Crew Member. Post their graduation in #academy-graduation-log on Discord.');
+  alert('✓ ' + callsign + ' graduated and promoted to Private. Post in #academy-graduation-log on Discord.');
 }
 
 
@@ -2212,6 +2425,11 @@ function initAcademy() {
   // Restore callsign display
   const cs = localStorage.getItem('ram_callsign');
   if (cs) updateCallsignDisplay(cs);
+  // Show instructor button if flagged as instructor
+  if (isInstructor()) {
+    const btn = document.getElementById('inst-panel-btn');
+    if (btn) btn.style.display = 'inline-block';
+  }
 }
 </script>
 
@@ -2365,6 +2583,7 @@ function initAcademy() {
     <div id="acad-callsign-display" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#5a8aaa;text-transform:uppercase;"></div>
     <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;transition:color 0.2s;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
     <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.15em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:4px 12px;text-transform:uppercase;">Cadet Portal</div>
+    <button id="inst-panel-btn" onclick="goToInstructor()" style="display:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.12em;color:#04070f;background:#00c8ff;border:none;padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">⬡ Instructor Panel</button>
     <a href="https://discord.gg/Xhaj3nRAEp" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:6px 14px;text-decoration:none;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='#00c8ff';this.style.color='#04070f'" onmouseout="this.style.background='transparent';this.style.color='#00c8ff'">Discord</a>
   </div>
 </nav>
@@ -2850,9 +3069,15 @@ function initAcademy() {
     </div>
     <button class="admin-submit" onclick="addMember()">Add Member</button>
   </div>
+  <div class="admin-form" style="margin-top:12px;">
+    <div class="admin-form-title">// Assign Cadet to Instructor</div>
+    <div class="admin-form-grid">
+      <select class="admin-select" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
+      <select class="admin-select" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
+    </div>
+    <button class="admin-submit" onclick="assignCadetToInstructor()">Assign</button>
+  </div>
 </div>
-
-<!-- ── EVENTS ── -->
 <div class="admin-panel" id="admin-panel-events">
   <div class="admin-section-label">Operations</div>
   <div class="admin-panel-title">Event Management</div>
@@ -2935,6 +3160,80 @@ function initAcademy() {
 </div>
 
 </div><!-- /page-admin -->
+
+<!-- ══ INSTRUCTOR PANEL PAGE ══ -->
+<div id="page-instructor" style="display:none;">
+
+<style>
+.inst-panel { display:none; padding:48px 68px; border-bottom:1px solid rgba(0,200,255,0.1); }
+.inst-panel.active { display:block; animation:acadIn 0.3s ease both; }
+.inst-tab { display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,200,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%; }
+.inst-tab:hover { color:#8ab8d8;background:rgba(0,100,200,0.06); }
+.inst-tab.active { color:#00c8ff;border-bottom-color:#00c8ff; }
+.inst-tab-dot { width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0; }
+.inst-tab.active .inst-tab-dot { background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7); }
+.inst-cadet-row { background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:2px;transition:border-color 0.2s; }
+.inst-cadet-row:hover { border-color:rgba(0,200,255,0.25); }
+.inst-cadet-name { font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px; }
+.inst-cadet-meta { font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;margin-bottom:10px; }
+.inst-progress-bar { height:3px;background:#1e3a5f;margin-bottom:10px; }
+.inst-progress-fill { height:100%;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.4);transition:width 0.5s; }
+.inst-signoff-btn { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:7px 18px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:background 0.2s; }
+.inst-signoff-btn:hover { background:#40e8c0; }
+.inst-signoff-done { font-family:'Share Tech Mono',monospace;font-size:10px;color:#1fc8a0;letter-spacing:0.08em; }
+.inst-note-input { width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;transition:border-color 0.2s; }
+.inst-note-input:focus { border-color:rgba(0,200,255,0.3); }
+.inst-note-save { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:6px 14px;cursor:pointer;margin-top:6px;transition:all 0.2s; }
+.inst-note-save:hover { background:rgba(0,200,255,0.15); }
+.inst-empty { font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase; }
+</style>
+
+<!-- Instructor Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,200,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/><polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/><circle cx="16" cy="16" r="2.5" fill="#00c8ff"/></svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Instructor Panel</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div id="inst-callsign-nav" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;"></div>
+    <button onclick="goToAcademy()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Academy</button>
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5a8aaa;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">Main Site</button>
+  </div>
+</nav>
+
+<!-- Instructor Header -->
+<div style="padding:100px 68px 48px;background:#060c18;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;"><span style="display:block;width:32px;height:1px;background:#00c8ff;"></span>Second Fleet Academy</div>
+  <h1 id="inst-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 30px rgba(0,200,255,0.2);">Instructor<br><em style="font-style:normal;color:#00c8ff;">Command</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Your assigned cadets, their progress, and your sign-off tools. Only you can mark Live Ops Qualifications complete.</p>
+</div>
+
+<!-- Instructor Tab Bar -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="inst-tab active" onclick="showInstPanel('cadets')"><span class="inst-tab-dot"></span>My Cadets</button>
+  <button class="inst-tab" onclick="showInstPanel('roster')"><span class="inst-tab-dot"></span>Class Roster</button>
+</div>
+
+<!-- PANEL: MY CADETS -->
+<div class="inst-panel active" id="inst-panel-cadets">
+  <div class="acad-panel-tag">Assigned Cadets</div>
+  <div class="acad-panel-title">My Cadets</div>
+  <p class="acad-panel-sub">Cadets the Admiral has assigned to you. Track their progress and give your Live Ops Qualification sign-off when they complete their first live op with you.</p>
+  <div id="inst-cadet-list"></div>
+</div>
+
+<!-- PANEL: CLASS ROSTER -->
+<div class="inst-panel" id="inst-panel-roster">
+  <div class="acad-panel-tag">Overview</div>
+  <div class="acad-panel-title">Class Roster</div>
+  <p class="acad-panel-sub">All cadets currently enrolled in the Academy. View-only — contact the Admiral to reassign cadets.</p>
+  <div id="inst-roster-list"></div>
+</div>
+
+</div><!-- /page-instructor -->
 
 </body>
 </html>
