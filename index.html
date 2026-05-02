@@ -1517,22 +1517,43 @@ function renderAdminApplications() {
   if (!el) return;
   const apps = getAdminData('applications', []);
   if (!apps.length) { el.innerHTML = '<div class="admin-empty">No applications yet.</div>'; return; }
-  el.innerHTML = apps.map((a, i) => `
-    <div class="admin-row" style="border-color:${a.status==='Approved'?'rgba(31,200,160,0.3)':a.status==='Rejected'?'rgba(232,64,64,0.2)':'#1e3a5f'}">
-      <div class="admin-row-main">
-        <div class="admin-row-name">${a.callsign} <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${a.status==='Approved'?'#1fc8a0':a.status==='Rejected'?'#e84040':'#00c8ff'};border:1px solid;padding:2px 8px;margin-left:8px;">${a.status}</span>${a.examPassed?'<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;margin-left:6px;">✓ EXAM PASSED</span>':''}</div>
-        <div class="admin-row-meta" style="margin-top:6px;">
-          Discord: <span style="color:#8ab8d8">${a.discord}</span>
-          &nbsp;·&nbsp; RSI: <span style="color:#8ab8d8">${a.rsi}</span>
-          &nbsp;·&nbsp; Applied: ${a.date}
+  el.innerHTML = apps.map((a, i) => {
+    const statusColor = a.status==='Approved'?'#1fc8a0':a.status==='Rejected'?'#e84040':'#00c8ff';
+    const borderColor = a.status==='Approved'?'rgba(31,200,160,0.3)':a.status==='Rejected'?'rgba(232,64,64,0.2)':'#1e3a5f';
+    const answersHTML = a.answers ? a.answers.map((ans, qi) => `
+      <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #1e3a5f;align-items:flex-start;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6080;letter-spacing:0.1em;min-width:28px;padding-top:2px;">Q${qi+1}</div>
+        <div>
+          <div style="font-size:11px;color:#5a8aaa;margin-bottom:3px;line-height:1.4;">${ans.q}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${ans.answer==='B'&&qi===0||ans.answer==='B'&&qi===1||ans.answer==='D'&&qi===2||ans.answer==='C'&&qi===3||ans.answer==='B'&&qi===4?'#1fc8a0':'#e84040'};letter-spacing:0.05em;">${ans.answer} — ${ans.text}</div>
+        </div>
+      </div>`).join('') : '<div style="font-size:12px;color:#3a6080;padding:8px 0;">Exam not yet completed.</div>';
+
+    return `<div class="admin-row" style="border-color:${borderColor};flex-direction:column;gap:0;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;width:100%;margin-bottom:14px;">
+        <div>
+          <div class="admin-row-name">${a.callsign}
+            <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:${statusColor};border:1px solid ${statusColor};padding:2px 8px;margin-left:8px;">${a.status}</span>
+            ${a.examPassed?'<span style="color:#1fc8a0;font-size:10px;margin-left:6px;font-weight:500;">✓ EXAM PASSED</span>':'<span style="color:#e84040;font-size:10px;margin-left:6px;">✗ EXAM NOT PASSED</span>'}
+          </div>
+          <div class="admin-row-meta" style="margin-top:6px;">
+            Discord: <span style="color:#8ab8d8">${a.discord}</span>
+            &nbsp;·&nbsp; RSI: <span style="color:#8ab8d8">${a.rsi}</span>
+            &nbsp;·&nbsp; Applied: ${a.date}
+          </div>
+        </div>
+        <div class="admin-row-actions" style="flex-shrink:0;">
+          ${a.status==='Pending'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button><button class="admin-btn-sm admin-btn-danger" onclick="rejectApplication(${i})">Reject</button>`:''}
+          ${a.status==='Approved'?'<span style="color:#1fc8a0;font-size:10px;">Approved ✓</span>':''}
+          ${a.status==='Rejected'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button><button class="admin-btn-sm admin-btn-danger" onclick="rejectApplication(${i})">Reject</button>`:''}
         </div>
       </div>
-      <div class="admin-row-actions">
-        ${a.status==='Pending'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button><button class="admin-btn-sm admin-btn-danger" onclick="rejectApplication(${i})">Reject</button>`:''}
-        ${a.status==='Approved'?'<span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#1fc8a0;">Approved ✓</span>':''}
-        ${a.status==='Rejected'?`<button class="admin-btn-sm" onclick="approveApplication(${i})" style="color:#1fc8a0;border-color:rgba(31,200,160,0.3);">Approve</button>`:''}
+      <div style="background:#091220;border:1px solid #1e3a5f;padding:14px 16px;width:100%;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#3a6080;text-transform:uppercase;margin-bottom:10px;">Exam Answers</div>
+        ${answersHTML}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function approveApplication(i) {
@@ -1920,11 +1941,35 @@ function submitExam() {
     return;
   }
 
-  // Passed — update application
+  // Passed — save answers and update application
   const callsign = localStorage.getItem('ram_callsign');
   const apps = getAdminData('applications', []);
   const idx = apps.findIndex(a => a.callsign === callsign);
-  if (idx !== -1) apps[idx].examPassed = true;
+
+  const qLabels = ['Q1','Q2','Q3','Q4','Q5'];
+  const qTexts = [
+    'What is Star Citizen?',
+    'What do you plan to contribute to RAM Space Industries?',
+    'Which division handles healing, rescue, and medical gameplay?',
+    'If you have a dispute with another member, what should you do?',
+    'What is most important to remember when on a live fleet op?'
+  ];
+  const optTexts = {
+    q1: {A:'A fantasy RPG', B:'A space simulation MMO by Cloud Imperium Games', C:'A first person shooter', D:'A strategy game'},
+    q2: {A:'Nothing, just joining for fun', B:'Active participation in ops, events, and org activities', C:"I haven't decided yet", D:"Just to see what it's like"},
+    q3: {A:'CORE', B:'HAUL', C:'HORIZON', D:'PULSE'},
+    q4: {A:'Handle it yourself in game', B:'Leave the org', C:'Bring it to a Lieutenant or above', D:'Post about it publicly'},
+    q5: {A:'Do whatever you want', B:"Follow your Captain's orders and keep voice comms clear", C:'Talk as much as possible', D:'Only listen to people you know'}
+  };
+  const savedAnswers = [];
+  for (let i = 1; i <= 5; i++) {
+    const sel = document.querySelector('input[name="q' + i + '"]:checked');
+    const key = 'q' + i;
+    const val = sel ? sel.value : '—';
+    savedAnswers.push({ q: qTexts[i-1], answer: val, text: optTexts[key][val] || '—' });
+  }
+
+  if (idx !== -1) { apps[idx].examPassed = true; apps[idx].answers = savedAnswers; }
   setAdminData('applications', apps);
 
   // Move to pending screen
