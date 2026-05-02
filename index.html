@@ -1030,6 +1030,7 @@ footer {
         <!-- Signed in state -->
         <div id="rsi-dropdown-member" style="display:none;padding:10px 6px;">
           <button onclick="goToAcademy();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Academy Portal</button>
+          <button id="rsi-drop-admin" onclick="goToAdmin();toggleRsiDropdown()" class="rsi-drop-btn" style="display:none;color:#e84040;">⬡ Admin Panel</button>
           <button id="rsi-drop-instructor" onclick="goToInstructor();toggleRsiDropdown()" class="rsi-drop-btn" style="display:none;">★ Instructor Panel</button>
           <div style="height:1px;background:rgba(0,200,255,0.1);margin:6px 0;"></div>
           <button onclick="signOutMember();toggleRsiDropdown()" class="rsi-drop-btn" style="color:var(--text3);">← Sign Out</button>
@@ -1635,6 +1636,8 @@ function updateRsiDropdown() {
     if (guest) guest.style.display = 'none';
     if (member) member.style.display = 'block';
     if (instBtn) instBtn.style.display = isInstructor() ? 'block' : 'none';
+    const adminBtn = document.getElementById('rsi-drop-admin');
+    if (adminBtn) adminBtn.style.display = callsign === ADMIN_CALLSIGN ? 'block' : 'none';
   } else if (callsign) {
     if (label) label.textContent = callsign;
     if (cs) cs.textContent = callsign;
@@ -2514,10 +2517,19 @@ function updateCallsignDisplay(callsign) {
 
 // ════════════════════════════════════════
 // ── ADMIN BUTTON — only shown for CaptainRam ──
+// console shortcut: type openAdmin() to open admin panel directly
+window.openAdmin = openAdminPanel;
+
 function checkAdminButton() {
   const callsign = localStorage.getItem('ram_callsign');
   const wrap = document.getElementById('admin-nav-btn-wrap');
-  if (wrap) wrap.style.display = callsign === ADMIN_CALLSIGN ? 'list-item' : 'none';
+  if (!wrap) return;
+  if (callsign === ADMIN_CALLSIGN) {
+    wrap.style.display = 'list-item';
+    wrap.style.visibility = 'visible';
+  } else {
+    wrap.style.display = 'none';
+  }
 }
 
 // ── ONE-TIME ADMIN ACCOUNT SETUP ──
@@ -2573,8 +2585,12 @@ window.setupAdminAccount = async function() {
   }
 };
 
-// Check admin button visibility on load
-checkAdminButton();
+// Check admin button visibility once DOM is ready
+document.addEventListener("DOMContentLoaded", function() {
+  checkAdminButton();
+  // Also expose openAdminPanel directly for console debugging
+  window.openAdmin = openAdminPanel;
+});
 
 // MAIN SITE — scroll reveal + connector
 // ════════════════════════════════════════
