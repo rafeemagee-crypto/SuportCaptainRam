@@ -1965,168 +1965,168 @@ footer {
 </div>
 
 <!-- ══ ADMIN PAGE ══ -->
-<div id="page-admin" style="display:none;min-height:100vh;background:#04070f;position:relative;z-index:1;">
+<div id="page-admin" style="display:none;background:#04070f;min-height:100vh;">
 
 <!-- Admin Nav -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);box-shadow:0 1px 30px rgba(120,0,0,0.15);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
   <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/>
-      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#e84040" stroke-width="0.8" fill="rgba(232,64,64,0.06)"/>
-      <circle cx="16" cy="16" r="2.5" fill="#e84040"/>
-    </svg>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Admiral Command</div>
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="2.5" fill="#e84040"/></svg>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;">Admiral Command</span>
   </div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#e84040'" onmouseout="this.style.color='#8ab8d8'">← Main Site</button>
-    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,64,64,0.1)'" onmouseout="this.style.background='none'">Logout</button>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;">← Main Site</button>
+    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;">Logout</button>
   </div>
 </nav>
 
 <!-- Admin Header -->
-<div style="padding:100px 72px 48px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;overflow:hidden;">
+<div style="padding:90px 60px 40px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e84040,transparent);opacity:0.3;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;">
-    <span style="display:block;width:32px;height:1px;background:#e84040;"></span>Admiral Command Panel
-  </div>
-  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,72px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 40px rgba(232,64,64,0.2);">Command<br><em style="font-style:normal;color:#e84040;">Centre</em></h1>
-  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, events, instructors, announcements, and academy progress. All changes save locally to this browser.</p>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:12px;position:relative;">Admiral Command Panel</div>
+  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:10px;position:relative;">Command <em style="font-style:normal;color:#e84040;">Centre</em></h1>
+  <p style="font-size:14px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, applications, events, instructors, announcements, academy progress.</p>
 </div>
 
-<!-- Admin Tab Bar -->
-<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
-  <button class="admin-tab active" onclick="showAdminTab('members')"><span class="admin-tab-dot"></span>Members</button>
-  <button class="admin-tab" onclick="showAdminTab('applications')"><span class="admin-tab-dot"></span>Applications</button>
-  <button class="admin-tab" onclick="showAdminTab('events')"><span class="admin-tab-dot"></span>Events</button>
-  <button class="admin-tab" onclick="showAdminTab('instructors')"><span class="admin-tab-dot"></span>Instructors</button>
-  <button class="admin-tab" onclick="showAdminTab('announcements')"><span class="admin-tab-dot"></span>Announcements</button>
-  <button class="admin-tab" onclick="showAdminTab('academy')"><span class="admin-tab-dot"></span>Academy Progress</button>
+<!-- Admin Tabs -->
+<div id="admin-tabs" style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;height:52px;overflow-x:auto;">
+  <button onclick="showAdminTab('members')"      style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#e84040;border:none;border-bottom:2px solid #e84040;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-members">Members</button>
+  <button onclick="showAdminTab('applications')" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-applications">Applications</button>
+  <button onclick="showAdminTab('events')"       style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-events">Events</button>
+  <button onclick="showAdminTab('instructors')"  style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-instructors">Instructors</button>
+  <button onclick="showAdminTab('announcements')" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-announcements">Announcements</button>
+  <button onclick="showAdminTab('academy')"      style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-academy">Academy Progress</button>
 </div>
 
-<!-- ── APPLICATIONS ── -->
-<div class="admin-panel" id="admin-panel-applications" style="padding-top:110px;">
-  <div class="admin-section-label">Enrollment</div>
-  <div class="admin-panel-title">Applications</div>
-  <p class="admin-panel-sub">Review enrollment applications from new cadets. Verify their Discord and RSI membership before approving. Approving adds them to the member roster and grants them Academy access.</p>
-  <div id="admin-application-list"></div>
-</div>
+<!-- Admin Content Wrapper -->
+<div id="admin-content" style="padding:40px 60px;min-height:calc(100vh - 200px);">
 
-<!-- ── MEMBERS ── -->
-<div class="admin-panel active" id="admin-panel-members" style="padding-top:110px;">
-  <div class="admin-section-label">Roster</div>
-  <div class="admin-panel-title">Member Management</div>
-  <p class="admin-panel-sub">View all members, promote ranks, and award Standing Points. All changes save locally.</p>
-  <div id="admin-member-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Add New Member</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-callsign" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
-      <select class="admin-select" id="new-division">
-        <option value="VANGUARD">VANGUARD — Combat &amp; Security</option>
-        <option value="CLAIM">CLAIM — Collection</option>
-        <option value="PULSE">PULSE — Medical</option>
-        <option value="HAUL">HAUL — Logistics</option>
-        <option value="CORE">CORE — Engineering</option>
-        <option value="HORIZON">HORIZON — Exploration</option>
-        <option value="SHADE">SHADE — Covert (Admin only)</option>
-        <option value="COMMAND">COMMAND</option>
-      </select>
+  <!-- MEMBERS -->
+  <div id="admin-panel-members" style="display:block;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Roster</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Member Management</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">View all members, promote ranks, and award Standing Points.</p>
+    <div id="admin-member-list"></div>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Add New Member</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <input id="new-callsign" class="admin-input" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
+        <select id="new-division" class="admin-select">
+          <option value="VANGUARD">VANGUARD — Combat &amp; Security</option>
+          <option value="CLAIM">CLAIM — Collection</option>
+          <option value="PULSE">PULSE — Medical</option>
+          <option value="HAUL">HAUL — Logistics</option>
+          <option value="CORE">CORE — Engineering</option>
+          <option value="HORIZON">HORIZON — Exploration</option>
+          <option value="SHADE">SHADE — Covert</option>
+          <option value="COMMAND">COMMAND</option>
+        </select>
+      </div>
+      <button onclick="addMember()" class="admin-submit">Add Member</button>
     </div>
-    <button class="admin-submit" onclick="addMember()">Add Member</button>
-  </div>
-  <div class="admin-form" style="margin-top:12px;">
-    <div class="admin-form-title">// Assign Cadet to Instructor</div>
-    <div class="admin-form-grid">
-      <select class="admin-select" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
-      <select class="admin-select" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:10px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Assign Cadet to Instructor</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <select id="assign-cadet-select" class="admin-select"><option value="">— Select Cadet —</option></select>
+        <select id="assign-instructor-select" class="admin-select"><option value="">— Select Instructor —</option></select>
+      </div>
+      <button onclick="assignCadetToInstructor()" class="admin-submit">Assign</button>
     </div>
-    <button class="admin-submit" onclick="assignCadetToInstructor()">Assign</button>
   </div>
-</div>
-<div class="admin-panel" id="admin-panel-events">
-  <div class="admin-section-label">Operations</div>
-  <div class="admin-panel-title">Event Management</div>
-  <p class="admin-panel-sub">Schedule fleet ops, division ops, and casual nights. Track status from Scheduled → Live → Complete.</p>
-  <div id="admin-event-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Schedule New Event</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-event-name" placeholder="Event name" style="grid-column:1/-1;">
-      <select class="admin-select" id="new-event-type">
-        <option value="Fleet Op">Fleet Op — Saturday</option>
-        <option value="Division Op">Division Op — Wednesday</option>
-        <option value="Casual Night">Casual Night — Monday</option>
-        <option value="Org Meeting">Org Meeting — Monthly</option>
-        <option value="Special Op">Special Op</option>
-      </select>
-      <input class="admin-input" id="new-event-date" type="date">
+
+  <!-- APPLICATIONS -->
+  <div id="admin-panel-applications" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Enrollment</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Applications</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Review enrollment applications. Verify Discord and RSI membership before approving.</p>
+    <div id="admin-application-list"></div>
+  </div>
+
+  <!-- EVENTS -->
+  <div id="admin-panel-events" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Operations</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Event Management</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Schedule fleet ops, division ops, and casual nights.</p>
+    <div id="admin-event-list"></div>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Schedule New Event</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <input id="new-event-name" class="admin-input" placeholder="Event name" style="grid-column:1/-1;">
+        <select id="new-event-type" class="admin-select">
+          <option value="Fleet Op">Fleet Op</option>
+          <option value="Division Op">Division Op</option>
+          <option value="Casual Night">Casual Night</option>
+          <option value="Org Meeting">Org Meeting</option>
+          <option value="Special Op">Special Op</option>
+        </select>
+        <input id="new-event-date" class="admin-input" type="date">
+      </div>
+      <textarea id="new-event-notes" class="admin-textarea" placeholder="Briefing notes (optional)..." style="margin-bottom:12px;"></textarea>
+      <button onclick="addEvent()" class="admin-submit">Schedule Event</button>
     </div>
-    <textarea class="admin-textarea" id="new-event-notes" placeholder="Briefing notes (optional)..." style="margin-bottom:14px;"></textarea>
-    <button class="admin-submit" onclick="addEvent()">Schedule Event</button>
   </div>
-</div>
 
-<!-- ── INSTRUCTORS ── -->
-<div class="admin-panel" id="admin-panel-instructors">
-  <div class="admin-section-label">Faculty</div>
-  <div class="admin-panel-title">Instructor Management</div>
-  <p class="admin-panel-sub">Add and manage Academy instructors. Logging a session awards their Standing Points automatically. 5 sessions unlocks a Commendation.</p>
-  <div id="admin-instructor-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Add New Instructor</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-instructor-name" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
-      <input class="admin-input" id="new-instructor-role" placeholder="Role / title">
-      <select class="admin-select" id="new-instructor-div">
-        <option value="SHIELD">SHIELD</option>
-        <option value="HAUL">HAUL</option>
-        <option value="SCOUT">SCOUT</option>
-        <option value="FORGE">FORGE</option>
-        <option value="COMMAND">COMMAND</option>
-      </select>
+  <!-- INSTRUCTORS -->
+  <div id="admin-panel-instructors" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Faculty</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Instructor Management</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Add instructors, log sessions, track commendations. 5 sessions = Commendation.</p>
+    <div id="admin-instructor-list"></div>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Add New Instructor</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        <input id="new-instructor-name" class="admin-input" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
+        <input id="new-instructor-role" class="admin-input" placeholder="Role / title">
+        <select id="new-instructor-div" class="admin-select">
+          <option value="VANGUARD">VANGUARD</option>
+          <option value="CLAIM">CLAIM</option>
+          <option value="PULSE">PULSE</option>
+          <option value="HAUL">HAUL</option>
+          <option value="CORE">CORE</option>
+          <option value="HORIZON">HORIZON</option>
+          <option value="COMMAND">COMMAND</option>
+        </select>
+      </div>
+      <button onclick="addInstructor()" class="admin-submit">Add Instructor</button>
     </div>
-    <button class="admin-submit" onclick="addInstructor()">Add Instructor</button>
   </div>
-</div>
 
-<!-- ── ANNOUNCEMENTS ── -->
-<div class="admin-panel" id="admin-panel-announcements">
-  <div class="admin-section-label">Comms</div>
-  <div class="admin-panel-title">Announcements</div>
-  <p class="admin-panel-sub">Post org-wide announcements. These will display on the main site news feed when that feature goes live.</p>
-  <div id="admin-announcement-list"></div>
-  <div class="admin-form">
-    <div class="admin-form-title">// Post New Announcement</div>
-    <div class="admin-form-grid">
-      <input class="admin-input" id="new-ann-title" placeholder="Announcement title" style="grid-column:1/-1;">
-      <select class="admin-select" id="new-ann-type">
-        <option value="GENERAL">General</option>
-        <option value="OP">Fleet Op</option>
-        <option value="URGENT">Urgent</option>
-        <option value="ACADEMY">Academy</option>
-      </select>
+  <!-- ANNOUNCEMENTS -->
+  <div id="admin-panel-announcements" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Comms</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Announcements</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Post org-wide announcements for the fleet.</p>
+    <div id="admin-announcement-list"></div>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Post New Announcement</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <input id="new-ann-title" class="admin-input" placeholder="Announcement title" style="grid-column:1/-1;">
+        <select id="new-ann-type" class="admin-select">
+          <option value="GENERAL">General</option>
+          <option value="OP">Fleet Op</option>
+          <option value="URGENT">Urgent</option>
+          <option value="ACADEMY">Academy</option>
+        </select>
+      </div>
+      <textarea id="new-ann-body" class="admin-textarea" placeholder="Announcement body..." style="margin-bottom:12px;"></textarea>
+      <button onclick="addAnnouncement()" class="admin-submit">Post Announcement</button>
     </div>
-    <textarea class="admin-textarea" id="new-ann-body" placeholder="Announcement body..." style="margin-bottom:14px;"></textarea>
-    <button class="admin-submit" onclick="addAnnouncement()">Post Announcement</button>
   </div>
-</div>
 
-<!-- ── ACADEMY PROGRESS ── -->
-<div class="admin-panel" id="admin-panel-academy">
-  <div class="admin-section-label">Intel</div>
-  <div class="admin-panel-title">Academy Progress</div>
-  <p class="admin-panel-sub">View enrolled cadets and track their progress through the orientation pipeline in real time.</p>
-  <div id="admin-academy-list"></div>
-  <div class="admin-form" style="margin-top:16px;">
-    <div class="admin-form-title">// Remove Cadet from Firestore</div>
-    <p style="font-size:13px;color:#8ab8d8;margin-bottom:14px;">Permanently removes a cadet account from Firestore and all local data. Use this to clear test profiles or remove a member completely.</p>
-    <input class="admin-input" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
-    <button class="admin-submit" onclick="clearCadetSession()" style="background:#3a6080;box-shadow:none;">Remove Cadet</button>
+  <!-- ACADEMY PROGRESS -->
+  <div id="admin-panel-academy" style="display:none;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Intel</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Academy Progress</div>
+    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Track all enrolled cadets, their exam answers, progress, and graduate them when ready.</p>
+    <div id="admin-academy-list"></div>
+    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Remove Cadet from Firestore</div>
+      <input id="clear-callsign-input" class="admin-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="width:100%;margin-bottom:10px;">
+      <button onclick="clearCadetSession()" class="admin-submit" style="background:#3a6080;">Remove Cadet</button>
+    </div>
   </div>
-</div>
 
+</div><!-- /admin-content -->
 </div><!-- /page-admin -->
 
 <!-- ══ INSTRUCTOR PANEL PAGE ══ -->
@@ -2631,18 +2631,15 @@ function adminLogout() {
 }
 
 function showAdminTab(id) {
-  document.querySelectorAll('.admin-panel').forEach(p => {
-    p.classList.remove('active');
-    p.style.display = 'none';
-  });
-  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
-  const panel = document.getElementById('admin-panel-' + id);
-  if (panel) {
-    panel.classList.add('active');
-    panel.style.display = 'block';
-  }
-  document.querySelectorAll('.admin-tab').forEach(b => {
-    if (b.getAttribute('onclick') === "showAdminTab('" + id + "')") b.classList.add('active');
+  const panels = ['members','applications','events','instructors','announcements','academy'];
+  panels.forEach(p => {
+    const el = document.getElementById('admin-panel-' + p);
+    const tab = document.getElementById('atab-' + p);
+    if (el) el.style.display = p === id ? 'block' : 'none';
+    if (tab) {
+      tab.style.color = p === id ? '#e84040' : '#5a8aaa';
+      tab.style.borderBottom = p === id ? '2px solid #e84040' : '2px solid transparent';
+    }
   });
 }
 
