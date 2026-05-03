@@ -973,9 +973,6 @@ footer {
 }
 </style>
   <!-- Firebase compat SDKs — must load before main script -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 .admin-tab{display:flex;align-items:center;gap:9px;padding:0 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(232,64,64,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%;}
 .admin-tab:hover{color:#8ab8d8;background:rgba(232,64,64,0.05);}
@@ -1966,8 +1963,7 @@ footer {
 
 <!-- ══ ADMIN PAGE ══ -->
 <div id="page-admin" style="display:none;background:#04070f;min-height:100vh;">
-
-<!-- Admin Nav -->
+<div id="admin-test" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#e84040;z-index:99999;display:flex;align-items:center;justify-content:center;font-size:40px;color:white;font-family:sans-serif;">ADMIN PANEL LOADED</div>
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
   <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
     <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="2.5" fill="#e84040"/></svg>
@@ -2203,6 +2199,11 @@ footer {
 
 </div><!-- /page-instructor -->
 
+
+<!-- Firebase compat SDKs — loaded immediately before main script -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
 // ════════════════════════════════════════
