@@ -1668,6 +1668,8 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <button onclick="goToMain()" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">← Return to Main Site</button>
   </div>
 
+</div>
+
 <!-- ══ ACADEMY NAV ══ -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,180,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
   <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
@@ -2053,6 +2055,84 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
   </div>
 </div>
 
+
+<!-- ══ INSTRUCTOR PANEL PAGE ══ -->
+<div id="page-instructor" style="display:none;">
+
+<style>
+.inst-panel { display:none; padding:48px 68px; border-bottom:1px solid rgba(0,200,255,0.1); }
+.inst-panel.active { display:block; animation:acadIn 0.3s ease both; }
+.inst-tab { display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,200,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%; }
+.inst-tab:hover { color:#8ab8d8;background:rgba(0,100,200,0.06); }
+.inst-tab.active { color:#00c8ff;border-bottom-color:#00c8ff; }
+.inst-tab-dot { width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0; }
+.inst-tab.active .inst-tab-dot { background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7); }
+.inst-cadet-row { background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:2px;transition:border-color 0.2s; }
+.inst-cadet-row:hover { border-color:rgba(0,200,255,0.25); }
+.inst-cadet-name { font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px; }
+.inst-cadet-meta { font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;margin-bottom:10px; }
+.inst-progress-bar { height:3px;background:#1e3a5f;margin-bottom:10px; }
+.inst-progress-fill { height:100%;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.4);transition:width 0.5s; }
+.inst-signoff-btn { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:7px 18px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:background 0.2s; }
+.inst-signoff-btn:hover { background:#40e8c0; }
+.inst-signoff-done { font-family:'Share Tech Mono',monospace;font-size:10px;color:#1fc8a0;letter-spacing:0.08em; }
+.inst-note-input { width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;transition:border-color 0.2s; }
+.inst-note-input:focus { border-color:rgba(0,200,255,0.3); }
+.inst-note-save { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:6px 14px;cursor:pointer;margin-top:6px;transition:all 0.2s; }
+.inst-note-save:hover { background:rgba(0,200,255,0.15); }
+.inst-empty { font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase; }
+</style>
+
+<!-- Instructor Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,200,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
+  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/><polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/><circle cx="16" cy="16" r="2.5" fill="#00c8ff"/></svg>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Instructor Panel</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div id="inst-callsign-nav" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;"></div>
+    <button onclick="goToAcademy()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Academy</button>
+    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5a8aaa;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">Main Site</button>
+  </div>
+</nav>
+
+<!-- Instructor Header -->
+<div style="padding:100px 68px 48px;background:#060c18;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;"><span style="display:block;width:32px;height:1px;background:#00c8ff;"></span>Second Fleet Academy</div>
+  <h1 id="inst-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 30px rgba(0,200,255,0.2);">Instructor<br><em style="font-style:normal;color:#00c8ff;">Command</em></h1>
+  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Your assigned cadets, their progress, and your sign-off tools. Only you can mark Live Ops Qualifications complete.</p>
+</div>
+
+<!-- Instructor Tab Bar -->
+<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
+  <button class="inst-tab active" onclick="showInstPanel('cadets')"><span class="inst-tab-dot"></span>My Cadets</button>
+  <button class="inst-tab" onclick="showInstPanel('roster')"><span class="inst-tab-dot"></span>Class Roster</button>
+</div>
+
+<!-- PANEL: MY CADETS -->
+<div class="inst-panel active" id="inst-panel-cadets">
+  <div class="acad-panel-tag">Assigned Cadets</div>
+  <div class="acad-panel-title">My Cadets</div>
+  <p class="acad-panel-sub">Cadets the Admiral has assigned to you. Track their progress and give your Live Ops Qualification sign-off when they complete their first live op with you.</p>
+  <div id="inst-cadet-list"></div>
+</div>
+
+<!-- PANEL: CLASS ROSTER -->
+<div class="inst-panel" id="inst-panel-roster">
+  <div class="acad-panel-tag">Overview</div>
+  <div class="acad-panel-title">Class Roster</div>
+  <p class="acad-panel-sub">All cadets currently enrolled in the Academy. View-only — contact the Admiral to reassign cadets.</p>
+  <div id="inst-roster-list"></div>
+</div>
+
+</div><!-- /page-instructor -->
+
+
+<!-- Firebase compat SDKs — loaded immediately before main script -->
+
 <!-- ══ ADMIN PAGE ══ -->
 <div id="page-admin" style="display:none;">
 <!-- AUTH GATE -->
@@ -2225,82 +2305,6 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
 </div><!-- /app -->
 </div><!-- /page-admin -->
 
-<!-- ══ INSTRUCTOR PANEL PAGE ══ -->
-<div id="page-instructor" style="display:none;">
-
-<style>
-.inst-panel { display:none; padding:48px 68px; border-bottom:1px solid rgba(0,200,255,0.1); }
-.inst-panel.active { display:block; animation:acadIn 0.3s ease both; }
-.inst-tab { display:flex;align-items:center;gap:10px;padding:0 22px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;border:none;border-right:1px solid rgba(0,200,255,0.1);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all 0.2s;background:none;height:100%; }
-.inst-tab:hover { color:#8ab8d8;background:rgba(0,100,200,0.06); }
-.inst-tab.active { color:#00c8ff;border-bottom-color:#00c8ff; }
-.inst-tab-dot { width:7px;height:7px;border-radius:50%;background:#1e3a5f;flex-shrink:0; }
-.inst-tab.active .inst-tab-dot { background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.7); }
-.inst-cadet-row { background:#0c1828;border:1px solid #1e3a5f;padding:18px 22px;margin-bottom:2px;transition:border-color 0.2s; }
-.inst-cadet-row:hover { border-color:rgba(0,200,255,0.25); }
-.inst-cadet-name { font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:#e8f4ff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px; }
-.inst-cadet-meta { font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.06em;margin-bottom:10px; }
-.inst-progress-bar { height:3px;background:#1e3a5f;margin-bottom:10px; }
-.inst-progress-fill { height:100%;background:#00c8ff;box-shadow:0 0 6px rgba(0,200,255,0.4);transition:width 0.5s; }
-.inst-signoff-btn { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#04070f;background:#1fc8a0;border:none;padding:7px 18px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:background 0.2s; }
-.inst-signoff-btn:hover { background:#40e8c0; }
-.inst-signoff-done { font-family:'Share Tech Mono',monospace;font-size:10px;color:#1fc8a0;letter-spacing:0.08em; }
-.inst-note-input { width:100%;background:rgba(0,200,255,0.04);border:1px solid #1e3a5f;color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;resize:vertical;min-height:60px;transition:border-color 0.2s; }
-.inst-note-input:focus { border-color:rgba(0,200,255,0.3); }
-.inst-note-save { font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#00c8ff;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);padding:6px 14px;cursor:pointer;margin-top:6px;transition:all 0.2s; }
-.inst-note-save:hover { background:rgba(0,200,255,0.15); }
-.inst-empty { font-family:'Share Tech Mono',monospace;font-size:12px;color:#3a6080;letter-spacing:0.1em;padding:28px;text-align:center;border:1px dashed #1e3a5f;text-transform:uppercase; }
-</style>
-
-<!-- Instructor Nav -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,200,255,0.2);box-shadow:0 1px 30px rgba(0,100,200,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
-  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#00c8ff" stroke-width="1.5" fill="none"/><polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#00c8ff" stroke-width="0.8" fill="rgba(0,200,255,0.06)"/><circle cx="16" cy="16" r="2.5" fill="#00c8ff"/></svg>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#00c8ff;"> SPACE INDUSTRIES</span></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#00c8ff;border:1px solid rgba(0,200,255,0.3);padding:3px 10px;text-transform:uppercase;margin-left:8px;">Instructor Panel</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <div id="inst-callsign-nav" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;"></div>
-    <button onclick="goToAcademy()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#00c8ff'" onmouseout="this.style.color='#8ab8d8'">← Academy</button>
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;color:#5a8aaa;background:none;border:none;cursor:pointer;text-transform:uppercase;" onmouseover="this.style.color='#8ab8d8'" onmouseout="this.style.color='#5a8aaa'">Main Site</button>
-  </div>
-</nav>
-
-<!-- Instructor Header -->
-<div style="padding:100px 68px 48px;background:#060c18;border-bottom:1px solid rgba(0,180,255,0.15);position:relative;overflow:hidden;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:0.3;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#00c8ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative;"><span style="display:block;width:32px;height:1px;background:#00c8ff;"></span>Second Fleet Academy</div>
-  <h1 id="inst-welcome-h1" style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:0.95;margin-bottom:12px;position:relative;text-shadow:0 0 30px rgba(0,200,255,0.2);">Instructor<br><em style="font-style:normal;color:#00c8ff;">Command</em></h1>
-  <p style="font-size:15px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Your assigned cadets, their progress, and your sign-off tools. Only you can mark Live Ops Qualifications complete.</p>
-</div>
-
-<!-- Instructor Tab Bar -->
-<div style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(0,180,255,0.1);display:flex;align-items:stretch;height:52px;overflow-x:auto;">
-  <button class="inst-tab active" onclick="showInstPanel('cadets')"><span class="inst-tab-dot"></span>My Cadets</button>
-  <button class="inst-tab" onclick="showInstPanel('roster')"><span class="inst-tab-dot"></span>Class Roster</button>
-</div>
-
-<!-- PANEL: MY CADETS -->
-<div class="inst-panel active" id="inst-panel-cadets">
-  <div class="acad-panel-tag">Assigned Cadets</div>
-  <div class="acad-panel-title">My Cadets</div>
-  <p class="acad-panel-sub">Cadets the Admiral has assigned to you. Track their progress and give your Live Ops Qualification sign-off when they complete their first live op with you.</p>
-  <div id="inst-cadet-list"></div>
-</div>
-
-<!-- PANEL: CLASS ROSTER -->
-<div class="inst-panel" id="inst-panel-roster">
-  <div class="acad-panel-tag">Overview</div>
-  <div class="acad-panel-title">Class Roster</div>
-  <p class="acad-panel-sub">All cadets currently enrolled in the Academy. View-only — contact the Admiral to reassign cadets.</p>
-  <div id="inst-roster-list"></div>
-</div>
-
-</div><!-- /page-instructor -->
-
-
-<!-- Firebase compat SDKs — loaded immediately before main script -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
