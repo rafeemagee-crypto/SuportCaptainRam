@@ -2061,9 +2061,9 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <div class="auth-sub">Restricted Access</div>
     <div class="auth-title">Admiral<br><span style="color:#e84040">Command</span></div>
     <p style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:24px;">Enter your admin password to continue.</p>
-    <input class="auth-input" id="auth-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doAuth()">
+    <input class="auth-input" id="auth-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')adminDoAuth()">
     <div class="auth-error" id="auth-err"></div>
-    <button class="auth-btn" onclick="doAuth()">Authenticate</button>
+    <button class="auth-btn" onclick="adminDoAuth()">Authenticate</button>
   </div>
 </div>
 
@@ -2076,7 +2076,7 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <span class="nav-brand">RAM<span> Space Industries</span></span>
     <span class="nav-badge">Admiral Command</span>
   </div>
-  <button class="nav-btn" onclick="doLogout()">Logout</button>
+  <button class="nav-btn" onclick="adminDoLogout()">Logout</button>
 </nav>
 
 <div class="header">
@@ -2086,12 +2086,12 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-members"      onclick="showTab('members')">Members</button>
-  <button class="tab"        id="tab-applications" onclick="showTab('applications')">Applications</button>
-  <button class="tab"        id="tab-events"       onclick="showTab('events')">Events</button>
-  <button class="tab"        id="tab-instructors"  onclick="showTab('instructors')">Instructors</button>
-  <button class="tab"        id="tab-announcements" onclick="showTab('announcements')">Announcements</button>
-  <button class="tab"        id="tab-academy"      onclick="showTab('academy')">Academy Progress</button>
+  <button class="tab active" id="tab-members"      onclick="showAdminTabNew('members')">Members</button>
+  <button class="tab"        id="tab-applications" onclick="showAdminTabNew('applications')">Applications</button>
+  <button class="tab"        id="tab-events"       onclick="showAdminTabNew('events')">Events</button>
+  <button class="tab"        id="tab-instructors"  onclick="showAdminTabNew('instructors')">Instructors</button>
+  <button class="tab"        id="tab-announcements" onclick="showAdminTabNew('announcements')">Announcements</button>
+  <button class="tab"        id="tab-academy"      onclick="showAdminTabNew('academy')">Academy Progress</button>
 </div>
 
 <div class="content">
