@@ -2704,21 +2704,26 @@ function adminLogin() {
 function openAdminPanel() {
   const callsign = localStorage.getItem('ram_callsign');
   if (callsign !== ADMIN_CALLSIGN) { alert('// ACCESS DENIED'); return; }
-  // Hide all other pages
   document.getElementById('page-main').style.cssText = 'display:none;visibility:hidden;';
   document.getElementById('page-academy').style.cssText = 'display:none;visibility:hidden;';
   const pi = document.getElementById('page-instructor');
   if (pi) pi.style.cssText = 'display:none;visibility:hidden;';
-  // Show admin page
   const pa = document.getElementById('page-admin');
   pa.style.cssText = 'display:block;visibility:visible;min-height:100vh;';
-  // Show the app div inside, hide auth gate
   const ag = document.getElementById('auth-gate');
   if (ag) ag.style.display = 'none';
   const appDiv = document.getElementById('app');
   if (appDiv) appDiv.style.cssText = 'display:block;visibility:visible;';
   window.scrollTo({ top: 0, behavior: 'instant' });
-  initAdminAll();
+  // Inline init — no external function dependency
+  adminShowTab('members');
+  adminRenderMembers();
+  adminRenderApps();
+  adminRenderEvents();
+  adminRenderInsts();
+  adminRenderAnns();
+  adminRenderAcademy();
+  adminRenderAssign();
 }
 
 function adminLogout() {
