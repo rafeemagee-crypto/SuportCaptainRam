@@ -1592,50 +1592,87 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
 
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
 <!-- ══ SIGNUP / SIGN IN OVERLAY — from RSI dropdown ══ -->
-<div id="signup-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:center;backdrop-filter:blur(14px);">
+<div id="signup-gate" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,7,15,0.98);align-items:center;justify-content:flex-start;overflow-y:auto;backdrop-filter:blur(14px);flex-direction:column;padding-top:40px;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.05) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="position:relative;max-width:440px;width:90%;text-align:center;padding:40px 20px;">
+
+  <!-- STEP 1: Callsign + Password (account creation / sign in) -->
+  <div id="ss-step-1" style="position:relative;max-width:480px;width:90%;text-align:center;padding:20px 20px 40px;">
     <div style="width:72px;height:72px;margin:0 auto 22px;">
       <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(0,200,255,0.4)" stroke-width="1.5" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(0,200,255,0.15)" stroke="#00c8ff" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#00c8ff"/></svg>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">RAM Space Industries</div>
     <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:6px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Signup /<br><span style="color:#00c8ff;">Sign In</span></h2>
-    <p style="font-size:13px;color:#5a8aaa;line-height:1.7;margin:14px 0 24px;">Enter your callsign. New members will create an account — returning members will sign in.</p>
-
-    <!-- Mode tabs -->
+    <p style="font-size:13px;color:#5a8aaa;line-height:1.7;margin:14px 0 24px;">New members create an account. Returning members sign in.</p>
     <div style="display:flex;gap:2px;margin-bottom:20px;">
       <button id="ss-tab-new" onclick="setSsMode('new')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid rgba(0,200,255,0.4);background:rgba(0,200,255,0.1);color:#00c8ff;cursor:pointer;">New Member</button>
       <button id="ss-tab-ret" onclick="setSsMode('return')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;border:1px solid #1e3a5f;background:transparent;color:#5a8aaa;cursor:pointer;">Returning</button>
     </div>
-
     <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
       <div style="position:relative;">
         <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">CALLSIGN //</div>
         <input id="ss-callsign" type="text" maxlength="24" placeholder="Your callsign" autocomplete="off" spellcheck="false"
           style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;letter-spacing:0.1em;text-transform:uppercase;"
-          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doSignupSignin()">
+          oninput="this.value=this.value.toUpperCase()">
       </div>
-      <!-- Password field — only for returning members -->
       <div id="ss-password-wrap" style="display:none;position:relative;">
         <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
         <input id="ss-password" type="password" placeholder="Your password" autocomplete="current-password"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
-          onkeydown="if(event.key==='Enter')doSignupSignin()">
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;">
       </div>
-      <!-- Password set — only for new members -->
       <div id="ss-newpass-wrap" style="position:relative;">
         <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">PASSWORD //</div>
         <input id="ss-newpassword" type="password" placeholder="Choose a password (min 6 chars)" autocomplete="new-password"
-          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;"
-          onkeydown="if(event.key==='Enter')doSignupSignin()">
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 110px;outline:none;">
       </div>
     </div>
-
     <div id="ss-error" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;min-height:18px;margin-bottom:12px;text-align:left;"></div>
-    <button onclick="doSignupSignin()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'" id="ss-submit-btn">Create Account →</button>
+    <button onclick="doSignupSignin()" id="ss-submit-btn" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Continue →</button>
     <button onclick="document.getElementById('signup-gate').style.display='none'" style="display:block;width:100%;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#3a6080;background:none;border:1px solid #1e3a5f;padding:11px;cursor:pointer;">← Cancel</button>
   </div>
+
+  <!-- STEP 2: Discord, RSI, Application message (new members only) -->
+  <div id="ss-step-2" style="display:none;position:relative;max-width:560px;width:90%;text-align:center;padding:20px 20px 40px;">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#00c8ff;text-transform:uppercase;margin-bottom:12px;">Step 2 of 2 — Application</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:8px;text-shadow:0 0 30px rgba(0,200,255,0.3);">Your <span style="color:#00c8ff;">Application</span></h2>
+    <p style="font-size:13px;color:#8ab8d8;line-height:1.7;margin:12px 0 24px;">Your callsign has been registered. Now provide your Discord and RSI details so the Admiral can verify your membership.</p>
+    <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">DISCORD //</div>
+        <input id="ss-discord" type="text" maxlength="48" placeholder="Your Discord username"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;">
+      </div>
+      <div style="position:relative;">
+        <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;white-space:nowrap;">RSI NAME //</div>
+        <input id="ss-rsi" type="text" maxlength="48" placeholder="Your RSI display name"
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Share Tech Mono',monospace;font-size:15px;padding:14px 14px 14px 100px;outline:none;">
+      </div>
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#5a8aaa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;text-align:left;">Application Message // Optional</div>
+        <div style="font-size:12px;color:#3a6080;line-height:1.7;margin-bottom:8px;text-align:left;background:rgba(0,200,255,0.03);border:1px solid #1e3a5f;border-left:2px solid #00c8ff;padding:10px 14px;">
+          If joining the org on this site before on the RSI site first, write why you should join the org, what you could help the org with, and why you want to join. Otherwise this is optional.
+        </div>
+        <textarea id="ss-message" placeholder="Write your application message here (optional)..."
+          style="width:100%;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);color:#e8f4ff;font-family:'Barlow',sans-serif;font-size:14px;padding:12px 14px;outline:none;resize:vertical;min-height:100px;line-height:1.7;"></textarea>
+      </div>
+    </div>
+    <div id="ss-error-2" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;letter-spacing:0.1em;min-height:18px;margin-bottom:12px;text-align:left;"></div>
+    <button onclick="submitApplication()" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#04070f;background:#00c8ff;border:none;padding:14px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));box-shadow:0 0 24px rgba(0,200,255,0.3);transition:all 0.2s;" onmouseover="this.style.background='#40dfff'" onmouseout="this.style.background='#00c8ff'">Submit Application →</button>
+  </div>
+
+  <!-- STEP 3: Submitted confirmation -->
+  <div id="ss-step-3" style="display:none;position:relative;max-width:480px;width:90%;text-align:center;padding:20px 20px 40px;">
+    <div style="width:72px;height:72px;margin:0 auto 22px;">
+      <svg viewBox="0 0 90 90" fill="none"><polygon points="45,4 86,24 86,66 45,86 4,66 4,24" stroke="rgba(31,200,160,0.5)" stroke-width="1.5" fill="none"/><circle cx="45" cy="45" r="8" fill="rgba(31,200,160,0.15)" stroke="#1fc8a0" stroke-width="1.5"><animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="45" cy="45" r="4" fill="#1fc8a0"/></svg>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#1fc8a0;text-transform:uppercase;margin-bottom:12px;">Application Submitted</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:16px;">Pending<br><span style="color:#1fc8a0;">Admiral Approval</span></h2>
+    <div id="ss-confirm-callsign" style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#00c8ff;letter-spacing:0.15em;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.2);padding:14px;margin-bottom:16px;"></div>
+    <p style="font-size:14px;color:#8ab8d8;line-height:1.8;margin-bottom:24px;">Your application has been submitted. The Admiral will review your Discord and RSI details. You will be notified on Discord when approved.</p>
+    <button onclick="document.getElementById('signup-gate').style.display='none'" style="width:100%;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:#5a8aaa;background:none;border:1px solid #1e3a5f;padding:14px;cursor:pointer;">← Return to Site</button>
+  </div>
+
 </div>
+
 
 <!-- ══ ACADEMY ENROLLMENT GATE — only shown first time going to academy after signing in ══ -->
 <div id="enroll-gate" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,7,15,0.97);backdrop-filter:blur(12px);overflow-y:auto;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:40px;">
@@ -3195,12 +3232,20 @@ function clearCadetSession() {
 let ssMode = 'new'; // 'new' or 'return'
 
 function openSignupSignin() {
-  document.getElementById('signup-gate').style.display = 'flex';
+  const gate = document.getElementById('signup-gate');
+  gate.style.display = 'flex';
+  gate.scrollTop = 0;
+  // Reset all steps
+  document.getElementById('ss-step-1').style.display = 'block';
+  document.getElementById('ss-step-2').style.display = 'none';
+  document.getElementById('ss-step-3').style.display = 'none';
   setSsMode('new');
   document.getElementById('ss-callsign').value = '';
   document.getElementById('ss-newpassword').value = '';
   document.getElementById('ss-password').value = '';
   document.getElementById('ss-error').textContent = '';
+  const e2 = document.getElementById('ss-error-2');
+  if (e2) e2.textContent = '';
 }
 
 function setSsMode(mode) {
@@ -3244,8 +3289,10 @@ async function doSignupSignin() {
       localStorage.setItem('ram_callsign', callsign);
       localStorage.setItem('ram_password', password);
       localStorage.setItem('ram_approved', 'false');
-      document.getElementById('signup-gate').style.display = 'none';
-      updateCallsignDisplay(callsign);
+      // Show step 2 — application details
+      document.getElementById('ss-step-1').style.display = 'none';
+      document.getElementById('ss-step-2').style.display = 'block';
+      document.getElementById('signup-gate').scrollTop = 0;
     } catch(e) {
       if (e.code === 'auth/email-already-in-use') {
         err.textContent = '// CALLSIGN TAKEN — USE RETURNING TAB TO SIGN IN';
@@ -3272,6 +3319,39 @@ async function doSignupSignin() {
       err.textContent = '// ERROR: INVALID CALLSIGN OR PASSWORD';
     }
   }
+}
+
+async function submitApplication() {
+  const callsign = localStorage.getItem('ram_callsign');
+  const discord  = document.getElementById('ss-discord').value.trim();
+  const rsi      = document.getElementById('ss-rsi').value.trim();
+  const message  = document.getElementById('ss-message').value.trim();
+  const err      = document.getElementById('ss-error-2');
+  err.textContent = '';
+
+  if (!discord) { err.textContent = '// ERROR: DISCORD USERNAME REQUIRED'; return; }
+  if (!rsi)     { err.textContent = '// ERROR: RSI DISPLAY NAME REQUIRED'; return; }
+
+  const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+
+  // Update Firestore with application details
+  await fsSet('members', callsign, { discord, rsi, applicationMessage: message, status: 'Pending', date: now });
+  localStorage.setItem('ram_discord', discord);
+  localStorage.setItem('ram_rsi', rsi);
+
+  // Save to admin applications
+  const apps = getAdminData('applications', []);
+  const filtered = apps.filter(a => a.callsign !== callsign);
+  filtered.unshift({ callsign, discord, rsi, message, date: now, status: 'Pending', examPassed: false });
+  setAdminData('applications', filtered);
+
+  // Show confirmation step
+  document.getElementById('ss-step-2').style.display = 'none';
+  document.getElementById('ss-step-3').style.display = 'block';
+  document.getElementById('signup-gate').scrollTop = 0;
+  const cd = document.getElementById('ss-confirm-callsign');
+  if (cd) cd.textContent = '// CALLSIGN: ' + callsign + ' — APPLICATION SUBMITTED';
+  updateCallsignDisplay(callsign);
 }
 
 // ── ACADEMY ENROLLMENT STEP 1: Discord + RSI (callsign already known) ──
@@ -3856,6 +3936,7 @@ function adminRenderApps() {
         <div class="row-main">
           <div class="row-name">${a.callsign} <span style="font-size:10px;color:${a.status==='Approved'?'#1fc8a0':a.status==='Rejected'?'#e84040':'#00c8ff'};border:1px solid;padding:2px 8px;margin-left:8px;">${a.status}</span> ${a.examPassed?'<span style="color:#1fc8a0;font-size:10px;margin-left:6px;">✓ EXAM PASSED</span>':'<span style="color:#e84040;font-size:10px;margin-left:6px;">✗ EXAM NOT PASSED</span>'}</div>
           <div class="row-meta" style="margin-top:6px;">Discord: <span style="color:#8ab8d8">${a.discord||'—'}</span> · RSI: <span style="color:#8ab8d8">${a.rsi||'—'}</span> · ${a.date||''}</div>
+          ${a.message?`<div style="font-size:13px;color:#8ab8d8;margin-top:8px;padding:10px 14px;background:#091220;border:1px solid #1e3a5f;border-left:2px solid #00c8ff;line-height:1.7;"><span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a6080;text-transform:uppercase;display:block;margin-bottom:4px;">Application Message</span>${a.message}</div>`:''}
         </div>
         <div class="row-actions">
           ${a.status!=='Approved'?`<button class="btn btn-green" onclick="adminApproveApp(${i})">Approve</button>`:''}
