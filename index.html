@@ -2709,14 +2709,19 @@ function openAdminPanel() {
   const pi = document.getElementById('page-instructor');
   if (pi) pi.style.cssText = 'display:none;visibility:hidden;';
   const pa = document.getElementById('page-admin');
-  pa.style.cssText = 'display:block;visibility:visible;min-height:100vh;';
+  pa.style.cssText = 'display:block;visibility:visible;min-height:100vh;background:#04070f;';
   const ag = document.getElementById('auth-gate');
   if (ag) ag.style.display = 'none';
   const appDiv = document.getElementById('app');
   if (appDiv) appDiv.style.cssText = 'display:block;visibility:visible;';
+  // Force panels visible — CSS display:none overrides class-based hiding
+  ['members','applications','events','instructors','announcements','academy'].forEach(t => {
+    const el = document.getElementById('panel-' + t);
+    if (el) el.style.display = t === 'members' ? 'block' : 'none';
+    const tab = document.getElementById('tab-' + t);
+    if (tab) { tab.style.color = t==='members'?'#e84040':'#5a8aaa'; tab.style.borderBottom = t==='members'?'2px solid #e84040':'2px solid transparent'; }
+  });
   window.scrollTo({ top: 0, behavior: 'instant' });
-  // Inline init — no external function dependency
-  adminShowTab('members');
   adminRenderMembers();
   adminRenderApps();
   adminRenderEvents();
