@@ -2156,7 +2156,7 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <span class="nav-brand">RAM<span> Space Industries</span></span>
     <span class="nav-badge">Admiral Command</span>
   </div>
-  <button class="nav-btn" onclick="adminDoLogout()">Logout</button>
+  <button class="nav-btn" onclick="adminLogout()">← Home</button>
 </nav>
 
 <div class="header">
@@ -2736,9 +2736,9 @@ function openAdminPanel() {
 }
 
 function adminLogout() {
-  localStorage.removeItem('ram_admin_auth');
-  document.getElementById('page-admin').style.display = 'none';
-  document.getElementById('page-main').style.display = 'block';
+  document.getElementById('page-admin').style.cssText = 'display:none;';
+  const pm = document.getElementById('page-main');
+  pm.style.cssText = 'display:block;visibility:visible;';
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
