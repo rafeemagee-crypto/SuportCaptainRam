@@ -2166,22 +2166,22 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-members"      onclick="adminShowTab('members')">Members</button>
-  <button class="tab"        id="tab-applications" onclick="adminShowTab('applications')">Applications</button>
-  <button class="tab"        id="tab-events"       onclick="adminShowTab('events')">Events</button>
-  <button class="tab"        id="tab-instructors"  onclick="adminShowTab('instructors')">Instructors</button>
-  <button class="tab"        id="tab-announcements" onclick="adminShowTab('announcements')">Announcements</button>
-  <button class="tab"        id="tab-academy"      onclick="adminShowTab('academy')">Academy Progress</button>
+  <button class="tab active" id="atab-members"      onclick="adminShowTab('members')">Members</button>
+  <button class="tab"        id="atab-applications" onclick="adminShowTab('applications')">Applications</button>
+  <button class="tab"        id="atab-events"       onclick="adminShowTab('events')">Events</button>
+  <button class="tab"        id="atab-instructors"  onclick="adminShowTab('instructors')">Instructors</button>
+  <button class="tab"        id="atab-announcements" onclick="adminShowTab('announcements')">Announcements</button>
+  <button class="tab"        id="atab-academy"      onclick="adminShowTab('academy')">Academy Progress</button>
 </div>
 
 <div class="content">
 
   <!-- MEMBERS -->
-  <div class="panel active" id="panel-members">
+  <div class="panel active" id="apanel-members">
     <div class="panel-tag">Roster</div>
     <div class="panel-title">Member Management</div>
     <p class="panel-sub">View all members, promote ranks, award or deduct SP.</p>
-    <div id="list-members"></div>
+    <div id="alist-members"></div>
     <div class="form">
       <div class="form-title">// Add New Member</div>
       <div class="form-grid">
@@ -2202,27 +2202,27 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <div class="form" style="margin-top:10px;">
       <div class="form-title">// Assign Cadet to Instructor</div>
       <div class="form-grid">
-        <select class="inp" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
-        <select class="inp" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
+        <select class="inp" id="aassign-cadet-select"><option value="">— Select Cadet —</option></select>
+        <select class="inp" id="aassign-instructor-select"><option value="">— Select Instructor —</option></select>
       </div>
       <button class="submit" onclick="adminAssignCadet()">Assign</button>
     </div>
   </div>
 
   <!-- APPLICATIONS -->
-  <div class="panel" id="panel-applications">
+  <div class="panel" id="apanel-applications">
     <div class="panel-tag">Enrollment</div>
     <div class="panel-title">Applications</div>
     <p class="panel-sub">Review enrollment applications. Verify Discord and RSI membership before approving.</p>
-    <div id="list-applications"></div>
+    <div id="alist-applications"></div>
   </div>
 
   <!-- EVENTS -->
-  <div class="panel" id="panel-events">
+  <div class="panel" id="apanel-events">
     <div class="panel-tag">Operations</div>
     <div class="panel-title">Event Management</div>
     <p class="panel-sub">Schedule fleet ops, division ops, and casual nights.</p>
-    <div id="list-events"></div>
+    <div id="alist-events"></div>
     <div class="form">
       <div class="form-title">// Schedule New Event</div>
       <div class="form-grid">
@@ -2242,11 +2242,11 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
   </div>
 
   <!-- INSTRUCTORS -->
-  <div class="panel" id="panel-instructors">
+  <div class="panel" id="apanel-instructors">
     <div class="panel-tag">Faculty</div>
     <div class="panel-title">Instructor Management</div>
     <p class="panel-sub">Add instructors, log sessions. 5 sessions = Commendation.</p>
-    <div id="list-instructors"></div>
+    <div id="alist-instructors"></div>
     <div class="form">
       <div class="form-title">// Add New Instructor</div>
       <div class="form-grid">
@@ -2267,11 +2267,11 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
   </div>
 
   <!-- ANNOUNCEMENTS -->
-  <div class="panel" id="panel-announcements">
+  <div class="panel" id="apanel-announcements">
     <div class="panel-tag">Comms</div>
     <div class="panel-title">Announcements</div>
     <p class="panel-sub">Post org-wide announcements for the fleet.</p>
-    <div id="list-announcements"></div>
+    <div id="alist-announcements"></div>
     <div class="form">
       <div class="form-title">// Post New Announcement</div>
       <div class="form-grid">
@@ -2289,14 +2289,14 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
   </div>
 
   <!-- ACADEMY -->
-  <div class="panel" id="panel-academy">
+  <div class="panel" id="apanel-academy">
     <div class="panel-tag">Intel</div>
     <div class="panel-title">Academy Progress</div>
     <p class="panel-sub">Track cadets, exam answers, progress, and graduate when ready.</p>
-    <div id="list-academy"></div>
+    <div id="alist-academy"></div>
     <div class="form" style="margin-top:16px;">
       <div class="form-title">// Remove Cadet from Firestore</div>
-      <input class="inp" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
+      <input class="inp" id="aclear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
       <button class="submit" style="background:#3a6080;" onclick="adminClearCadet()">Remove Cadet</button>
     </div>
   </div>
@@ -2720,9 +2720,9 @@ function openAdminPanel() {
   if (appDiv) appDiv.style.cssText = 'display:block;visibility:visible;';
   // Force panels visible — CSS display:none overrides class-based hiding
   ['members','applications','events','instructors','announcements','academy'].forEach(t => {
-    const el = document.getElementById('panel-' + t);
+    const el = document.getElementById('apanel-' + t);
     if (el) el.style.display = t === 'members' ? 'block' : 'none';
-    const tab = document.getElementById('tab-' + t);
+    const tab = document.getElementById('atab-' + t);
     if (tab) { tab.style.color = t==='members'?'#e84040':'#5a8aaa'; tab.style.borderBottom = t==='members'?'2px solid #e84040':'2px solid transparent'; }
   });
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2906,8 +2906,8 @@ function toggleInstructor(i) {
 }
 
 function assignCadetToInstructor() {
-  const cadetSel = document.getElementById('assign-cadet-select').value;
-  const instSel  = document.getElementById('assign-instructor-select').value;
+  const cadetSel = document.getElementById('aassign-cadet-select').value;
+  const instSel  = document.getElementById('aassign-instructor-select').value;
   if (!cadetSel || !instSel) return;
   const members = getAdminData('members', []);
   const idx = members.findIndex(m => m.callsign === cadetSel);
@@ -2920,8 +2920,8 @@ function renderAssignPanel() {
   const members = getAdminData('members', []);
   const cadets = members.filter(m => m.rank === 'Cadet' || m.rank === 'Private');
   const instructors = members.filter(m => m.isInstructor);
-  const cadetSel = document.getElementById('assign-cadet-select');
-  const instSel  = document.getElementById('assign-instructor-select');
+  const cadetSel = document.getElementById('aassign-cadet-select');
+  const instSel  = document.getElementById('aassign-instructor-select');
   if (cadetSel) cadetSel.innerHTML = '<option value="">— Select Cadet —</option>' + cadets.map(c => `<option value="${c.callsign}">${c.callsign} (${c.assignedInstructor ? 'Assigned: ' + c.assignedInstructor : 'Unassigned'})</option>`).join('');
   if (instSel)  instSel.innerHTML  = '<option value="">— Select Instructor —</option>' + instructors.map(inst => `<option value="${inst.callsign}">${inst.callsign} (${inst.rank})</option>`).join('');
 }
@@ -3705,8 +3705,8 @@ function initAdminAll() {
 
 function adminShowTab(id) {
   ['members','applications','events','instructors','announcements','academy'].forEach(t => {
-    const panel = document.getElementById('panel-' + t);
-    const tab   = document.getElementById('tab-' + t);
+    const panel = document.getElementById('apanel-' + t);
+    const tab   = document.getElementById('atab-' + t);
     if (panel) panel.style.display = t === id ? 'block' : 'none';
     if (tab) {
       tab.style.color = t === id ? '#e84040' : '#5a8aaa';
@@ -3756,7 +3756,7 @@ async function adminFsDelete(col, id) {
 
 function adminRenderMembers() {
   const members = adminGetData('members', []);
-  const el = document.getElementById('list-members');
+  const el = document.getElementById('alist-members');
   if (!members.length) { el.innerHTML = '<div class="empty">No members yet. Add your first member below.</div>'; return; }
   el.innerHTML = members.map((m, i) => `
     <div class="row">
@@ -3830,14 +3830,14 @@ function adminRenderAssign() {
   const m = adminGetData('members', []);
   const cadets = m.filter(x => x.rank === 'Cadet' || x.rank === 'Private');
   const insts  = m.filter(x => x.isInstructor);
-  const cs = document.getElementById('assign-cadet-select');
-  const is = document.getElementById('assign-instructor-select');
+  const cs = document.getElementById('aassign-cadet-select');
+  const is = document.getElementById('aassign-instructor-select');
   if (cs) cs.innerHTML = '<option value="">— Select Cadet —</option>' + cadets.map(c => `<option value="${c.callsign}">${c.callsign}${c.assignedInstructor ? ' (→ ' + c.assignedInstructor + ')' : ''}</option>`).join('');
   if (is) is.innerHTML = '<option value="">— Select Instructor —</option>' + insts.map(x => `<option value="${x.callsign}">${x.callsign} (${x.rank})</option>`).join('');
 }
 function adminAssignCadet() {
-  const cadet = document.getElementById('assign-cadet-select').value;
-  const inst  = document.getElementById('assign-instructor-select').value;
+  const cadet = document.getElementById('aassign-cadet-select').value;
+  const inst  = document.getElementById('aassign-instructor-select').value;
   if (!cadet || !inst) return;
   const m = adminGetData('members', []);
   const idx = m.findIndex(x => x.callsign === cadet);
@@ -3848,7 +3848,7 @@ function adminAssignCadet() {
 // ── APPLICATIONS ──
 function adminRenderApps() {
   const apps = adminGetData('applications', []);
-  const el = document.getElementById('list-applications');
+  const el = document.getElementById('alist-applications');
   if (!apps.length) { el.innerHTML = '<div class="empty">No applications yet.</div>'; return; }
   el.innerHTML = apps.map((a, i) => `
     <div class="row" style="flex-direction:column;gap:0;border-color:${a.status==='Approved'?'rgba(31,200,160,0.3)':a.status==='Rejected'?'rgba(232,64,64,0.2)':'#1e3a5f'}">
@@ -3889,7 +3889,7 @@ function adminRejectApp(i) {
 // ── EVENTS ──
 function adminRenderEvents() {
   const events = adminGetData('events', []);
-  const el = document.getElementById('list-events');
+  const el = document.getElementById('alist-events');
   if (!events.length) { el.innerHTML = '<div class="empty">No events scheduled yet.</div>'; return; }
   const colors = { Live:'#e84040', Complete:'#1fc8a0', Scheduled:'#00c8ff', Archived:'#5a8aaa' };
   el.innerHTML = events.map((e, i) => `
@@ -3932,7 +3932,7 @@ function adminRemoveEvent(i) {
 // ── INSTRUCTORS ──
 function adminRenderInsts() {
   const insts = adminGetData('instructors', [{ name:'Admiral', role:'Org Founder · Academy Commandant', div:'COMMAND', sessions:999, commend:true }]);
-  const el = document.getElementById('list-instructors');
+  const el = document.getElementById('alist-instructors');
   el.innerHTML = insts.map((inst, i) => `
     <div class="row">
       <div class="row-main">
@@ -3970,7 +3970,7 @@ function adminRemoveInst(i) {
 // ── ANNOUNCEMENTS ──
 function adminRenderAnns() {
   const posts = adminGetData('announcements', []);
-  const el = document.getElementById('list-announcements');
+  const el = document.getElementById('alist-announcements');
   if (!posts.length) { el.innerHTML = '<div class="empty">No announcements yet.</div>'; return; }
   const colors = { URGENT:'#e84040', OP:'#00c8ff', ACADEMY:'#1fc8a0', GENERAL:'#8ab8d8' };
   el.innerHTML = posts.map((p, i) => `
@@ -4005,7 +4005,7 @@ function adminRemoveAnn(i) {
 
 // ── ACADEMY ──
 async function adminRenderAcademy() {
-  const el = document.getElementById('list-academy');
+  const el = document.getElementById('alist-academy');
   el.innerHTML = '<div class="empty">Loading from Firestore...</div>';
   const fsMembers = await adminFsGetAll('members');
   const apps = adminGetData('applications', []);
@@ -4072,14 +4072,14 @@ async function adminGraduate(callsign) {
 }
 
 async function adminClearCadet() {
-  const callsign = document.getElementById('clear-callsign-input').value.trim().toUpperCase();
+  const callsign = document.getElementById('aclear-callsign-input').value.trim().toUpperCase();
   if (!callsign) { alert('Enter a callsign first.'); return; }
   await adminFsDelete('members', callsign);
   const apps = adminGetData('applications', []);
   adminSetData('applications', apps.filter(a => a.callsign !== callsign));
   const m = adminGetData('members', []);
   adminSetData('members', m.filter(x => x.callsign !== callsign));
-  document.getElementById('clear-callsign-input').value = '';
+  document.getElementById('aclear-callsign-input').value = '';
   adminRenderAcademy(); adminRenderApps(); adminRenderMembers();
   alert('✓ ' + callsign + ' removed.');
 }
