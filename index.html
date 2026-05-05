@@ -2156,7 +2156,7 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
     <span class="nav-brand">RAM<span> Space Industries</span></span>
     <span class="nav-badge">Admiral Command</span>
   </div>
-  <button class="nav-btn" onclick="adminLogout()">← Home</button>
+  <button class="nav-btn" onclick="document.getElementById('page-admin').style.cssText='display:none;';document.getElementById('page-main').style.cssText='display:block;visibility:visible;';window.scrollTo(0,0);">← Home</button>
 </nav>
 
 <div class="header">
