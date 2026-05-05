@@ -1015,9 +1015,101 @@ footer {
 .admin-progress-bar-wrap{margin-top:8px;height:3px;background:#1e3a5f;border-radius:0;}
 .admin-progress-bar-fill{height:100%;background:#e84040;box-shadow:0 0 8px rgba(232,64,64,0.4);transition:width 0.5s ease;}
 </style>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #04070f; color: #e8f4ff; font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+/* Auth gate */
+#auth-gate { position: fixed; inset: 0; background: #04070f; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+#auth-gate.hidden { display: none; }
+.auth-box { max-width: 400px; width: 90%; text-align: center; padding: 40px 20px; }
+.auth-title { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 700; text-transform: uppercase; line-height: 1; margin-bottom: 8px; }
+.auth-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #e84040; text-transform: uppercase; margin-bottom: 32px; }
+.auth-input { width: 100%; background: rgba(232,64,64,0.05); border: 1px solid rgba(232,64,64,0.2); color: #e8f4ff; font-family: 'Share Tech Mono', monospace; font-size: 15px; padding: 14px; outline: none; margin-bottom: 10px; letter-spacing: 0.15em; }
+.auth-btn { width: 100%; background: #e84040; color: #04070f; border: none; font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; padding: 14px; cursor: pointer; }
+.auth-btn:hover { background: #ff6060; }
+.auth-error { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #e84040; min-height: 18px; margin-bottom: 10px; text-align: left; }
+
+/* Layout */
+#app { display: none; }
+#app.visible { display: block; }
+nav { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: rgba(4,7,15,0.97); border-bottom: 1px solid rgba(232,64,64,0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; }
+.nav-brand { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.15em; text-transform: uppercase; }
+.nav-brand span { color: #e84040; }
+.nav-badge { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: #e84040; border: 1px solid rgba(232,64,64,0.3); padding: 3px 10px; text-transform: uppercase; margin-left: 10px; }
+.nav-btn { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: none; border: 1px solid rgba(232,64,64,0.3); color: #e84040; padding: 6px 14px; cursor: pointer; }
+.nav-btn:hover { background: rgba(232,64,64,0.1); }
+
+.header { padding: 90px 60px 40px; background: #060c18; border-bottom: 1px solid rgba(232,64,64,0.15); position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(232,64,64,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,64,64,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
+.header-tag { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.25em; color: #e84040; text-transform: uppercase; margin-bottom: 12px; position: relative; }
+.header-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(36px,5vw,64px); font-weight: 700; text-transform: uppercase; line-height: 1; margin-bottom: 10px; position: relative; }
+.header-title em { font-style: normal; color: #e84040; }
+.header-sub { font-size: 14px; color: #8ab8d8; max-width: 560px; line-height: 1.8; position: relative; }
+
+/* Tabs */
+.tabs { position: sticky; top: 58px; z-index: 900; background: #091220; border-bottom: 1px solid rgba(232,64,64,0.1); display: flex; height: 52px; overflow-x: auto; }
+.tab { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: none; border: none; border-bottom: 2px solid transparent; color: #5a8aaa; padding: 0 22px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.tab.active { color: #e84040; border-bottom-color: #e84040; }
+.tab:hover { color: #8ab8d8; }
+
+/* Content */
+.content { padding: 40px 60px; min-height: calc(100vh - 200px); }
+.panel { display: none; }
+.panel.active { display: block; }
+.panel-tag { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.25em; color: #e84040; text-transform: uppercase; margin-bottom: 12px; }
+.panel-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+.panel-sub { font-size: 14px; color: #8ab8d8; margin-bottom: 28px; line-height: 1.7; }
+
+/* Rows */
+.row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; background: #0c1828; border: 1px solid #1e3a5f; padding: 16px 20px; margin-bottom: 2px; transition: border-color 0.2s; }
+.row:hover { border-color: rgba(232,64,64,0.2); }
+.row-main { flex: 1; min-width: 0; }
+.row-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+.row-meta { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #5a8aaa; letter-spacing: 0.06em; }
+.row-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
+.btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #00c8ff; background: rgba(0,200,255,0.06); border: 1px solid rgba(0,200,255,0.2); padding: 5px 12px; cursor: pointer; transition: all 0.2s; }
+.btn:hover { background: rgba(0,200,255,0.15); }
+.btn-danger { color: #e84040; background: rgba(232,64,64,0.06); border-color: rgba(232,64,64,0.2); }
+.btn-danger:hover { background: rgba(232,64,64,0.15); }
+.btn-green { color: #1fc8a0; background: rgba(31,200,160,0.06); border-color: rgba(31,200,160,0.3); }
+.btn-green:hover { background: rgba(31,200,160,0.15); }
+.empty { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #3a6080; letter-spacing: 0.1em; padding: 28px; text-align: center; border: 1px dashed #1e3a5f; text-transform: uppercase; }
+
+/* Forms */
+.form { background: #091220; border: 1px solid rgba(232,64,64,0.15); padding: 22px; margin-top: 16px; }
+.form-title { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #e84040; text-transform: uppercase; margin-bottom: 16px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.form-grid.wide { grid-template-columns: 1fr; }
+input.inp, select.inp, textarea.inp { width: 100%; background: rgba(0,200,255,0.04); border: 1px solid #1e3a5f; color: #e8f4ff; font-family: 'Share Tech Mono', monospace; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+input.inp:focus, select.inp:focus, textarea.inp:focus { border-color: rgba(0,200,255,0.4); }
+select.inp { background: #091220; cursor: pointer; }
+textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-serif; font-size: 14px; }
+.submit { font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #04070f; background: #e84040; border: none; padding: 11px 28px; cursor: pointer; transition: background 0.2s; }
+.submit:hover { background: #ff6060; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-bottom: 20px; }
+.stat { background: #0c1828; border: 1px solid #1e3a5f; padding: 16px 20px; }
+.stat-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: #3a6080; text-transform: uppercase; margin-bottom: 6px; }
+.stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: #e84040; line-height: 1; }
+
+/* Progress */
+.prog-wrap { height: 4px; background: #1e3a5f; margin-top: 8px; }
+.prog-fill { height: 100%; background: #e84040; transition: width 0.5s; }
+
+/* Exam answers */
+.answers { background: #091220; border: 1px solid #1e3a5f; padding: 14px 16px; margin-top: 8px; }
+.answer-row { display: flex; gap: 10px; padding: 5px 0; border-bottom: 1px solid #1a2d50; align-items: flex-start; }
+.answer-q { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: #3a6080; min-width: 26px; padding-top: 2px; }
+.answer-text { font-size: 11px; color: #5a8aaa; margin-bottom: 2px; }
+.answer-val { font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+.correct { color: #1fc8a0; }
+.wrong { color: #e84040; }
+</style>
 </head>
 <body>
-<div id="page-main">
+<div id="page-main" style="display:block;">
 
 <!-- ─── NAV ─── -->
 <nav>
@@ -1496,7 +1588,7 @@ footer {
 <!-- ════════════════════════════════════════
      ACADEMY PORTAL — hidden on load
 ════════════════════════════════════════ -->
-<div id="page-academy" style="display:none;">
+<div id="page-academy" style="display:none !important;">
 
 <!-- ══ ENROLLMENT GATE — shown on first visit ══ -->
 <!-- ══ SIGNUP / SIGN IN OVERLAY — from RSI dropdown ══ -->
@@ -1962,52 +2054,59 @@ footer {
 </div>
 
 <!-- ══ ADMIN PAGE ══ -->
-<div id="page-admin" style="display:none;background:#04070f;min-height:100vh;">
-<div id="admin-test" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#e84040;z-index:99999;display:flex;align-items:center;justify-content:center;font-size:40px;color:white;font-family:sans-serif;">ADMIN PANEL LOADED</div>
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,7,15,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,64,64,0.2);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:58px;">
-  <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="goToMain()">
+<div id="page-admin" style="display:none;">
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="auth-box">
+    <div class="auth-sub">Restricted Access</div>
+    <div class="auth-title">Admiral<br><span style="color:#e84040">Command</span></div>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5a8aaa;letter-spacing:0.1em;margin-bottom:24px;">Enter your admin password to continue.</p>
+    <input class="auth-input" id="auth-pw" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doAuth()">
+    <div class="auth-error" id="auth-err"></div>
+    <button class="auth-btn" onclick="doAuth()">Authenticate</button>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="app">
+
+<nav>
+  <div style="display:flex;align-items:center;gap:10px;">
     <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><polygon points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#e84040" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="2.5" fill="#e84040"/></svg>
-    <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.15em;color:#e8f4ff;text-transform:uppercase;">RAM<span style="color:#e84040;"> SPACE INDUSTRIES</span></span>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#e84040;border:1px solid rgba(232,64,64,0.3);padding:3px 10px;text-transform:uppercase;">Admiral Command</span>
+    <span class="nav-brand">RAM<span> Space Industries</span></span>
+    <span class="nav-badge">Admiral Command</span>
   </div>
-  <div style="display:flex;align-items:center;gap:14px;">
-    <button onclick="goToMain()" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#8ab8d8;background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;">← Main Site</button>
-    <button onclick="adminLogout()" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#e84040;background:none;border:1px solid rgba(232,64,64,0.3);padding:6px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;">Logout</button>
-  </div>
+  <button class="nav-btn" onclick="doLogout()">Logout</button>
 </nav>
 
-<!-- Admin Header -->
-<div style="padding:90px 60px 40px;background:#060c18;border-bottom:1px solid rgba(232,64,64,0.15);position:relative;">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,64,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,64,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;"></div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:12px;position:relative;">Admiral Command Panel</div>
-  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:700;color:#e8f4ff;text-transform:uppercase;line-height:1;margin-bottom:10px;position:relative;">Command <em style="font-style:normal;color:#e84040;">Centre</em></h1>
-  <p style="font-size:14px;color:#8ab8d8;max-width:560px;line-height:1.8;position:relative;">Full org management — members, applications, events, instructors, announcements, academy progress.</p>
+<div class="header">
+  <div class="header-tag">Admiral Command Panel</div>
+  <h1 class="header-title">Command <em>Centre</em></h1>
+  <p class="header-sub">Full org management — members, applications, events, instructors, announcements, academy progress.</p>
 </div>
 
-<!-- Admin Tabs -->
-<div id="admin-tabs" style="position:sticky;top:58px;z-index:900;background:#091220;border-bottom:1px solid rgba(232,64,64,0.1);display:flex;height:52px;overflow-x:auto;">
-  <button onclick="showAdminTab('members')"      style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#e84040;border:none;border-bottom:2px solid #e84040;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-members">Members</button>
-  <button onclick="showAdminTab('applications')" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-applications">Applications</button>
-  <button onclick="showAdminTab('events')"       style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-events">Events</button>
-  <button onclick="showAdminTab('instructors')"  style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-instructors">Instructors</button>
-  <button onclick="showAdminTab('announcements')" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-announcements">Announcements</button>
-  <button onclick="showAdminTab('academy')"      style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#5a8aaa;border:none;border-bottom:2px solid transparent;background:none;padding:0 20px;cursor:pointer;white-space:nowrap;" id="atab-academy">Academy Progress</button>
+<div class="tabs">
+  <button class="tab active" id="tab-members"      onclick="showTab('members')">Members</button>
+  <button class="tab"        id="tab-applications" onclick="showTab('applications')">Applications</button>
+  <button class="tab"        id="tab-events"       onclick="showTab('events')">Events</button>
+  <button class="tab"        id="tab-instructors"  onclick="showTab('instructors')">Instructors</button>
+  <button class="tab"        id="tab-announcements" onclick="showTab('announcements')">Announcements</button>
+  <button class="tab"        id="tab-academy"      onclick="showTab('academy')">Academy Progress</button>
 </div>
 
-<!-- Admin Content Wrapper -->
-<div id="admin-content" style="padding:40px 60px;min-height:calc(100vh - 200px);">
+<div class="content">
 
   <!-- MEMBERS -->
-  <div id="admin-panel-members" style="display:block;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Roster</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Member Management</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">View all members, promote ranks, and award Standing Points.</p>
-    <div id="admin-member-list"></div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Add New Member</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <input id="new-callsign" class="admin-input" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')addMember()">
-        <select id="new-division" class="admin-select">
+  <div class="panel active" id="panel-members">
+    <div class="panel-tag">Roster</div>
+    <div class="panel-title">Member Management</div>
+    <p class="panel-sub">View all members, promote ranks, award or deduct SP.</p>
+    <div id="list-members"></div>
+    <div class="form">
+      <div class="form-title">// Add New Member</div>
+      <div class="form-grid">
+        <input class="inp" id="new-callsign" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
+        <select class="inp" id="new-division">
           <option value="VANGUARD">VANGUARD — Combat &amp; Security</option>
           <option value="CLAIM">CLAIM — Collection</option>
           <option value="PULSE">PULSE — Medical</option>
@@ -2018,62 +2117,62 @@ footer {
           <option value="COMMAND">COMMAND</option>
         </select>
       </div>
-      <button onclick="addMember()" class="admin-submit">Add Member</button>
+      <button class="submit" onclick="addMember()">Add Member</button>
     </div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:10px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Assign Cadet to Instructor</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <select id="assign-cadet-select" class="admin-select"><option value="">— Select Cadet —</option></select>
-        <select id="assign-instructor-select" class="admin-select"><option value="">— Select Instructor —</option></select>
+    <div class="form" style="margin-top:10px;">
+      <div class="form-title">// Assign Cadet to Instructor</div>
+      <div class="form-grid">
+        <select class="inp" id="assign-cadet-select"><option value="">— Select Cadet —</option></select>
+        <select class="inp" id="assign-instructor-select"><option value="">— Select Instructor —</option></select>
       </div>
-      <button onclick="assignCadetToInstructor()" class="admin-submit">Assign</button>
+      <button class="submit" onclick="assignCadetToInstructor()">Assign</button>
     </div>
   </div>
 
   <!-- APPLICATIONS -->
-  <div id="admin-panel-applications" style="display:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Enrollment</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Applications</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Review enrollment applications. Verify Discord and RSI membership before approving.</p>
-    <div id="admin-application-list"></div>
+  <div class="panel" id="panel-applications">
+    <div class="panel-tag">Enrollment</div>
+    <div class="panel-title">Applications</div>
+    <p class="panel-sub">Review enrollment applications. Verify Discord and RSI membership before approving.</p>
+    <div id="list-applications"></div>
   </div>
 
   <!-- EVENTS -->
-  <div id="admin-panel-events" style="display:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Operations</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Event Management</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Schedule fleet ops, division ops, and casual nights.</p>
-    <div id="admin-event-list"></div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Schedule New Event</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <input id="new-event-name" class="admin-input" placeholder="Event name" style="grid-column:1/-1;">
-        <select id="new-event-type" class="admin-select">
+  <div class="panel" id="panel-events">
+    <div class="panel-tag">Operations</div>
+    <div class="panel-title">Event Management</div>
+    <p class="panel-sub">Schedule fleet ops, division ops, and casual nights.</p>
+    <div id="list-events"></div>
+    <div class="form">
+      <div class="form-title">// Schedule New Event</div>
+      <div class="form-grid">
+        <input class="inp" id="new-event-name" placeholder="Event name" style="grid-column:1/-1;">
+        <select class="inp" id="new-event-type">
           <option value="Fleet Op">Fleet Op</option>
           <option value="Division Op">Division Op</option>
           <option value="Casual Night">Casual Night</option>
           <option value="Org Meeting">Org Meeting</option>
           <option value="Special Op">Special Op</option>
         </select>
-        <input id="new-event-date" class="admin-input" type="date">
+        <input class="inp" id="new-event-date" type="date">
       </div>
-      <textarea id="new-event-notes" class="admin-textarea" placeholder="Briefing notes (optional)..." style="margin-bottom:12px;"></textarea>
-      <button onclick="addEvent()" class="admin-submit">Schedule Event</button>
+      <textarea class="inp" id="new-event-notes" placeholder="Briefing notes (optional)..." style="margin-bottom:12px;"></textarea>
+      <button class="submit" onclick="addEvent()">Schedule Event</button>
     </div>
   </div>
 
   <!-- INSTRUCTORS -->
-  <div id="admin-panel-instructors" style="display:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Faculty</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Instructor Management</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Add instructors, log sessions, track commendations. 5 sessions = Commendation.</p>
-    <div id="admin-instructor-list"></div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Add New Instructor</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
-        <input id="new-instructor-name" class="admin-input" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
-        <input id="new-instructor-role" class="admin-input" placeholder="Role / title">
-        <select id="new-instructor-div" class="admin-select">
+  <div class="panel" id="panel-instructors">
+    <div class="panel-tag">Faculty</div>
+    <div class="panel-title">Instructor Management</div>
+    <p class="panel-sub">Add instructors, log sessions. 5 sessions = Commendation.</p>
+    <div id="list-instructors"></div>
+    <div class="form">
+      <div class="form-title">// Add New Instructor</div>
+      <div class="form-grid">
+        <input class="inp" id="new-instructor-name" placeholder="CALLSIGN" oninput="this.value=this.value.toUpperCase()">
+        <input class="inp" id="new-instructor-role" placeholder="Role / title">
+        <select class="inp" id="new-instructor-div">
           <option value="VANGUARD">VANGUARD</option>
           <option value="CLAIM">CLAIM</option>
           <option value="PULSE">PULSE</option>
@@ -2083,46 +2182,47 @@ footer {
           <option value="COMMAND">COMMAND</option>
         </select>
       </div>
-      <button onclick="addInstructor()" class="admin-submit">Add Instructor</button>
+      <button class="submit" onclick="addInstructor()">Add Instructor</button>
     </div>
   </div>
 
   <!-- ANNOUNCEMENTS -->
-  <div id="admin-panel-announcements" style="display:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Comms</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Announcements</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Post org-wide announcements for the fleet.</p>
-    <div id="admin-announcement-list"></div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Post New Announcement</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-        <input id="new-ann-title" class="admin-input" placeholder="Announcement title" style="grid-column:1/-1;">
-        <select id="new-ann-type" class="admin-select">
+  <div class="panel" id="panel-announcements">
+    <div class="panel-tag">Comms</div>
+    <div class="panel-title">Announcements</div>
+    <p class="panel-sub">Post org-wide announcements for the fleet.</p>
+    <div id="list-announcements"></div>
+    <div class="form">
+      <div class="form-title">// Post New Announcement</div>
+      <div class="form-grid">
+        <input class="inp" id="new-ann-title" placeholder="Announcement title" style="grid-column:1/-1;">
+        <select class="inp" id="new-ann-type">
           <option value="GENERAL">General</option>
           <option value="OP">Fleet Op</option>
           <option value="URGENT">Urgent</option>
           <option value="ACADEMY">Academy</option>
         </select>
       </div>
-      <textarea id="new-ann-body" class="admin-textarea" placeholder="Announcement body..." style="margin-bottom:12px;"></textarea>
-      <button onclick="addAnnouncement()" class="admin-submit">Post Announcement</button>
+      <textarea class="inp" id="new-ann-body" placeholder="Announcement body..." style="margin-bottom:12px;"></textarea>
+      <button class="submit" onclick="addAnnouncement()">Post Announcement</button>
     </div>
   </div>
 
-  <!-- ACADEMY PROGRESS -->
-  <div id="admin-panel-academy" style="display:none;">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:#e84040;text-transform:uppercase;margin-bottom:14px;">Intel</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;color:#e8f4ff;text-transform:uppercase;margin-bottom:10px;">Academy Progress</div>
-    <p style="font-size:14px;color:#8ab8d8;margin-bottom:28px;line-height:1.7;">Track all enrolled cadets, their exam answers, progress, and graduate them when ready.</p>
-    <div id="admin-academy-list"></div>
-    <div style="background:#091220;border:1px solid rgba(232,64,64,0.15);padding:20px;margin-top:20px;">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#e84040;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:14px;">// Remove Cadet from Firestore</div>
-      <input id="clear-callsign-input" class="admin-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="width:100%;margin-bottom:10px;">
-      <button onclick="clearCadetSession()" class="admin-submit" style="background:#3a6080;">Remove Cadet</button>
+  <!-- ACADEMY -->
+  <div class="panel" id="panel-academy">
+    <div class="panel-tag">Intel</div>
+    <div class="panel-title">Academy Progress</div>
+    <p class="panel-sub">Track cadets, exam answers, progress, and graduate when ready.</p>
+    <div id="list-academy"></div>
+    <div class="form" style="margin-top:16px;">
+      <div class="form-title">// Remove Cadet from Firestore</div>
+      <input class="inp" id="clear-callsign-input" placeholder="ENTER CALLSIGN TO REMOVE" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:10px;width:100%;">
+      <button class="submit" style="background:#3a6080;" onclick="clearCadetSession()">Remove Cadet</button>
     </div>
   </div>
 
-</div><!-- /admin-content -->
+</div><!-- /content -->
+</div><!-- /app -->
 </div><!-- /page-admin -->
 
 <!-- ══ INSTRUCTOR PANEL PAGE ══ -->
@@ -2602,12 +2702,17 @@ function adminLogin() {
 }
 
 function openAdminPanel() {
-  document.getElementById('page-main').style.display = 'none';
-  document.getElementById('page-academy').style.display = 'none';
+  const pm = document.getElementById('page-main');
+  pm.style.display = 'none';
+  pm.style.visibility = 'hidden';
+  const pac = document.getElementById('page-academy');
+  pac.style.display = 'none';
+  pac.style.visibility = 'hidden';
   const pi = document.getElementById('page-instructor');
   if (pi) pi.style.display = 'none';
   const pa = document.getElementById('page-admin');
   pa.style.display = 'block';
+  pa.style.visibility = 'visible';
   pa.style.minHeight = '100vh';
   pa.style.background = '#04070f';
   window.scrollTo({ top: 0, behavior: 'instant' });
