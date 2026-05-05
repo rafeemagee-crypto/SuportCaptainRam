@@ -3734,24 +3734,8 @@ async function adminFsDelete(col, id) {
 
 // ── LOCAL DATA ──
 // ── TABS ──
-function adminShowTab(id) {
-  ['members','applications','events','instructors','announcements','academy'].forEach(t => {
-    document.getElementById('panel-' + t).classList.toggle('active', t === id);
-    document.getElementById('tab-' + t).classList.toggle('active', t === id);
-  });
-}
 
 // ── INIT ──
-function initAdminAll() {
-  initFirebase();
-  adminRenderMembers();
-  adminRenderApps();
-  adminRenderEvents();
-  adminRenderInsts();
-  adminRenderAnns();
-  adminRenderAcademy();
-  adminRenderAssign();
-}
 
 // ── MEMBERS ──
 
