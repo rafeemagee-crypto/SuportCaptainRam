@@ -1156,7 +1156,7 @@ textarea.inp { resize: vertical; min-height: 80px; font-family: 'Barlow', sans-s
         </div>
         <!-- Not signed in state -->
         <div id="rsi-dropdown-guest" style="padding:10px 6px;">
-          <button onclick="openSignupSignin();toggleRsiDropdown()" class="rsi-drop-btn">⬡ Signup / Sign In</button>
+          <button onclick="document.getElementById('signup-gate').style.display='flex';document.getElementById('ss-step-1').style.display='block';document.getElementById('ss-step-2').style.display='none';document.getElementById('ss-step-3').style.display='none';dropdownOpen=false;document.getElementById('rsi-dropdown').style.display='none';" class="rsi-drop-btn">⬡ Signup / Sign In</button>
         </div>
         <!-- Signed in state -->
         <div id="rsi-dropdown-member" style="display:none;padding:10px 6px;">
